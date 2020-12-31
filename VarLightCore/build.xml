@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="VarLightCore" default="master">
+
+    <property name="javac-debug" value="true"/>
+    <property name="javac-debug-level" value="source,vars,lines"/>
+    <property name="javac-source" value="8"/>
+    <property name="javac-target" value="8"/>
+
+    <property name="dist" location="dist"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="init" depends="clean">
+        <mkdir dir="build"/>
+        <mkdir dir="${dist}"/>
+    </target>
+
+    <target name="master" depends="init">
+        <echo message="Compiling with debug=${javac-debug} and debug-level=${javac-debug-level}"/>
+
+        <javac
+            srcdir="src"
+            destdir="build"
+            includeantruntime="false"
+            compiler="modern"
+            debug="${javac-debug}"
+            debuglevel="${javac-debug-level}"
+            source="${javac-source}"
+            target="${javac-target}">
+            <classpath>
+                <fileset dir="lib">
+                    <include name="**/annotations-17.0.0.jar"/>
+                    <include name="**/lombok-1.18.10.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+
+        <jar destfile="${dist}/VarLightCore-with-libs.jar" basedir="build">
+            <zipgroupfileset dir="lib">
+                <include name="annotations-17.0.0.jar"/>
+            </zipgroupfileset>
+        </jar>
+
+        <jar destfile="${dist}/VarLightCore.jar" basedir="build"/>
+    </target>
+</project>

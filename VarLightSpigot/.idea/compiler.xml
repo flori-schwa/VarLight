@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Lombok" enabled="true">
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/libraries/lombok-1.18.16.jar" />
+        </processorPath>
+        <module name="v1_16_R1" />
+        <module name="v1_12_R1" />
+        <module name="v1_15_R1" />
+        <module name="v1_16_R2" />
+        <module name="SpigotCore" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>

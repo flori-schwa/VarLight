@@ -1,0 +1,20 @@
+# VARLIGHT PLUGIN CONFIGURATION
+# Please refer to the wiki for more information: https://github.com/flori-schwa/VarLight/wiki
+
+lui: "glowstone_dust"
+autosave: -1
+check-permission: false
+whitelist: []
+blacklist: []
+nls-deflated: true
+stepsize:
+  gamemodes:
+    creative: true
+    survival: false
+    adventure: false
+reclaim: true
+logger:
+  verbose: false
+  debug: false
+check-update: true
+experimental-blocks: false
