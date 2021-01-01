@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SpigotCore/SpigotCore.iml" filepath="$PROJECT_DIR$/SpigotCore/SpigotCore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../VarLightCore/VarLightCore.iml" filepath="$PROJECT_DIR$/../VarLightCore/VarLightCore.iml" />
       <module fileurl="file://$PROJECT_DIR$/implementations/v1_12_R1/v1_12_R1.iml" filepath="$PROJECT_DIR$/implementations/v1_12_R1/v1_12_R1.iml" />
       <module fileurl="file://$PROJECT_DIR$/implementations/v1_15_R1/v1_15_R1.iml" filepath="$PROJECT_DIR$/implementations/v1_15_R1/v1_15_R1.iml" />
       <module fileurl="file://$PROJECT_DIR$/implementations/v1_16_R1/v1_16_R1.iml" filepath="$PROJECT_DIR$/implementations/v1_16_R1/v1_16_R1.iml" />

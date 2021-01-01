@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.requireNonNull;
+
 public class NamespacedID {
 
     private static final Pattern NAMESPACE_PATTERN = Pattern.compile("[0-9a-z_\\-\\.]+");
@@ -29,8 +31,12 @@ public class NamespacedID {
         return new NamespacedID("varlight", name);
     }
 
+    public static NamespacedID fromBukkit(NamespacedKey key) {
+        return new NamespacedID(key.getNamespace(), key.getKey());
+    }
+
     public NamespacedID(@NotNull String fullKey) {
-        Objects.requireNonNull(fullKey, "fullKey may not be null");
+        requireNonNull(fullKey, "fullKey may not be null");
 
         if (fullKey.contains(":")) {
             String[] parts = fullKey.split(":", 2);
@@ -59,10 +65,19 @@ public class NamespacedID {
     }
 
     public NamespacedID(@NotNull String namespace, @NotNull String name) {
-        this.namespace = Objects.requireNonNull(namespace, "Namespace may not be null");
-        this.name = Objects.requireNonNull(name, "Name may not be null");
+        this.namespace = requireNonNull(namespace, "Namespace may not be null");
+        this.name = requireNonNull(name, "Name may not be null");
+
+        if (!isLegalNamespace(namespace)) {
+            throw new IllegalArgumentException(String.format("%s is an illegal Namespace", namespace));
+        }
+
+        if (!isLegalName(name)) {
+            throw new IllegalArgumentException(String.format("%s is an illegal Name", name));
+        }
     }
 
+    @SuppressWarnings("Deprecation")
     public NamespacedKey toBukkitKey() {
         return new NamespacedKey(this.namespace, this.name);
     }

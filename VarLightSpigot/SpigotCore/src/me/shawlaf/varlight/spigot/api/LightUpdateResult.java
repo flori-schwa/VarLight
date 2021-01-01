@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 public class LightUpdateResult {
 
@@ -42,11 +42,11 @@ public class LightUpdateResult {
     }
 
     public static LightUpdateResult notActive(int fromLight, int toLight, @NotNull VarLightNotActiveException exception) {
-        return new LightUpdateResult(LightUpdateResultType.CANCELLED, fromLight, toLight, Objects.requireNonNull(exception));
+        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, requireNonNull(exception, "Must provide a VarLightNotActiveException for NOT_ACTIVE Result"));
     }
 
     private LightUpdateResult(@NotNull LightUpdateResultType resultType, int fromLight, int toLight, @Nullable VarLightNotActiveException exception) {
-        this.resultType = Objects.requireNonNull(resultType, "resultType may not be null");
+        this.resultType = requireNonNull(resultType, "resultType may not be null");
         this.fromLight = fromLight;
         this.toLight = toLight;
         this.exception = exception;
@@ -69,14 +69,14 @@ public class LightUpdateResult {
             case UPDATED:
                 return String.format("Updated Light level to %d", toLight);
             case NOT_ACTIVE:
-                return Objects.requireNonNull(exception).getMessage();
+                return requireNonNull(exception).getMessage();
             default:
                 throw new IllegalStateException(String.format("Reached default block (%s)", resultType.toString()));
         }
     }
 
     public void displayMessage(@NotNull CommandSender sender) {
-        Objects.requireNonNull(sender);
+        requireNonNull(sender);
 
         String message = getMessage();
 

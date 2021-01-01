@@ -99,6 +99,14 @@ public class NLSFile {
         }
     }
 
+    public static File getFile(File parent, RegionCoords regionCoords) {
+        return getFile(parent, regionCoords.x, regionCoords.z);
+    }
+
+    public static File getFile(File parent, int regionX, int regionZ) {
+        return new File(parent, String.format(FILE_NAME_FORMAT, regionX, regionZ));
+    }
+
     public static NLSFile newFile(@NotNull File file, int regionX, int regionZ) {
         return new NLSFile(file, regionX, regionZ, true);
     }
