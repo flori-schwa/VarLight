@@ -1,11 +1,13 @@
 package me.shawlaf.varlight.spigot.persistence;
 
 import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.persistence.LightPersistFailedException;
 import me.shawlaf.varlight.persistence.nls.NLSFile;
 import me.shawlaf.varlight.persistence.nls.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
+import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import me.shawlaf.varlight.util.RegionCoords;
@@ -22,8 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntSupplier;
 
-import static me.shawlaf.varlight.spigot.util.IntPositionExtension.toIntPosition;
-
+@ExtensionMethod({
+        IntPositionExtension.class
+})
 public class WorldLightPersistence {
 
     @Getter
@@ -65,7 +68,7 @@ public class WorldLightPersistence {
     }
 
     public void setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException {
-        setCustomLuminance(toIntPosition(location), luminance);
+        setCustomLuminance(location.toIntPosition(), luminance);
     }
 
     public void setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException {

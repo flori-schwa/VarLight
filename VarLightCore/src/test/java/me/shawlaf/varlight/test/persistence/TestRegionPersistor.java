@@ -22,15 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRegionPersistor {
 
-    private File tempDir;
-
-    @BeforeEach
-    public void initTempDir(@TempDir File tempDir) {
-        this.tempDir = tempDir;
-    }
-
     @Test
-    public void testIsNotDirectory() {
+    public void testIsNotDirectory(@TempDir File tempDir) {
         File notDirectory = new File(tempDir, "test");
 
         try {
@@ -43,7 +36,7 @@ public class TestRegionPersistor {
     }
 
     @Test
-    public void testFileNotExist() {
+    public void testFileNotExist(@TempDir File tempDir) {
         class Test {
             public Test(int rx, int rz) throws IOException {
                 RegionPersistorBasic persistorBasic = new RegionPersistorBasic(tempDir, rx, rz);
@@ -71,7 +64,7 @@ public class TestRegionPersistor {
     }
 
     @Test
-    public void testFileExists() {
+    public void testFileExists(@TempDir File tempDir) {
         class Test {
             public Test(int rx, int rz) throws IOException {
                 File testFile = new File(tempDir, String.format(VLDBFile.FILE_NAME_FORMAT, rx, rz));

@@ -1,9 +1,11 @@
 package me.shawlaf.varlight.spigot.api;
 
+import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,14 +17,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static me.shawlaf.varlight.spigot.util.IntPositionExtension.toIntPosition;
 
 // TODO document
+@ExtensionMethod({
+        Objects.class,
+        IntPositionExtension.class
+})
 public class VarLightAPI {
 
     public static VarLightAPI getAPI() {
@@ -43,7 +48,7 @@ public class VarLightAPI {
     }
 
     public WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
-        requireNonNull(world, "World may not be null");
+        world.requireNonNull("World may not be null");
 
         WorldLightPersistence wlp = persistenceManagers.get(world.getUID());
 
@@ -60,11 +65,11 @@ public class VarLightAPI {
     }
 
     public int getCustomLuminance(@NotNull Location location) {
-        requireNonNull(location, "Location may not be null");
-        requireNonNull(location.getWorld(), "Location must have an associated world");
+        location.requireNonNull("Location may not be null");
+        location.getWorld().requireNonNull("Location must have an associated world");
 
         try {
-            return requireVarLightEnabled(location.getWorld()).getCustomLuminance(toIntPosition(location), 0);
+            return requireVarLightEnabled(location.getWorld()).getCustomLuminance(location.toIntPosition(), 0);
         } catch (VarLightNotActiveException exception) {
             return 0;
         }
@@ -80,8 +85,8 @@ public class VarLightAPI {
 
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance) {
-        requireNonNull(location, "Location may not be null");
-        requireNonNull(location.getWorld(), "Location must have an associated world");
+        location.requireNonNull("Location may not be null");
+        location.getWorld().requireNonNull("Location must have an associated world");
 
         int fromLight = location.getBlock().getLightFromBlocks();
 
@@ -97,7 +102,7 @@ public class VarLightAPI {
             return completedFuture(LightUpdateResult.invalidBlock(fromLight, customLuminance));
         }
 
-        IntPosition position = toIntPosition(location);
+        IntPosition position = location.toIntPosition();
         World world = location.getWorld();
 
         WorldLightPersistence wlp;

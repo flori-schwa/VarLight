@@ -112,6 +112,4 @@ hs_err_pid*
 
 /build
 /dist
-/test-servers
-/VarLight.wiki
-/brigadier
+/libraries

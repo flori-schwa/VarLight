@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.spigot.api;
 
 import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -9,8 +10,11 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static java.util.Objects.requireNonNull;
+import java.util.Objects;
 
+@ExtensionMethod({
+        Objects.class
+})
 public class LightUpdateResult {
 
     @NotNull
@@ -42,11 +46,11 @@ public class LightUpdateResult {
     }
 
     public static LightUpdateResult notActive(int fromLight, int toLight, @NotNull VarLightNotActiveException exception) {
-        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, requireNonNull(exception, "Must provide a VarLightNotActiveException for NOT_ACTIVE Result"));
+        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, exception.requireNonNull("Must provide a VarLightNotActiveException for NOT_ACTIVE Result"));
     }
 
     private LightUpdateResult(@NotNull LightUpdateResultType resultType, int fromLight, int toLight, @Nullable VarLightNotActiveException exception) {
-        this.resultType = requireNonNull(resultType, "resultType may not be null");
+        this.resultType = resultType.requireNonNull("resultType may not be null");
         this.fromLight = fromLight;
         this.toLight = toLight;
         this.exception = exception;
@@ -69,14 +73,14 @@ public class LightUpdateResult {
             case UPDATED:
                 return String.format("Updated Light level to %d", toLight);
             case NOT_ACTIVE:
-                return requireNonNull(exception).getMessage();
+                return exception.requireNonNull().getMessage();
             default:
                 throw new IllegalStateException(String.format("Reached default block (%s)", resultType.toString()));
         }
     }
 
     public void displayMessage(@NotNull CommandSender sender) {
-        requireNonNull(sender);
+        sender.requireNonNull();
 
         String message = getMessage();
 
