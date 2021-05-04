@@ -1,4 +1,7 @@
 pipeline {
+
+    agent 'any'
+
     tools {
         ant "ant-1.10.10"
         maven "maven-3.6.3"
