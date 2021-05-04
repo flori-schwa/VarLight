@@ -58,7 +58,7 @@ pipeline {
         }
 
         always {
-            recordIssues(tools: [java(), mavenConsole()])
+            recordIssues(tools: [java(), mavenConsole(), junitParser(pattern: 'VarLightCore/target/**/*.xml')])
         }
     }
 }
