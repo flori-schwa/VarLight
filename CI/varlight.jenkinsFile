@@ -1,0 +1,60 @@
+pipeline {
+    tools {
+        ant "ant-1.10.10"
+        maven "maven-3.6.3"
+    }
+
+    parameters {
+        string(name: 'VERSION')
+    }
+
+    stages {
+
+        stage("Prepare") {
+            steps {
+                dir("VarLightSpigot") {
+                    mkdir(dir:"libraries")
+                }
+            }
+        }
+
+        stage("Build Core") {
+            steps {
+                dir("VarLightCore") {
+                    sh "mvn -B clean package"
+                }
+            }
+        }
+
+        stage("Build Plugin") {
+            steps {
+                dir("VarLightSpigot/libraries") {
+                    copyArtifacts(projectName: 'Spigot 1.16.5')
+                    copyArtifacts(projectName: 'Spigot 1.16.1')
+                    copyArtifacts(projectName: 'Spigot 1.15.2')
+                    copyArtifacts(projectName: 'Spigot 1.12.2')
+
+                    sh "wget https://repo1.maven.org/maven2/org/jetbrains/annotations/20.1.0/annotations-20.1.0.jar"
+                    sh "wget https://repo1.maven.org/maven2/org/jooq/joor-java-8/0.9.13/joor-java-8-0.9.13.jar"
+                    sh "wget https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar"
+                    sh "wget https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-bukkit/7.1.0/worldedit-bukkit-7.1.0.jar"
+                    sh "wget https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-bukkit/7.0.2/worldguard-bukkit-7.0.2.jar"
+                }
+                
+                dir ("VarLightSpigot") {
+                    sh "ant -Dplugin.version=${VERSION}"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: 'VarLightSpigot/dist/*.jar', fingerprint: true, followSymlinks: false
+        }
+
+        always {
+            recordIssues(tools: [java(), mavenConsole()])
+        }
+    }
+}
