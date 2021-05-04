@@ -16,7 +16,7 @@ pipeline {
         stage("Prepare") {
             steps {
                 dir("VarLightSpigot") {
-                    mkdir(dir:"libraries")
+                    sh "mkdir libraries"
                 }
             }
         }
