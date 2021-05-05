@@ -8,10 +8,25 @@ pipeline {
     }
 
     parameters {
+        booleanParam(name: 'DRY_RUN', defaultValue: false)
         string(name: 'VERSION', defaultValue: '')
     }
 
+    triggers {
+        cron('H 0 3 * * *') // Start Nightly after Spigot Builds
+    }
+
     stages {
+
+        stage('Dry Run') {
+            when {
+                expression { params.DRY_RUN }
+            }
+
+            steps {
+                error('Dry Run complete')
+            }
+        }
 
         stage("Prepare") {
             steps {
