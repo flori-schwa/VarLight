@@ -13,7 +13,7 @@ pipeline {
     }
 
     triggers {
-        cron('H 0 3 * * *') // Start Nightly after Spigot Builds
+        cron('H 0 3 * *') // Start Nightly after Spigot Builds
     }
 
     stages {
