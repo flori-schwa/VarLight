@@ -50,12 +50,12 @@ pipeline {
                         def version;
 
                         if (params.VERSION == null) {
-                            version = "dev-{BUILD_NUMBER}"
+                            version = "dev-${BUILD_NUMBER}"
                         } else {
                             version = params.VERSION
                         }
 
-                        sh "ant -Dplugin.version=${version}"
+                        sh "ant -Dplugin.version=$version"
                     }
                 }
             }
