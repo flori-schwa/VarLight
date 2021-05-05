@@ -8,7 +8,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'VERSION')
+        string(name: 'VERSION', defaultValue: null)
     }
 
     stages {
@@ -46,7 +46,17 @@ pipeline {
                 }
                 
                 dir ("VarLightSpigot") {
-                    sh "ant -Dplugin.version=${VERSION}"
+                    script {
+                        def version;
+
+                        if (params.VERSION == null) {
+                            version = "dev-{BUILD_NUMBER}"
+                        } else {
+                            version = params.VERSION
+                        }
+
+                        sh "ant -Dplugin.version=${version}"
+                    }
                 }
             }
         }
