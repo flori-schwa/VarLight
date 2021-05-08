@@ -1,8 +1,12 @@
 package me.shawlaf.varlight.spigot.api;
 
+import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
+import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
+import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
+import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
@@ -43,8 +47,17 @@ public class VarLightAPI {
     private final VarLightPlugin plugin;
     private final Map<UUID, WorldLightPersistence> persistenceManagers = new HashMap<>();
 
+    @Getter
+    private final AbstractBukkitExecutor syncExecutor;
+
+    @Getter
+    private final AbstractBukkitExecutor asyncExecutor;
+
     public VarLightAPI(VarLightPlugin plugin) {
         this.plugin = plugin;
+
+        this.syncExecutor = new BukkitSyncExecutorService(plugin);
+        this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
     }
 
     public WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
