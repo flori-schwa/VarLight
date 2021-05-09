@@ -12,16 +12,24 @@ public class Ticks {
         this.ticks = ticks;
     }
 
+    public static long calculate(long n, TimeUnit timeUnit) {
+        return timeUnit.toSeconds(n) * 20L;
+    }
+
+    public static long calculate(Duration duration) {
+        return duration.getSeconds() * 20L;
+    }
+
     public static Ticks of(long nTicks) {
         return new Ticks(nTicks);
     }
 
     public static Ticks of(long n, TimeUnit timeUnit) {
-        return new Ticks(timeUnit.toSeconds(n) * 20L);
+        return new Ticks(calculate(n, timeUnit));
     }
 
     public static Ticks of(Duration duration) {
-        return new Ticks(duration.getSeconds() * 20L);
+        return new Ticks(calculate(duration));
     }
 
     @Override

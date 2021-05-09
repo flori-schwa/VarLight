@@ -11,6 +11,7 @@ import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import me.shawlaf.varlight.util.RegionCoords;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -73,6 +74,10 @@ public class WorldLightPersistence {
 
     public void setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException {
         getNLSFile(position.toRegionCoords()).setCustomLuminance(position, luminance);
+    }
+
+    public void runAutosave() {
+        save(Bukkit.getConsoleSender(), plugin.getVarLightConfig().isLogVerbose());
     }
 
     public void save(CommandSender commandSender, boolean log) {

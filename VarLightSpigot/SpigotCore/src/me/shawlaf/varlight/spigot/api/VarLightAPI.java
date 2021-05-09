@@ -8,6 +8,7 @@ import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.IntPosition;
@@ -53,14 +54,18 @@ public class VarLightAPI {
     @Getter
     private final AbstractBukkitExecutor asyncExecutor;
 
+    @Getter
+    private final Autosave autosaveHandler;
+
     public VarLightAPI(VarLightPlugin plugin) {
         this.plugin = plugin;
 
         this.syncExecutor = new BukkitSyncExecutorService(plugin);
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
+        this.autosaveHandler = new Autosave(plugin);
     }
 
-    public WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
+    public @NotNull WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
         world.requireNonNull("World may not be null");
 
         WorldLightPersistence wlp = persistenceManagers.get(world.getUID());
