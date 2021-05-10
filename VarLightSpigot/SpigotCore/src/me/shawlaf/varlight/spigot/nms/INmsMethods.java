@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -53,11 +54,17 @@ public interface INmsMethods {
      * @param namespacedID The Namespaced ID
      * @return The associated Material, or null if none found
      */
-    @Nullable Material getItem(@NotNull NamespacedID namespacedID);
+    @Nullable Material getItemFromKey(@NotNull NamespacedID namespacedID);
+
+    @Nullable Material getBlockFromKey(@NotNull NamespacedID namespacedID);
 
     @NotNull default NamespacedID getKey(@NotNull Material material) {
         return NamespacedID.fromBukkit(getBukkitKey(material));
     }
+
+    @NotNull Collection<NamespacedID> getAllMinecraftBlockKeys();
+
+    @NotNull Collection<NamespacedID> getAllMinecraftItemKeys();
 
     /**
      * Determines and creates (if not present) the directory where NLS Files are to be saved for the specified {@link World}.

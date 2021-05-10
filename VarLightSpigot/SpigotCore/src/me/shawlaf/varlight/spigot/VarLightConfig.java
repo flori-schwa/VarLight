@@ -66,11 +66,11 @@ public class VarLightConfig {
         save();
     }
 
-    public Material getLightUpdateItem() {
+    public Material loadLightUpdateItem() {
         String glowstoneDust = plugin.getNmsAdapter().getKey(Material.GLOWSTONE_DUST).toString().toLowerCase();
         String configMaterial = plugin.getConfig().getString(CONFIG_KEY_VARLIGHT_ITEM, glowstoneDust);
 
-        Material material = plugin.getNmsAdapter().getItem(new NamespacedID(configMaterial));
+        Material material = plugin.getNmsAdapter().getItemFromKey(new NamespacedID(configMaterial));
 
         if (material == null) {
             plugin.getLogger().warning(String.format("Could not find a Material with the given name \"%s\", defaulting to \"%s\"", configMaterial, glowstoneDust));

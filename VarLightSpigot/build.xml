@@ -81,7 +81,7 @@
             <classpath>
                 <fileset dir="${libraries}">
                     <include name="**/${lib-lombok}"/>
-                    <include name="**/${lib-spigot-1.12.2}"/>
+                    <include name="**/${lib-spigot-1.16.5}"/> <!-- TODO: Switch back to using 1.12.2 and include brigadier in final JAR -->
                     <include name="**/${lib-worldedit}"/>
                     <include name="**/${lib-worldguard}"/>
                     <include name="**/${lib-varlight-core}"/>

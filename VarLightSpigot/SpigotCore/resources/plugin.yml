@@ -8,7 +8,6 @@ load: STARTUP
 
 softdepend:
   - "Multiverse-Core"
-  - "LightAPI"
   - "WorldEdit"
   - "WorldGuard"
 

@@ -14,8 +14,6 @@ public class VarLightPlugin extends JavaPlugin {
 
     /*
         TODO
-         - Autosave
-         - Light Update Item
          - Check for WorldGuard and WorldEdit
          - Commands
          - Maybe Version Check?
@@ -68,8 +66,8 @@ public class VarLightPlugin extends JavaPlugin {
             return;
         }
 
-        this.api = new VarLightAPI(this);
         this.varLightConfig = new VarLightConfig(this);
+        this.api = new VarLightAPI(this);
     }
 
     @Override
@@ -95,6 +93,10 @@ public class VarLightPlugin extends JavaPlugin {
         getLogger().severe(sep);
 
         doLoad = false;
+    }
+
+    public void reload() {
+        // TODO implement
     }
 
     // endregion

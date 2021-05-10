@@ -3,6 +3,7 @@ package me.shawlaf.varlight.spigot.api;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.LightUpdateFailedException;
+import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
@@ -14,6 +15,7 @@ import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -57,12 +59,17 @@ public class VarLightAPI {
     @Getter
     private final Autosave autosaveHandler;
 
+    @Getter
+    private Material lightUpdateItem;
+
     public VarLightAPI(VarLightPlugin plugin) {
         this.plugin = plugin;
 
         this.syncExecutor = new BukkitSyncExecutorService(plugin);
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
         this.autosaveHandler = new Autosave(plugin);
+
+        loadLightUpdateItem();
     }
 
     public @NotNull WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
@@ -101,6 +108,17 @@ public class VarLightAPI {
         });
     }
 
+    public void setLightUpdateItem(Material item) {
+        if (item == null) {
+            item = Material.GLOWSTONE_DUST;
+        }
+
+        plugin.getConfig().set(VarLightConfig.CONFIG_KEY_VARLIGHT_ITEM, item.getKey().toString());
+        plugin.saveConfig();
+
+        loadLightUpdateItem();
+    }
+
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance) {
         location.requireNonNull("Location may not be null");
@@ -126,6 +144,7 @@ public class VarLightAPI {
         WorldLightPersistence wlp;
 
         try {
+            // noinspection ConstantConditions NotNull for world Already checked at the beginning of the Method
             wlp = requireVarLightEnabled(world);
         } catch (VarLightNotActiveException e) {
             return completedFuture(LightUpdateResult.notActive(fromLight, customLuminance, e));
@@ -137,7 +156,7 @@ public class VarLightAPI {
 
         wlp.setCustomLuminance(position, customLuminance);
 
-        return CompletableFuture.supplyAsync(() -> { // TODO use Bukkit executor
+        return asyncExecutor.submit(() -> {
             try {
                 plugin.getLightUpdater().updateLightServer(world, position).join();
                 plugin.getLightUpdater().updateLightClient(world, position.toChunkCoords());
@@ -148,4 +167,13 @@ public class VarLightAPI {
             }
         });
     }
+
+    // region Internals
+
+    private void loadLightUpdateItem() {
+        this.lightUpdateItem = plugin.getVarLightConfig().loadLightUpdateItem();
+        plugin.getLogger().info(String.format("Using \"%s\" as the Light Update Item", lightUpdateItem.getKey()));
+    }
+
+    // endregion
 }
