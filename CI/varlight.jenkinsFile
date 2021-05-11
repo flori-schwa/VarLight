@@ -11,8 +11,8 @@ pipeline {
         booleanParam(name: 'DRY_RUN', defaultValue: false)
         string(name: 'VERSION', defaultValue: '')
 
-        string(name: 'WORLD_EDIT_VERSION', defaultValue: '7.1.0')
-        string(name: 'WORLD_GUARD_VERSION', defaultValue: '7.0.2')
+        string(name: 'WORLD_EDIT_VERSION', defaultValue: '7.2.5')
+        string(name: 'WORLD_GUARD_VERSION', defaultValue: '7.0.4')
         string(name: 'ANNOTATIONS_VERSION', defaultValue: '20.1.0')
         string(name: 'JOOR_JAVA_8_VERSION', defaultValue: '0.9.13')
         string(name: 'LOMBOK_VERSION', defaultValue: '1.18.20')
