@@ -23,8 +23,9 @@ pipeline {
         JOOR_FILE = "joor-java-8-${JOOR_JAVA_8_VERSION}.jar"
         LOMBOK_FILE = "lombok-${LOMBOK_VERSION}.jar"
         WORLD_EDIT_FILE = "worldedit-bukkit-${params.WORLD_EDIT_VERSION}.jar"
+        WORLD_EDIT_CORE_FILE = "worldedit-core-${params.WORLD_EDIT_VERSION}.jar"
         WORLD_GUARD_FILE = "worldguard-bukkit-${params.WORLD_GUARD_VERSION}.jar"
-
+        WORLD_GUARD_CORE_FILE = "worldguard-core-${params.WORLD_GUARD_VERSION}.jar"
     }
 
     triggers {
@@ -68,11 +69,7 @@ pipeline {
                     copyArtifacts(projectName: 'Spigot 1.15.2')
                     copyArtifacts(projectName: 'Spigot 1.12.2')
 
-                    sh "curl https://repo1.maven.org/maven2/org/jetbrains/annotations/${params.ANNOTATIONS_VERSION}/${env.ANNOTATIONS_FILE} > ${env.ANNOTATIONS_FILE}"
-                    sh "curl https://repo1.maven.org/maven2/org/jooq/joor-java-8/${params.JOOR_JAVA_8_VERSION}/${env.JOOR_FILE} > ${env.JOOR_FILE}"
-                    sh "curl https://repo1.maven.org/maven2/org/projectlombok/lombok/${params.LOMBOK_VERSION}/${env.LOMBOK_FILE} > ${env.LOMBOK_FILE}"                
-                    sh "curl https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-bukkit/${params.WORLD_EDIT_VERSION}/${env.WORLD_EDIT_FILE} > ${env.WORLD_EDIT_FILE}"
-                    sh "curl https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-bukkit/${params.WORLD_GUARD_VERSION}/${env.WORLD_GUARD_FILE} > ${env.WORLD_GUARD_FILE}"
+                    sh "ant -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djoor-java-8-version=${params.JOOR_JAVA_8_VERSION} -Dlombok-version=${params.LOMBOK_VERSION} -Dworldedit-version=${params.WORLD_EDIT_VERSION} -Dworldguard-version=${params.WORLD_GUARD_VERSION} download-libs"
                 }
                 
                 dir ("VarLightSpigot") {
@@ -85,7 +82,7 @@ pipeline {
                             version = params.VERSION
                         }
 
-                        sh "ant -Dplugin.version=$version -Dlib-annotations=${env.ANNOTATIONS_FILE} -Dlib-joor=${env.JOOR_FILE} -Dlib-lombok=${env.LOMBOK_FILE} -Dlib-worldedit=${env.WORLD_EDIT_FILE} -Dlib-worldguard=${env.WORLD_GUARD_FILE}"
+                        sh "ant -Dplugin.version=$version -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djoor-java-8-version=${params.JOOR_JAVA_8_VERSION} -Dlombok-version=${params.LOMBOK_VERSION} -Dworldedit-version=${params.WORLD_EDIT_VERSION} -Dworldguard-version=${params.WORLD_GUARD_VERSION}"
                     }
                 }
             }
