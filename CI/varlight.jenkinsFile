@@ -58,11 +58,11 @@ pipeline {
                     copyArtifacts(projectName: 'Spigot 1.16.1')
                     copyArtifacts(projectName: 'Spigot 1.15.2')
                     copyArtifacts(projectName: 'Spigot 1.12.2')
-
-                    sh "ant -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djoor-java-8-version=${params.JOOR_JAVA_8_VERSION} -Dlombok-version=${params.LOMBOK_VERSION} -Dworldedit-version=${params.WORLD_EDIT_VERSION} -Dworldguard-version=${params.WORLD_GUARD_VERSION} download-libs"
                 }
                 
                 dir ("VarLightSpigot") {
+                    sh "ant -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djoor-java-8-version=${params.JOOR_JAVA_8_VERSION} -Dlombok-version=${params.LOMBOK_VERSION} -Dworldedit-version=${params.WORLD_EDIT_VERSION} -Dworldguard-version=${params.WORLD_GUARD_VERSION} download-libs"
+
                     script {
                         def version;
 
