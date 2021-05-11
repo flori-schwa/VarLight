@@ -10,6 +10,21 @@ pipeline {
     parameters {
         booleanParam(name: 'DRY_RUN', defaultValue: false)
         string(name: 'VERSION', defaultValue: '')
+
+        string(name: 'WORLD_EDIT_VERSION', defaultValue: '7.1.0')
+        string(name: 'WORLD_GUARD_VERSION', defaultValue: '7.0.2')
+        string(name: 'ANNOTATIONS_VERSION', defaultValue: '20.1.0')
+        string(name: 'JOOR_JAVA_8_VERSION', defaultValue: '0.9.13')
+        string(name: 'LOMBOK_VERSION', defaultValue: '1.18.20')
+    }
+
+    environment {
+        ANNOTATIONS_FILE = "annotations-${params.ANNOTATIONS_VERSION}.jar"
+        JOOR_FILE = "joor-java-8-${JOOR_JAVA_8_VERSION}.jar"
+        LOMBOK_FILE = "lombok-${LOMBOK_VERSION}.jar"
+        WORLD_EDIT_FILE = "worldedit-bukkit-${params.WORLD_EDIT_VERSION}.jar"
+        WORLD_GUARD_FILE = "worldguard-bukkit-${params.WORLD_GUARD_VERSION}.jar"
+
     }
 
     triggers {
@@ -53,11 +68,11 @@ pipeline {
                     copyArtifacts(projectName: 'Spigot 1.15.2')
                     copyArtifacts(projectName: 'Spigot 1.12.2')
 
-                    sh "wget https://repo1.maven.org/maven2/org/jetbrains/annotations/20.1.0/annotations-20.1.0.jar"
-                    sh "wget https://repo1.maven.org/maven2/org/jooq/joor-java-8/0.9.13/joor-java-8-0.9.13.jar"
-                    sh "wget https://repo1.maven.org/maven2/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar"
-                    sh "wget https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-bukkit/7.1.0/worldedit-bukkit-7.1.0.jar"
-                    sh "wget https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-bukkit/7.0.2/worldguard-bukkit-7.0.2.jar"
+                    sh "curl https://repo1.maven.org/maven2/org/jetbrains/annotations/${params.ANNOTATIONS_VERSION}/${env.ANNOTATIONS_FILE} > ${env.ANNOTATIONS_FILE}"
+                    sh "curl https://repo1.maven.org/maven2/org/jooq/joor-java-8/${params.JOOR_JAVA_8_VERSION}/${env.JOOR_FILE} > ${env.JOOR_FILE}"
+                    sh "curl https://repo1.maven.org/maven2/org/projectlombok/lombok/${params.LOMBOK_VERSION}/${env.LOMBOK_FILE} > ${env.LOMBOK_FILE}"                
+                    sh "curl https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-bukkit/${params.WORLD_EDIT_VERSION}/${env.WORLD_EDIT_FILE} > ${env.WORLD_EDIT_FILE}"
+                    sh "curl https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-bukkit/${params.WORLD_GUARD_VERSION}/${env.WORLD_GUARD_FILE} > ${env.WORLD_GUARD_FILE}"
                 }
                 
                 dir ("VarLightSpigot") {
@@ -70,7 +85,7 @@ pipeline {
                             version = params.VERSION
                         }
 
-                        sh "ant -Dplugin.version=$version"
+                        sh "ant -Dplugin.version=$version -Dlib-annotations=${env.ANNOTATIONS_FILE} -Dlib-joor=${env.JOOR_FILE} -Dlib-lombok=${env.LOMBOK_FILE} -Dlib-worldedit=${env.WORLD_EDIT_FILE} -Dlib-worldguard=${env.WORLD_GUARD_FILE}"
                     }
                 }
             }
