@@ -18,16 +18,6 @@ pipeline {
         string(name: 'LOMBOK_VERSION', defaultValue: '1.18.20')
     }
 
-    environment {
-        ANNOTATIONS_FILE = "annotations-${params.ANNOTATIONS_VERSION}.jar"
-        JOOR_FILE = "joor-java-8-${JOOR_JAVA_8_VERSION}.jar"
-        LOMBOK_FILE = "lombok-${LOMBOK_VERSION}.jar"
-        WORLD_EDIT_FILE = "worldedit-bukkit-${params.WORLD_EDIT_VERSION}.jar"
-        WORLD_EDIT_CORE_FILE = "worldedit-core-${params.WORLD_EDIT_VERSION}.jar"
-        WORLD_GUARD_FILE = "worldguard-bukkit-${params.WORLD_GUARD_VERSION}.jar"
-        WORLD_GUARD_CORE_FILE = "worldguard-core-${params.WORLD_GUARD_VERSION}.jar"
-    }
-
     triggers {
         cron('H 3 * * *') // Start Nightly after Spigot Builds
     }
