@@ -47,7 +47,7 @@ pipeline {
         stage("Build Core") {
             steps {
                 dir("VarLightCore") {
-                    sh "mvn -B clean package \"-Dlombok-version=${params.LOMBOK_VERSION} -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djunit-version=${params.JUNIT_VERSION}\""
+                    sh "mvn -B clean package -Dlombok-version=${params.LOMBOK_VERSION} -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djunit-version=${params.JUNIT_VERSION}"
                 }
             }
         }
