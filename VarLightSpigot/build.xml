@@ -26,7 +26,7 @@
     <property name="joor-java-8-version" value="0.9.13"/> 
     <property name="lombok-version" value="1.18.20"/> 
     <property name="worldedit-version" value="7.2.5"/> 
-    <property name="worldguard-version" value="7.0.4"/> 
+    <property name="worldguard-version" value="7.0.4"/>
 
     <property name="lib-annotations" value="annotations-${annotations-version}.jar"/>
     <property name="lib-joor" value="joor-java-8-${joor-java-8-version}.jar"/>

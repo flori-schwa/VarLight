@@ -8,24 +8,30 @@
     <artifactId>VarLightCommons</artifactId>
     <version>0.0.1</version>
 
+    <properties>
+        <lombok-version>1.18.20</lombok-version>
+        <annotations-version>20.1.0</annotations-version>
+        <junit-version>5.7.1</junit-version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
+            <version>${lombok-version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>${annotations-version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.7.1</version>
+            <version>${junit-version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -42,7 +48,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.18</version>
+                            <version>${lombok-version}</version>
                         </path>
                     </annotationProcessorPaths>
 

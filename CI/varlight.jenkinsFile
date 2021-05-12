@@ -16,6 +16,7 @@ pipeline {
         string(name: 'ANNOTATIONS_VERSION', defaultValue: '20.1.0')
         string(name: 'JOOR_JAVA_8_VERSION', defaultValue: '0.9.13')
         string(name: 'LOMBOK_VERSION', defaultValue: '1.18.20')
+        string(name: 'JUNIT_VERSION', defaultValue: '5.7.1')
     }
 
     triggers {
@@ -46,7 +47,7 @@ pipeline {
         stage("Build Core") {
             steps {
                 dir("VarLightCore") {
-                    sh "mvn -B clean package"
+                    sh "mvn -B clean package \"-Dlombok-version=${params.LOMBOK_VERSION} -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djunit-version=${params.JUNIT_VERSION}\""
                 }
             }
         }
