@@ -8,6 +8,7 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
+import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
@@ -152,16 +153,21 @@ public class VarLightAPI {
 
         int finalFromLight = wlp.getCustomLuminance(position, 0);
 
-        // TODO call Light update event
+        final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(location.getBlock(), finalFromLight, customLuminance);
+        Bukkit.getPluginManager().callEvent(updateEvent);
 
-        wlp.setCustomLuminance(position, customLuminance);
+        if (updateEvent.isCancelled()) {
+            return completedFuture(LightUpdateResult.cancelled(updateEvent.getFromLight(), updateEvent.getToLight()));
+        }
+
+        wlp.setCustomLuminance(position, updateEvent.getToLight());
 
         return asyncExecutor.submit(() -> {
             try {
                 plugin.getLightUpdater().updateLightServer(world, position).join();
                 plugin.getLightUpdater().updateLightClient(world, position.toChunkCoords());
 
-                return LightUpdateResult.updated(finalFromLight, customLuminance);
+                return LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());
             } catch (VarLightNotActiveException exception) {
                 throw new LightUpdateFailedException(exception);
             }
