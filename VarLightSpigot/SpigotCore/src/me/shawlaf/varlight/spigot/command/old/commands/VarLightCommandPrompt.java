@@ -21,8 +21,7 @@ public class VarLightCommandPrompt extends VarLightSubCommand {
 
         node.then(
                 literalArgument("confirm").executes(c -> {
-                    // TODO Implement Chat Prompts
-//                    plugin.getChatPromptManager().confirmPrompt(c.getSource());
+                    plugin.getApi().getChatPromptManager().confirmPrompt(c.getSource());
 
                     return VarLightCommand.SUCCESS;
                 })
@@ -30,8 +29,7 @@ public class VarLightCommandPrompt extends VarLightSubCommand {
 
         node.then(
                 literalArgument("cancel").executes(c -> {
-                    // TODO Implement Char Prompts
-//                    plugin.getChatPromptManager().cancelPrompt(c.getSource());
+                    plugin.getApi().getChatPromptManager().cancelPrompt(c.getSource());
 
                     return VarLightCommand.SUCCESS;
                 })

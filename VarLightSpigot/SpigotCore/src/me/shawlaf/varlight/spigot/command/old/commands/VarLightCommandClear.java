@@ -4,11 +4,14 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import me.shawlaf.command.result.CommandResult;
+import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.util.ChunkCoords;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -20,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import static me.shawlaf.command.result.CommandResult.failure;
@@ -93,16 +97,14 @@ public class VarLightCommandClear extends VarLightSubCommand {
     private int startPrompt(LivingEntity source, Set<ChunkCoords> chunks) {
         World world = source.getWorld();
 
-        // TODO Implement Chat Prompts
-//        plugin.getChatPromptManager().startPrompt(
-//                source,
-//                new ComponentBuilder("[VarLight] Are you sure, you want to ")
-//                        .append("delete Light sources in " + chunks.size() + " chunks? ").color(ChatColor.RED)
-//                        .append("This action cannot be undone.").color(ChatColor.RED).underlined(true).create(),
-//                () -> clear(source, world, chunks),
-//                30,
-//                TimeUnit.SECONDS
-//        );
+        plugin.getApi().getChatPromptManager().runPrompt(
+                source,
+                new ComponentBuilder("[VarLight] Are you sure, you want to ")
+                        .append("delete Light sources in " + chunks.size() + " chunks? ").color(ChatColor.RED)
+                        .append("This action cannot be undone.").color(ChatColor.RED).underlined(true).create(),
+                () -> clear(source, world, chunks),
+                Ticks.of(1, TimeUnit.MINUTES)
+        );
 
         return SUCCESS;
     }

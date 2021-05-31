@@ -6,6 +6,12 @@ import java.util.concurrent.TimeUnit;
 
 public class Ticks {
 
+    private final static TimeUnitConversion[] UNITS =  {
+            new TimeUnitConversion(20 * 60 * 60, "Hour(s)"),
+            new TimeUnitConversion(20 * 60, "Minute(s)"),
+            new TimeUnitConversion(20, "Second(s)")
+    };
+
     public final long ticks;
 
     private Ticks(long ticks) {
@@ -32,6 +38,25 @@ public class Ticks {
         return new Ticks(calculate(duration));
     }
 
+    public String toReadable() {
+        StringBuilder builder = new StringBuilder();
+        long tmp = this.ticks;
+
+        for (TimeUnitConversion unit : UNITS) {
+            long amount = tmp / unit.invfactor;
+
+            if (amount > 0) {
+                builder.append(String.format("%d %s ", amount, unit.name));
+            }
+        }
+
+        if (tmp > 0) {
+            builder.append(String.format("%d Milliseconds", (tmp * 50)));
+        }
+
+        return builder.toString().trim();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,5 +68,15 @@ public class Ticks {
     @Override
     public int hashCode() {
         return Objects.hash(ticks);
+    }
+
+    private static class TimeUnitConversion {
+        public long invfactor;
+        public String name;
+
+        public TimeUnitConversion(long factor, String name) {
+            this.invfactor = factor;
+            this.name = name;
+        }
     }
 }

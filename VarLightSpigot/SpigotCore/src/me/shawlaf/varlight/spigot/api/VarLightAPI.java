@@ -12,6 +12,7 @@ import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Bukkit;
@@ -61,6 +62,9 @@ public class VarLightAPI {
     private final Autosave autosaveHandler;
 
     @Getter
+    private final ChatPrompts chatPromptManager;
+
+    @Getter
     private Material lightUpdateItem;
 
     public VarLightAPI(VarLightPlugin plugin) {
@@ -69,6 +73,7 @@ public class VarLightAPI {
         this.syncExecutor = new BukkitSyncExecutorService(plugin);
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
         this.autosaveHandler = new Autosave(plugin);
+        this.chatPromptManager = new ChatPrompts(plugin);
 
         loadLightUpdateItem();
     }
