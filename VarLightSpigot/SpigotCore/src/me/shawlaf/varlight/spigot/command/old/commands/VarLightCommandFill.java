@@ -6,25 +6,34 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
+import me.shawlaf.varlight.spigot.api.LightUpdateResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
+import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.RegionIterator;
+import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
 
 import static me.shawlaf.command.result.CommandResult.failure;
+import static me.shawlaf.command.result.CommandResult.successBroadcast;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
@@ -197,25 +206,23 @@ public class VarLightCommandFill extends VarLightSubCommand {
         IntPosition a = pos1.toIntPosition();
         IntPosition b = pos2.toIntPosition();
 
-        // TODO Implement RegionIterator
-        /*
+        RegionIterator iterator = new RegionIterator(a, b);
 
-        RegionIterator regionIterator = new RegionIterator(a, b);
+        Set<ChunkCoords> affectedChunks = iterator.getAllContainingChunks();
 
-        Set<ChunkCoords> affectedChunks = regionIterator.collectChunks();
-
-        if (affectedChunks.size() <= 1024) {
-            createTickets(world, affectedChunks).join();
-        } else if (!regionIterator.isRegionLoaded(world)) {
-            failure(this, source, "Not all chunks in the specified region are loaded and the region is too large to load!");
+        if (affectedChunks.size() > 25) { // TODO make configurable
+            failure(this, source, "The fill command may only affect a maximum of 25 chunks, you are trying to manipulate an area affecting " + affectedChunks.size() + " chunks.");
 
             return FAILURE;
         }
 
-        plugin.getBukkitAsyncExecutorService().submit(() -> {
+        createTickets(world, affectedChunks).join();
+
+        plugin.getApi().getSyncExecutor().submit(() -> {
             try {
-                int totalSize = regionIterator.getSize();
-                ProgressReport progressReport = totalSize < 1_000_000 ? ProgressReport.EMPTY : new ProgressReport(plugin, source, String.format("Fill from %s to %s", a.toShortString(), b.toShortString()), totalSize);
+                int totalSize = iterator.getSize();
+                // TODO Implement Progress Reports
+//                ProgressReport progressReport = totalSize < 1_000_000 ? ProgressReport.EMPTY : new ProgressReport(plugin, source, String.format("Fill from %s to %s", a.toShortString(), b.toShortString()), totalSize);
 
                 int total = 0, illegal = 0, updated = 0, skipped = 0, failed = 0;
 
@@ -224,10 +231,10 @@ public class VarLightCommandFill extends VarLightSubCommand {
                 Set<IntPosition> blockUpdates = new HashSet<>();
                 Set<ChunkCoords> chunksToUpdate = new HashSet<>();
 
-                while (regionIterator.hasNext()) {
-                    next = regionIterator.next();
-                    Block block = toBlock(next, world);
-                    progressReport.reportProgress(++total);
+                while (iterator.hasNext()) {
+                    next = iterator.next();
+                    Block block = next.toBlock(world);
+//                    progressReport.reportProgress(++total);
 
                     if (!filter.test(block.getType())) {
                         ++skipped;
@@ -239,9 +246,9 @@ public class VarLightCommandFill extends VarLightSubCommand {
                         continue;
                     }
 
-                    LightUpdateResult result = LightSourceUtil.placeNewLightSource(plugin, source, block.getLocation(), lightLevel, false);
+                    LightUpdateResult result = plugin.getApi().setCustomLuminance(block.getLocation(), lightLevel).join(); // TODO Suppress Immediate Light Updates
 
-                    if (!result.successful()) {
+                    if (!result.isSuccess()) {
                         ++failed;
                         continue;
                     } else {
@@ -249,41 +256,42 @@ public class VarLightCommandFill extends VarLightSubCommand {
                     }
 
                     blockUpdates.add(next);
-                    chunksToUpdate.addAll(plugin.getNmsAdapter().collectChunkPositionsToUpdate(new ChunkCoords(block.getX() >> 4, block.getZ() >> 4)));
+
+                    RegionIterator.cubicChunkArea(block.toIntPosition().toChunkCoords(), 1).forEachRemaining(chunksToUpdate::add);
                 }
 
-                plugin.getNmsAdapter().updateLight(world, blockUpdates).join(); // Wait for all block updates to finish
+                plugin.getLightUpdater().updateLightServer(world, blockUpdates).join(); // Wait for all block updates to finish
 
                 List<Callable<CompletableFuture<Void>>> chunkUpdateCallables = new ArrayList<>(chunksToUpdate.size());
                 List<Callable<Void>> lightUpdateCallables = new ArrayList<>(chunksToUpdate.size());
 
                 for (ChunkCoords chunkCoords : chunksToUpdate) {
-                    chunkUpdateCallables.add(() -> plugin.getNmsAdapter().updateChunk(world, chunkCoords));
+                    chunkUpdateCallables.add(() -> plugin.getLightUpdater().updateLightServer(world, chunkCoords));
 
                     lightUpdateCallables.add(() -> {
-                        plugin.getNmsAdapter().sendLightUpdates(world, chunkCoords);
+                        plugin.getLightUpdater().updateLightClient(world, chunkCoords);
                         return null;
                     });
                 }
 
-                List<Future<CompletableFuture<Void>>> futures = plugin.getBukkitMainThreadExecutorService().invokeAll(chunkUpdateCallables);
+                List<Future<CompletableFuture<Void>>> futures = plugin.getApi().getSyncExecutor().invokeAll(chunkUpdateCallables);
 
                 for (Future<CompletableFuture<Void>> future : futures) {
                     future.get().join();
                 }
 
-                plugin.getBukkitMainThreadExecutorService().invokeAll(lightUpdateCallables);
+                plugin.getApi().getSyncExecutor().invokeAll(lightUpdateCallables);
 
-                progressReport.finish();
+//                progressReport.finish(); // TODO Implement Progress Report
 
                 successBroadcast(this, source, String.format("Successfully updated %d Light sources in Region [%d, %d, %d] to [%d, %d, %d]. (Total blocks: %d, Invalid Blocks: %d, Skipped Blocks: %d, Failed Blocks: %d)",
                         updated,
-                        regionIterator.pos1.x,
-                        regionIterator.pos1.y,
-                        regionIterator.pos1.z,
-                        regionIterator.pos2.x,
-                        regionIterator.pos2.y,
-                        regionIterator.pos2.z,
+                        iterator.start.x,
+                        iterator.start.y,
+                        iterator.start.z,
+                        iterator.end.x,
+                        iterator.end.y,
+                        iterator.end.z,
                         total,
                         illegal,
                         skipped,
@@ -295,7 +303,6 @@ public class VarLightCommandFill extends VarLightSubCommand {
                 releaseTickets(world, affectedChunks).join();
             }
         });
-        */
 
         return SUCCESS;
     }

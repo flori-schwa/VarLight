@@ -2,7 +2,7 @@ package me.shawlaf.varlight.spigot.api;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
-import me.shawlaf.varlight.exception.LightUpdateFailedException;
+import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
@@ -125,6 +125,7 @@ public class VarLightAPI {
         loadLightUpdateItem();
     }
 
+    // TODO Allow disable immediate Light updates
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance) {
         location.requireNonNull("Location may not be null");

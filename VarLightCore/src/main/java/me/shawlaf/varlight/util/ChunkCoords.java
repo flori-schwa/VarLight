@@ -53,6 +53,14 @@ public class ChunkCoords {
         return getCornerAZ() + 15;
     }
 
+    public IntPosition getChunkStart() {
+        return getRelative(0, 0, 0);
+    }
+
+    public IntPosition getChunkEnd() {
+        return getRelative(15, 255, 15);
+    }
+
     public IntPosition getRelative(int dx, int dy, int dz) {
         Preconditions.assertInRange("dx", dx, 0, 15);
         Preconditions.assertInRange("dy", dy, 0, 255);
