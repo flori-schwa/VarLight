@@ -41,7 +41,12 @@ public class WorldLightPersistence {
         this.forBukkitWorld = forBukkitWorld;
         this.plugin = plugin;
 
-        // TODO ensure save directory exists and run migrations
+        synchronized (worldMap) {
+            // Create VarLight save directory if it does not exist
+            plugin.getNmsAdapter().getVarLightSaveDirectory(forBukkitWorld);
+
+            // TODO run migrations
+        }
     }
 
     public int getCustomLuminance(IntPosition position, int def) {
