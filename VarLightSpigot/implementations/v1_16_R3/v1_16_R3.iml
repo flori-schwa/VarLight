@@ -8,6 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="VarLightCore" />
+    <orderEntry type="module" module-name="SpigotCore" />
     <orderEntry type="library" name="spigot-1.16.5" level="project" />
     <orderEntry type="library" name="lombok-1.18.20" level="project" />
     <orderEntry type="library" name="annotations-20.1.0" level="project" />
