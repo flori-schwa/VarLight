@@ -246,7 +246,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
                         continue;
                     }
 
-                    LightUpdateResult result = plugin.getApi().setCustomLuminance(block.getLocation(), lightLevel).join(); // TODO Suppress Immediate Light Updates
+                    LightUpdateResult result = plugin.getApi().setCustomLuminance(block.getLocation(), lightLevel, false).join();
 
                     if (!result.isSuccess()) {
                         ++failed;

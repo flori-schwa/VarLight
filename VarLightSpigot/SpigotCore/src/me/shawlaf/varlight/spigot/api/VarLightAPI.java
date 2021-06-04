@@ -131,9 +131,13 @@ public class VarLightAPI {
         loadLightUpdateItem();
     }
 
-    // TODO Allow disable immediate Light updates
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance) {
+        return setCustomLuminance(location, customLuminance, true);
+    }
+
+    @NotNull
+    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance, boolean update) {
         location.requireNonNull("Location may not be null");
         location.getWorld().requireNonNull("Location must have an associated world");
 
@@ -176,8 +180,10 @@ public class VarLightAPI {
 
         return asyncExecutor.submit(() -> {
             try {
-                plugin.getLightUpdater().updateLightServer(world, position).join();
-                plugin.getLightUpdater().updateLightClient(world, position.toChunkCoords());
+                if (update) {
+                    plugin.getLightUpdater().updateLightServer(world, position).join();
+                    plugin.getLightUpdater().updateLightClient(world, position.toChunkCoords());
+                }
 
                 return LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());
             } catch (VarLightNotActiveException exception) {
