@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import static me.shawlaf.command.result.CommandResult.successBroadcast;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
 public class VarLightCommandGive extends VarLightSubCommand {
@@ -56,9 +57,6 @@ public class VarLightCommandGive extends VarLightSubCommand {
 
         ItemStack base = new ItemStack(type);
 
-        // TODO Implement makeGlowingStack and getLocalizedBlockName
-
-        /*
         while (given < amount) {
             ItemStack toGive = plugin.getNmsAdapter().makeGlowingStack(base, lightLevel);
             toGive.setAmount(Math.min(64, amount - given));
@@ -76,7 +74,7 @@ public class VarLightCommandGive extends VarLightSubCommand {
                         plugin.getNmsAdapter().getLocalizedBlockName(type),
                         target.getName())
         );
-        */
+
 
         return SUCCESS;
     }

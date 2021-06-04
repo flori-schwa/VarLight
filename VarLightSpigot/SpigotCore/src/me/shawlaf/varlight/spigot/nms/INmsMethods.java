@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,6 +66,10 @@ public interface INmsMethods {
     @NotNull Collection<NamespacedID> getAllMinecraftBlockKeys();
 
     @NotNull Collection<NamespacedID> getAllMinecraftItemKeys();
+
+    @NotNull ItemStack makeGlowingStack(@NotNull ItemStack base, int lightLevel);
+
+    @NotNull String getLocalizedBlockName(Material type);
 
     /**
      * Determines and creates (if not present) the directory where NLS Files are to be saved for the specified {@link World}.
