@@ -97,6 +97,10 @@ public class VarLightAPI {
         return wlp;
     }
 
+    public Collection<WorldLightPersistence> getAllActiveVarLightWorlds() {
+        return persistenceManagers.values();
+    }
+
     public int getCustomLuminance(@NotNull Location location) {
         location.requireNonNull("Location may not be null");
         location.getWorld().requireNonNull("Location must have an associated world");
