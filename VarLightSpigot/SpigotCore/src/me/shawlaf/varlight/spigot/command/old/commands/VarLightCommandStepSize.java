@@ -36,12 +36,26 @@ public class VarLightCommandStepSize extends VarLightSubCommand {
     @NotNull
     @Override
     public LiteralArgumentBuilder<CommandSender> build(LiteralArgumentBuilder<CommandSender> node) {
-        node.then(ARG_STEPSIZE.executes(this::run));
+        node.executes(this::getStepSize);
+        node.then(ARG_STEPSIZE.executes(this::setStepSize));
 
         return node;
     }
 
-    private int run(CommandContext<CommandSender> context) {
+    private int getStepSize(CommandContext<CommandSender> context) {
+        if (!(context.getSource() instanceof Player)) {
+            failure(this, context.getSource(), "Only players may use this command!");
+
+            return FAILURE;
+        }
+
+        Player player = (Player) context.getSource();
+        success(this, player, String.format("You current stepsize is %d", plugin.getApi().getStepsizeManager().getStepSize(player)));
+
+        return SUCCESS;
+    }
+
+    private int setStepSize(CommandContext<CommandSender> context) {
         if (!(context.getSource() instanceof Player)) {
             failure(this, context.getSource(), "Only players may use this command!");
 
@@ -52,8 +66,7 @@ public class VarLightCommandStepSize extends VarLightSubCommand {
 
         int newStepSize = context.getArgument(ARG_STEPSIZE.getName(), int.class);
 
-        // TODO Implement Stepsize functionality
-//        plugin.setStepSize(player, newStepSize); // Brigadier automatically filters all inputs < 1 and > 15
+        plugin.getApi().getStepsizeManager().setStepSize(player, newStepSize);
 
         success(this, player, String.format("Set your step size to %d", newStepSize));
 

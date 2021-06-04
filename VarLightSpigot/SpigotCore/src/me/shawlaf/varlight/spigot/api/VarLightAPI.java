@@ -13,6 +13,7 @@ import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
+import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Bukkit;
@@ -24,10 +25,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -65,6 +63,9 @@ public class VarLightAPI {
     private final ChatPrompts chatPromptManager;
 
     @Getter
+    private final StepsizeHandler stepsizeManager;
+
+    @Getter
     private Material lightUpdateItem;
 
     public VarLightAPI(VarLightPlugin plugin) {
@@ -74,6 +75,7 @@ public class VarLightAPI {
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
         this.autosaveHandler = new Autosave(plugin);
         this.chatPromptManager = new ChatPrompts(plugin);
+        this.stepsizeManager = new StepsizeHandler(plugin);
 
         loadLightUpdateItem();
     }
