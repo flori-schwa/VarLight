@@ -19,7 +19,7 @@ public class RegionIterator implements Iterator<IntPosition> {
     private boolean next;
     private int nextX, nextY, nextZ;
 
-    public static Iterator<ChunkCoords> cubicChunkArea(ChunkCoords center, int radius) {
+    public static Iterator<ChunkCoords> squareChunkArea(ChunkCoords center, int radius) {
         ChunkCoords a = center.getRelativeChunk(-radius, -radius);
         ChunkCoords b = center.getRelativeChunk(radius, radius);
 

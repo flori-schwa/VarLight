@@ -257,7 +257,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
                     blockUpdates.add(next);
 
-                    RegionIterator.cubicChunkArea(block.toIntPosition().toChunkCoords(), 1).forEachRemaining(chunksToUpdate::add);
+                    RegionIterator.squareChunkArea(block.toIntPosition().toChunkCoords(), 1).forEachRemaining(chunksToUpdate::add);
                 }
 
                 plugin.getLightUpdater().updateLightServer(world, blockUpdates).join(); // Wait for all block updates to finish
