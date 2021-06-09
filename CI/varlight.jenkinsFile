@@ -20,7 +20,7 @@ pipeline {
     }
 
     triggers {
-        cron('H 3 * * *') // Start Nightly after Spigot Builds
+        pollSCM('H 3 * * *') // Start Nightly after Spigot Builds
     }
 
     stages {
