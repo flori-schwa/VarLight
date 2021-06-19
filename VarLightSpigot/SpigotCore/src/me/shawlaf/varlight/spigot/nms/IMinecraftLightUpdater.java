@@ -19,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
 
+    CompletableFuture<Void> fullLightUpdate(World bukkitWorld, IntPosition position) throws VarLightNotActiveException;
+
     /**
      * <p>
      * Updates the Light Level at the specified Block location in the specified World, using the custom luminance stored in NLS

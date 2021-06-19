@@ -198,8 +198,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
         return asyncExecutor.submit(() -> {
             try {
                 if (update) {
-                    plugin.getLightUpdater().updateLightServer(world, position).join();
-                    plugin.getLightUpdater().updateLightClient(world, position.toChunkCoords());
+                    plugin.getLightUpdater().fullLightUpdate(world, position).join();
                 }
 
                 return LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());

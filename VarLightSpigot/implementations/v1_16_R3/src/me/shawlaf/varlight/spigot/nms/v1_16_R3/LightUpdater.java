@@ -16,9 +16,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.joor.Reflect;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 @ExtensionMethod({
         Util.class
@@ -38,6 +41,47 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
         for (World world : plugin.getVarLightConfig().getVarLightEnabledWorlds()) {
             injectCustomILightAccess(world);
         }
+    }
+
+    @Override
+    public CompletableFuture<Void> fullLightUpdate(World bukkitWorld, IntPosition position) throws VarLightNotActiveException {
+        WorldServer nmsWorld = bukkitWorld.toNmsWorld();
+        plugin.getApi().requireVarLightEnabled(bukkitWorld);
+
+        LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
+
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        nmsWorld.runLightEngineSync(() -> ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK)).checkBlock(position)).thenRunAsync(() -> {
+            List<Future<IChunkAccess>> futures = new ArrayList<>();
+
+            Iterator<ChunkCoords> chunks = RegionIterator.squareChunkArea(position.toChunkCoords(), 1);
+
+            while (chunks.hasNext()) {
+                ChunkCoords next = chunks.next();
+                IChunkAccess chunk = nmsWorld.getChunkProvider().a(next.x, next.z);
+
+                if (chunk == null) {
+                    throw new LightUpdateFailedException(String.format("Could not get IChunkAccess for Chunk %s in world %s", next.toShortString(), bukkitWorld.getName()));
+                }
+
+                futures.add(let.lightChunk(chunk, true));
+            }
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+            plugin.getApi().getSyncExecutor().submit(() -> {
+                try {
+                    updateLightClient(bukkitWorld, position.toChunkCoords());
+                } catch (VarLightNotActiveException e) {
+                    e.printStackTrace();
+                }
+
+                future.complete(null);
+            });
+        }, plugin.getApi().getAsyncExecutor());
+
+        return future;
     }
 
     @Override
