@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.spigot.nms;
 
 import me.shawlaf.varlight.exception.VarLightIOException;
+import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.util.NamespacedID;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -17,7 +18,7 @@ import java.util.Objects;
 /**
  * Interface containing methods with minecraft version-specific implementations
  */
-public interface INmsMethods {
+public interface INmsMethods extends IPluginLifeCycleOperations {
 
     /**
      * Checks whether the specified {@link Block} is allowed to be turned into a Custom Light source
@@ -26,6 +27,8 @@ public interface INmsMethods {
      * @return {@code true} if the Block is not allowed to be turned into a Custom Light source, {@code false} otherwise
      */
     boolean isIllegalBlock(@NotNull Block bukkitBlock);
+
+    boolean isIllegalBlockType(@NotNull Material blockType);
 
     /**
      * Checks whether the specified {@link Material} is allowed to be used the Light Update Item (LUI)

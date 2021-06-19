@@ -4,6 +4,7 @@ import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -13,12 +14,26 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.TimeUnit;
 
-public class Autosave implements Listener {
+public class Autosave implements Listener, IPluginLifeCycleOperations {
 
     public Autosave(VarLightPlugin plugin) {
         this.plugin = plugin;
+    }
 
+    @Override
+    public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    @Override
+    public void onDisable() {
+        for (World world : plugin.getVarLightConfig().getVarLightEnabledWorlds()) {
+            try {
+                plugin.getApi().requireVarLightEnabled(world).runAutosave();
+            } catch (VarLightNotActiveException ignored) {
+
+            }
+        }
     }
 
     public enum Strategy {
@@ -35,7 +50,7 @@ public class Autosave implements Listener {
 
     /**
      * <p>
-     *     Disables automatic saving of Custom Light Sources
+     * Disables automatic saving of Custom Light Sources
      * </p>
      */
     public void disable() {
@@ -44,8 +59,9 @@ public class Autosave implements Listener {
 
     /**
      * <p>
-     *     Automatically saves Custom Light Sources every {@code n} Minutes
+     * Automatically saves Custom Light Sources every {@code n} Minutes
      * </p>
+     *
      * @param interval The amount of Minutes in between every automatic save
      */
     public void setTimed(int interval) {
@@ -58,7 +74,7 @@ public class Autosave implements Listener {
 
     /**
      * <p>
-     *     Automatically saves Custom Light Sources when a {@link WorldSaveEvent} is called
+     * Automatically saves Custom Light Sources when a {@link WorldSaveEvent} is called
      * </p>
      */
     public void setOnWorldSave() {

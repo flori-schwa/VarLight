@@ -17,8 +17,12 @@ public class IntPositionExtension {
         return new IntPosition(self.getBlockX(), self.getBlockY(), self.getBlockZ());
     }
 
+    public Location toLocation(IntPosition self, World world) {
+        return new Location(world, self.x, self.y, self.z);
+    }
+
     public Block toBlock(IntPosition self, World world) {
-        return world.getBlockAt(self.x, self.y, self.z);
+        return self.convert(world::getBlockAt);
     }
 
 }

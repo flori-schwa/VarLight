@@ -2,6 +2,7 @@ package me.shawlaf.varlight.spigot.prompt;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
+import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.util.collections.EntityToObjectMap;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class ChatPrompts {
+public class ChatPrompts implements IPluginLifeCycleOperations {
 
     private Prompt consolePrompt;
     private final EntityToObjectMap<Prompt> activePrompts = new EntityToObjectMap<>();
@@ -23,6 +24,12 @@ public class ChatPrompts {
 
     public ChatPrompts(VarLightPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public void onDisable() {
+        activePrompts.clear();
+        consolePrompt = null;
     }
 
     private Prompt getCurrentActivePrompt(CommandSender sender) {
@@ -63,18 +70,18 @@ public class ChatPrompts {
 
         if (source instanceof Entity) {
             source.spigot().sendMessage(
-                new ComponentBuilder("[CONFIRM]")
-                        .bold(true)
-                        .color(net.md_5.bungee.api.ChatColor.GREEN)
-                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/varlight prompt confirm"))
-                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to accept the prompt").create()))
-                    .append(" ")
-                    .append("[CANCEL]")
-                        .bold(true)
-                        .color(net.md_5.bungee.api.ChatColor.RED)
-                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/varlight prompt cancel"))
-                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to cancel the prompt").create()))
-                .create()
+                    new ComponentBuilder("[CONFIRM]")
+                            .bold(true)
+                            .color(net.md_5.bungee.api.ChatColor.GREEN)
+                            .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/varlight prompt confirm"))
+                            .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to accept the prompt").create()))
+                            .append(" ")
+                            .append("[CANCEL]")
+                            .bold(true)
+                            .color(net.md_5.bungee.api.ChatColor.RED)
+                            .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/varlight prompt cancel"))
+                            .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click here to cancel the prompt").create()))
+                            .create()
             );
         } else {
             source.sendMessage(ChatColor.RED + "Type /varlight prompt confirm/cancel to confirm/cancel.");

@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemStack;
@@ -40,12 +39,17 @@ public class NmsAdapter implements INmsMethods {
 
     @Override
     public boolean isIllegalBlock(@NotNull Block bukkitBlock) {
-        if (HardcodedBlockList.ALLOWED_BLOCKS.contains(bukkitBlock.getType())) {
+        return isIllegalBlockType(bukkitBlock.getType());
+    }
+
+    @Override
+    public boolean isIllegalBlockType(@NotNull Material blockType) {
+        if (HardcodedBlockList.ALLOWED_BLOCKS.contains(blockType)) {
             return false;
         }
 
         if (plugin.getVarLightConfig().isAllowExperimentalBlocks()) {
-            return !HardcodedBlockList.EXPERIMENTAL_BLOCKS.contains(bukkitBlock.getType());
+            return !HardcodedBlockList.EXPERIMENTAL_BLOCKS.contains(blockType);
         }
 
         return true;
@@ -63,7 +67,7 @@ public class NmsAdapter implements INmsMethods {
 
     @Override
     public @NotNull File getRegionRoot(@NotNull World bukkitWorld) {
-        return Reflect.on(((CraftWorld) bukkitWorld).getHandle().getChunkProvider().playerChunkMap).get("w");
+        return Reflect.on(bukkitWorld.toNmsWorld().getChunkProvider().playerChunkMap).get("w");
     }
 
     @Override

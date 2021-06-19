@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.spigot.nms;
 
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.spigot.util.ChunkCoordExtension;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
@@ -16,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * An Interface, that defines methods for updating Light in Minecraft Internally
  */
-public interface IMinecraftLightUpdater {
+public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
 
     /**
      * <p>
@@ -64,7 +65,7 @@ public interface IMinecraftLightUpdater {
      * @param world       The {@link World} containing the Chunk
      * @param centerChunk The coordinates of the center Chunk
      */
-    void updateLightClient(World world, ChunkCoords centerChunk);
+    void updateLightClient(World world, ChunkCoords centerChunk) throws VarLightNotActiveException;
 
     /**
      * @param location The {@link Location} of the Light update
@@ -84,6 +85,10 @@ public interface IMinecraftLightUpdater {
      */
     default CompletableFuture<Void> updateLightServer(Chunk chunk) throws VarLightNotActiveException {
         return updateLightServer(chunk.getWorld(), ChunkCoordExtension.toChunkCoords(chunk));
+    }
+
+    default void updateLightClient(Chunk chunk) throws VarLightNotActiveException {
+        updateLightClient(chunk.getWorld(), ChunkCoordExtension.toChunkCoords(chunk));
     }
 
 }

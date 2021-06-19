@@ -1,15 +1,15 @@
 package me.shawlaf.varlight.spigot.api;
 
-import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
-import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
+import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
@@ -17,9 +17,9 @@ import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +35,9 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
         Objects.class,
         IntPositionExtension.class
 })
-public class VarLightAPI {
+public class VarLightAPIImpl implements IVarLightAPI {
 
-    public static VarLightAPI getAPI() {
+    public static IVarLightAPI getAPI() {
         Plugin varLightPlugin = Bukkit.getPluginManager().getPlugin("VarLight");
 
         if (varLightPlugin == null) {
@@ -50,36 +50,75 @@ public class VarLightAPI {
     private final VarLightPlugin plugin;
     private final Map<UUID, WorldLightPersistence> persistenceManagers = new HashMap<>();
 
-    @Getter
+    private final Map<Class<? extends IPluginLifeCycleOperations>, IPluginLifeCycleOperations> modules = new HashMap<>();
+
     private final AbstractBukkitExecutor syncExecutor;
-
-    @Getter
     private final AbstractBukkitExecutor asyncExecutor;
-
-    @Getter
     private final Autosave autosaveHandler;
-
-    @Getter
     private final ChatPrompts chatPromptManager;
-
-    @Getter
     private final StepsizeHandler stepsizeManager;
-
-    @Getter
     private Material lightUpdateItem;
 
-    public VarLightAPI(VarLightPlugin plugin) {
+    public VarLightAPIImpl(VarLightPlugin plugin) {
         this.plugin = plugin;
 
         this.syncExecutor = new BukkitSyncExecutorService(plugin);
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
-        this.autosaveHandler = new Autosave(plugin);
-        this.chatPromptManager = new ChatPrompts(plugin);
-        this.stepsizeManager = new StepsizeHandler(plugin);
+
+        addModule(this.autosaveHandler = new Autosave(plugin));
+        addModule(this.chatPromptManager = new ChatPrompts(plugin));
+        addModule(this.stepsizeManager = new StepsizeHandler(plugin));
 
         loadLightUpdateItem();
+
+        modules.values().forEach(IPluginLifeCycleOperations::onLoad);
     }
 
+    public void onEnable() {
+        modules.values().forEach(IPluginLifeCycleOperations::onEnable);
+    }
+
+    public void onDisable() {
+        modules.values().forEach(IPluginLifeCycleOperations::onDisable);
+    }
+
+    // region Impl
+
+    // region Getter
+
+    @Override
+    public AbstractBukkitExecutor getSyncExecutor() {
+        return syncExecutor;
+    }
+
+    @Override
+    public AbstractBukkitExecutor getAsyncExecutor() {
+        return asyncExecutor;
+    }
+
+    @Override
+    public Autosave getAutosaveHandler() {
+        return autosaveHandler;
+    }
+
+    @Override
+    public ChatPrompts getChatPromptManager() {
+        return chatPromptManager;
+    }
+
+    @Override
+    public StepsizeHandler getStepsizeManager() {
+        return stepsizeManager;
+    }
+
+    @Override
+    public Material getLightUpdateItem() {
+        return lightUpdateItem;
+    }
+
+    // endregion
+
+    @Override
     public @NotNull WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
         world.requireNonNull("World may not be null");
 
@@ -97,51 +136,32 @@ public class VarLightAPI {
         return wlp;
     }
 
+    @Override
+    @NotNull
     public Collection<WorldLightPersistence> getAllActiveVarLightWorlds() {
         return persistenceManagers.values();
     }
 
-    public int getCustomLuminance(@NotNull Location location) {
-        location.requireNonNull("Location may not be null");
-        location.getWorld().requireNonNull("Location must have an associated world");
+    @Override
+    public int getCustomLuminance(World world, IntPosition position) {
+        world.requireNonNull("World may not be null");
+        position.requireNonNull("Position may not be null");
 
         try {
-            return requireVarLightEnabled(location.getWorld()).getCustomLuminance(location.toIntPosition(), 0);
+            return requireVarLightEnabled(world).getCustomLuminance(position, 0);
         } catch (VarLightNotActiveException exception) {
             return 0;
         }
     }
 
-    public void setCustomLuminance(@Nullable CommandSender source, @NotNull Location location, int customLuminance) {
-        setCustomLuminance(location, customLuminance).thenAccept((result) -> {
-            if (source != null) {
-                result.displayMessage(source);
-            }
-        });
-    }
-
-    public void setLightUpdateItem(Material item) {
-        if (item == null) {
-            item = Material.GLOWSTONE_DUST;
-        }
-
-        plugin.getConfig().set(VarLightConfig.CONFIG_KEY_VARLIGHT_ITEM, item.getKey().toString());
-        plugin.saveConfig();
-
-        loadLightUpdateItem();
-    }
-
     @NotNull
-    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance) {
-        return setCustomLuminance(location, customLuminance, true);
-    }
+    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update) {
+        world.requireNonNull("World may not be null");
+        position.requireNonNull("Position may not be null");
 
-    @NotNull
-    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance, boolean update) {
-        location.requireNonNull("Location may not be null");
-        location.getWorld().requireNonNull("Location must have an associated world");
+        Block block = position.toBlock(world);
 
-        int fromLight = location.getBlock().getLightFromBlocks();
+        int fromLight = block.getLightFromBlocks();
 
         if (customLuminance < 0) {
             return completedFuture(LightUpdateResult.zeroReached(fromLight, customLuminance));
@@ -151,12 +171,9 @@ public class VarLightAPI {
             return completedFuture(LightUpdateResult.fifteenReached(fromLight, customLuminance));
         }
 
-        if (plugin.getNmsAdapter().isIllegalBlock(location.getBlock())) {
+        if (plugin.getNmsAdapter().isIllegalBlock(block)) {
             return completedFuture(LightUpdateResult.invalidBlock(fromLight, customLuminance));
         }
-
-        IntPosition position = location.toIntPosition();
-        World world = location.getWorld();
 
         WorldLightPersistence wlp;
 
@@ -169,7 +186,7 @@ public class VarLightAPI {
 
         int finalFromLight = wlp.getCustomLuminance(position, 0);
 
-        final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(location.getBlock(), finalFromLight, customLuminance);
+        final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(block, finalFromLight, customLuminance);
         Bukkit.getPluginManager().callEvent(updateEvent);
 
         if (updateEvent.isCancelled()) {
@@ -192,7 +209,34 @@ public class VarLightAPI {
         });
     }
 
+    @Override
+    public void setCustomLuminance(@Nullable CommandSender source, @NotNull World world, @NotNull IntPosition position, int customLuminance) {
+        setCustomLuminance(world, position, customLuminance, true).thenAccept(result -> {
+            if (source != null) {
+                result.displayMessage(source);
+            }
+        });
+    }
+
+    @Override
+    public void setLightUpdateItem(Material item) {
+        if (item == null) {
+            item = Material.GLOWSTONE_DUST;
+        }
+
+        plugin.getConfig().set(VarLightConfig.CONFIG_KEY_VARLIGHT_ITEM, item.getKey().toString());
+        plugin.saveConfig();
+
+        loadLightUpdateItem();
+    }
+
+    // endregion
+
     // region Internals
+
+    private <M extends IPluginLifeCycleOperations> void addModule(M module) {
+        this.modules.put(module.getClass(), module);
+    }
 
     private void loadLightUpdateItem() {
         this.lightUpdateItem = plugin.getVarLightConfig().loadLightUpdateItem();

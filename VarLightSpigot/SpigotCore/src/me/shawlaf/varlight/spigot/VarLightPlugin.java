@@ -1,7 +1,9 @@
 package me.shawlaf.varlight.spigot;
 
 import lombok.Getter;
-import me.shawlaf.varlight.spigot.api.VarLightAPI;
+import me.shawlaf.varlight.spigot.api.IVarLightAPI;
+import me.shawlaf.varlight.spigot.api.VarLightAPIImpl;
+import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightInitializationException;
 import me.shawlaf.varlight.spigot.nms.IMinecraftLightUpdater;
 import me.shawlaf.varlight.spigot.nms.INmsMethods;
@@ -24,13 +26,15 @@ public class VarLightPlugin extends JavaPlugin {
     private static final String SERVER_VERSION;
 
     @Getter
-    private VarLightAPI api;
+    private IVarLightAPI api;
     @Getter
     private IMinecraftLightUpdater lightUpdater;
     @Getter
     private INmsMethods nmsAdapter;
     @Getter
     private VarLightConfig varLightConfig;
+    @Getter
+    private VarLightCommand command;
 
     private boolean doLoad = true;
 
@@ -67,7 +71,16 @@ public class VarLightPlugin extends JavaPlugin {
         }
 
         this.varLightConfig = new VarLightConfig(this);
-        this.api = new VarLightAPI(this);
+        this.api = new VarLightAPIImpl(this);
+
+        try {
+            this.nmsAdapter.onLoad();
+            this.lightUpdater.onLoad();
+        } catch (Exception e) {
+            startUpError(e.getMessage());
+
+            throw new VarLightInitializationException(e);
+        }
     }
 
     @Override
@@ -76,6 +89,32 @@ public class VarLightPlugin extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
+        ((VarLightAPIImpl) this.api).onEnable();
+        this.command = new VarLightCommand(this);
+
+        Bukkit.getPluginManager().registerEvents(new VarLightEventHandlers(this), this);
+
+        try {
+            this.nmsAdapter.onEnable();
+            this.lightUpdater.onEnable();
+        } catch (Exception e) {
+            Bukkit.getPluginManager().disablePlugin(this);
+
+            throw new VarLightInitializationException(e);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        try {
+            this.nmsAdapter.onDisable();
+            this.lightUpdater.onDisable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ((VarLightAPIImpl) this.api).onDisable();
     }
 
     // region Util

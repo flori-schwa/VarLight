@@ -102,6 +102,10 @@ public class IntPosition implements Comparable<IntPosition> {
                 z == that.z;
     }
 
+    public <R> R convert(ConversionFunction<R> func) {
+        return func.convert(this);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(x, y, z);
@@ -123,5 +127,14 @@ public class IntPosition implements Comparable<IntPosition> {
     @Override
     public int compareTo(@NotNull IntPosition o) {
         return Integer.compare(this.manhattanDistance(ORIGIN), o.manhattanDistance(ORIGIN));
+    }
+
+    @FunctionalInterface
+    public interface ConversionFunction<R> {
+        R convert(int x, int y, int z);
+
+        default R convert(IntPosition from) {
+            return convert(from.x, from.y, from.z);
+        }
     }
 }
