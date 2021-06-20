@@ -11,7 +11,7 @@ import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
@@ -48,7 +48,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
     }
 
     private final VarLightPlugin plugin;
-    private final Map<UUID, WorldLightPersistence> persistenceManagers = new HashMap<>();
+    private final Map<UUID, CustomLightStorage> persistenceManagers = new HashMap<>();
 
     private final Map<Class<? extends IPluginLifeCycleOperations>, IPluginLifeCycleOperations> modules = new HashMap<>();
 
@@ -119,26 +119,24 @@ public class VarLightAPIImpl implements IVarLightAPI {
     // endregion
 
     @Override
-    public @NotNull WorldLightPersistence requireVarLightEnabled(@NotNull World world) throws VarLightNotActiveException {
+    public @Nullable CustomLightStorage getLightStorage(World world) {
         world.requireNonNull("World may not be null");
 
-        WorldLightPersistence wlp = persistenceManagers.get(world.getUID());
+        CustomLightStorage cls = persistenceManagers.get(world.getUID());
 
-        if (wlp == null) {
+        if (cls == null) {
             if (plugin.getVarLightConfig().getVarLightEnabledWorldNames().contains(world.getName())) {
-                wlp = new WorldLightPersistence(world, plugin);
-                persistenceManagers.put(world.getUID(), wlp);
-            } else {
-                throw new VarLightNotActiveException(world);
+                cls = new CustomLightStorage(world, plugin);
+                persistenceManagers.put(world.getUID(), cls);
             }
         }
 
-        return wlp;
+        return cls;
     }
 
     @Override
     @NotNull
-    public Collection<WorldLightPersistence> getAllActiveVarLightWorlds() {
+    public Collection<CustomLightStorage> getAllActiveVarLightWorlds() {
         return persistenceManagers.values();
     }
 
@@ -175,7 +173,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
             return completedFuture(LightUpdateResult.invalidBlock(fromLight, customLuminance));
         }
 
-        WorldLightPersistence wlp;
+        CustomLightStorage wlp;
 
         try {
             // noinspection ConstantConditions NotNull for world Already checked at the beginning of the Method
@@ -198,7 +196,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
         return asyncExecutor.submit(() -> {
             try {
                 if (update) {
-                    plugin.getLightUpdater().fullLightUpdate(world, position).join();
+                    plugin.getLightUpdater().updateLightFull(world, position).join();
                 }
 
                 return LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());

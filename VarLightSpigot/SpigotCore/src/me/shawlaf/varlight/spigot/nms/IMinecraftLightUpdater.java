@@ -1,8 +1,9 @@
 package me.shawlaf.varlight.spigot.nms;
 
+import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.spigot.util.ChunkCoordExtension;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.ChunkCoords;
@@ -19,7 +20,11 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
 
-    CompletableFuture<Void> fullLightUpdate(World bukkitWorld, IntPosition position) throws VarLightNotActiveException;
+    CompletableFuture<Void> updateLightFull(CustomLightStorage lightStorage, IntPosition position);
+
+    default CompletableFuture<Void> updateLightFull(World bukkitWorld, IntPosition position) throws VarLightNotActiveException {
+        return updateLightFull(getPlugin().getApi().requireVarLightEnabled(bukkitWorld), position);
+    }
 
     /**
      * <p>
@@ -29,7 +34,7 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
      *
      * <ul>
      *     <li>Send light updates to connected clients, use {@link IMinecraftLightUpdater#updateLightClient(World, ChunkCoords) } for that</li>
-     *     <li>Update the Custom Light Level stored by VarLight, use {@link WorldLightPersistence} for that</li>
+     *     <li>Update the Custom Light Level stored by VarLight, use {@link CustomLightStorage} for that</li>
      * </ul>
      *
      * @param bukkitWorld The {@link World} to update Light in
@@ -61,13 +66,17 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
      */
     CompletableFuture<Void> updateLightServer(World bukkitWorld, ChunkCoords chunk) throws VarLightNotActiveException;
 
+    void updateLightClient(CustomLightStorage lightStorage, ChunkCoords center);
+
     /**
      * Sends Light update Packets in a 3x3 area around the center Chunk to connected Clients
      *
      * @param world       The {@link World} containing the Chunk
      * @param centerChunk The coordinates of the center Chunk
      */
-    void updateLightClient(World world, ChunkCoords centerChunk) throws VarLightNotActiveException;
+    default void updateLightClient(World world, ChunkCoords centerChunk) throws VarLightNotActiveException {
+        updateLightClient(getPlugin().getApi().requireVarLightEnabled(world), centerChunk);
+    }
 
     /**
      * @param location The {@link Location} of the Light update
@@ -92,5 +101,7 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
     default void updateLightClient(Chunk chunk) throws VarLightNotActiveException {
         updateLightClient(chunk.getWorld(), ChunkCoordExtension.toChunkCoords(chunk));
     }
+
+    VarLightPlugin getPlugin();
 
 }

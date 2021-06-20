@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import me.shawlaf.varlight.util.Paginator;
@@ -177,7 +177,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
     }
 
     private void listLightSourcesInRegion(Player player, int regionX, int regionZ, int page) {
-        @NotNull WorldLightPersistence manager;
+        @NotNull CustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
@@ -198,7 +198,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
     }
 
     private void listLightSourcesInChunk(Player player, int chunkX, int chunkZ, int page) {
-        @NotNull WorldLightPersistence manager;
+        @NotNull CustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
@@ -223,7 +223,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
     @SuppressWarnings("ConstantConditions")
     // All Methods that call this Method already assert that the WorldLightSourceManager exists!
     private void listInternal(Player player, List<IntPosition> list) {
-        @NotNull WorldLightPersistence manager;
+        @NotNull CustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(player.getWorld());

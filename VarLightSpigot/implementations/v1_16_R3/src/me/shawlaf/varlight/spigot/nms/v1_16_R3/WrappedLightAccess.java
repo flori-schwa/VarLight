@@ -2,7 +2,7 @@ package me.shawlaf.varlight.spigot.nms.v1_16_R3;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import net.minecraft.server.v1_16_R3.*;
@@ -39,7 +39,7 @@ public class WrappedLightAccess implements ILightAccess, Listener {
         int vanilla = blockAccess.getType(bPos).f();
 
         try {
-            WorldLightPersistence wlp = plugin.getApi().requireVarLightEnabled(world.getWorld());
+            CustomLightStorage wlp = plugin.getApi().requireVarLightEnabled(world.getWorld());
 
             return wlp.getCustomLuminance(new IntPosition(bPos.getX(), bPos.getY(), bPos.getZ()), vanilla);
         } catch (VarLightNotActiveException e) {

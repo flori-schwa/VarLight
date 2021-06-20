@@ -28,7 +28,7 @@ import java.util.function.IntSupplier;
 @ExtensionMethod({
         IntPositionExtension.class
 })
-public class WorldLightPersistence {
+public class CustomLightStorage {
 
     @Getter
     private final World forBukkitWorld;
@@ -37,7 +37,7 @@ public class WorldLightPersistence {
 
     private final Map<RegionCoords, NLSFile> worldMap = new HashMap<>();
 
-    public WorldLightPersistence(World forBukkitWorld, VarLightPlugin plugin) {
+    public CustomLightStorage(World forBukkitWorld, VarLightPlugin plugin) {
         this.forBukkitWorld = forBukkitWorld;
         this.plugin = plugin;
 

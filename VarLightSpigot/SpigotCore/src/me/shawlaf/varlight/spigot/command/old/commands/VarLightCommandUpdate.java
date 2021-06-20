@@ -9,7 +9,7 @@ import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -88,7 +88,7 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
     private int update(CommandSender source, Location location, int toLight) {
         World world = location.getWorld();
 
-        @NotNull WorldLightPersistence manager;
+        @NotNull CustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(world);

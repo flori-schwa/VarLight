@@ -3,7 +3,7 @@ package me.shawlaf.varlight.spigot;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.IntPosition;
@@ -33,11 +33,9 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler
     public void playerModifyLightSource(PlayerInteractEvent e) {
-        WorldLightPersistence wlp;
+        CustomLightStorage cls = plugin.getApi().getLightStorage(e.getPlayer().getWorld());
 
-        try {
-            wlp = plugin.getApi().requireVarLightEnabled(e.getPlayer().getWorld());
-        } catch (VarLightNotActiveException ex) {
+        if (cls == null) {
             return;
         }
 
@@ -82,9 +80,10 @@ public class VarLightEventHandlers implements Listener {
 
         final int finalMod = mod;
 
-        plugin.getApi().setCustomLuminance(clicked.getLocation(), wlp.getCustomLuminance(clicked.toIntPosition(), 0) + mod).thenAccept(result -> {
+        e.setCancelled(creative && e.getAction() == Action.LEFT_CLICK_BLOCK); // Prevent Block break in creative
+
+        plugin.getApi().setCustomLuminance(clicked.getLocation(), cls.getCustomLuminance(clicked.toIntPosition(), 0) + mod).thenAccept(result -> {
             if (result.isSuccess()) {
-                e.setCancelled(creative && e.getAction() == Action.LEFT_CLICK_BLOCK); // Prevent Block break in creative
 
                 if (plugin.getVarLightConfig().isConsumeLui() && !creative && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     item.setAmount(item.getAmount() - Math.abs(finalMod));
@@ -97,48 +96,30 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler
     public void lightSourceReceiveUpdate(BlockPhysicsEvent e) {
-        WorldLightPersistence wlp;
-
         try {
-            wlp = plugin.getApi().requireVarLightEnabled(e.getBlock().getWorld());
+            CustomLightStorage cls = plugin.getApi().requireVarLightEnabled(e.getBlock().getWorld());
+
+            IntPosition position = e.getBlock().toIntPosition();
+            int luminance = cls.getCustomLuminance(position, 0);
+
+            if (luminance > 0) {
+                if (e.getBlock() == e.getSourceBlock()) {
+                    // The Light Source Block was changed
+
+                    // See World.notifyAndUpdatePhysics(BlockPosition, Chunk, IBlockData, IBlockData, IBlockData, int)
+                    if (plugin.getNmsAdapter().isIllegalBlockType(e.getChangedType())) {
+                        cls.setCustomLuminance(position, 0);
+                    } else {
+                        // Probably not possible, but /shrug
+                        plugin.getLightUpdater().updateLightFull(cls, position);
+                    }
+                } else {
+                    // The Light source Block received an update from another Block
+                    plugin.getLightUpdater().updateLightFull(cls, position);
+                }
+            }
         } catch (VarLightNotActiveException ex) {
             return;
-        }
-
-        IntPosition position = e.getBlock().toIntPosition();
-        int luminance = wlp.getCustomLuminance(position, 0);
-
-        if (luminance > 0) {
-            if (e.getBlock() == e.getSourceBlock()) {
-                // The Light Source Block was changed
-
-                // See World.notifyAndUpdatePhysics(BlockPosition, Chunk, IBlockData, IBlockData, IBlockData, int)
-                if (plugin.getNmsAdapter().isIllegalBlockType(e.getChangedType())) {
-                    wlp.setCustomLuminance(position, 0);
-                } else {
-                    // Probably not possible, but /shrug
-
-                    plugin.getApi().getSyncExecutor().submit(() -> {
-                        try {
-                            plugin.getLightUpdater().updateLightServer(e.getBlock().getChunk());
-                            plugin.getLightUpdater().updateLightClient(e.getBlock().getChunk());
-                        } catch (VarLightNotActiveException varLightNotActiveException) {
-                            varLightNotActiveException.printStackTrace();
-                        }
-                    });
-                }
-            } else {
-                // The Light source Block received an update from another Block
-
-                plugin.getApi().getSyncExecutor().submit(() -> {
-                    try {
-                        plugin.getLightUpdater().updateLightServer(e.getBlock().getChunk());
-                        plugin.getLightUpdater().updateLightClient(e.getBlock().getChunk());
-                    } catch (VarLightNotActiveException varLightNotActiveException) {
-                        varLightNotActiveException.printStackTrace();
-                    }
-                });
-            }
         }
     }
 

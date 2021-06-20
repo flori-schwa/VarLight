@@ -5,6 +5,7 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.nms.IMinecraftLightUpdater;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.spigot.util.RegionIterator;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
@@ -16,12 +17,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.joor.Reflect;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 @ExtensionMethod({
         Util.class
@@ -44,42 +42,21 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> fullLightUpdate(World bukkitWorld, IntPosition position) throws VarLightNotActiveException {
+    public CompletableFuture<Void> updateLightFull(CustomLightStorage lightStorage, IntPosition position) {
+        World bukkitWorld = lightStorage.getForBukkitWorld();
         WorldServer nmsWorld = bukkitWorld.toNmsWorld();
-        plugin.getApi().requireVarLightEnabled(bukkitWorld);
 
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
 
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        nmsWorld.runLightEngineSync(() -> ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK)).checkBlock(position)).thenRunAsync(() -> {
-            List<Future<IChunkAccess>> futures = new ArrayList<>();
-
-            Iterator<ChunkCoords> chunks = RegionIterator.squareChunkArea(position.toChunkCoords(), 1);
-
-            while (chunks.hasNext()) {
-                ChunkCoords next = chunks.next();
-                IChunkAccess chunk = nmsWorld.getChunkProvider().a(next.x, next.z);
-
-                if (chunk == null) {
-                    throw new LightUpdateFailedException(String.format("Could not get IChunkAccess for Chunk %s in world %s", next.toShortString(), bukkitWorld.getName()));
-                }
-
-                futures.add(let.lightChunk(chunk, true));
-            }
-
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        plugin.getApi().getAsyncExecutor().submit(() -> {
+            nmsWorld.runLightEngineSync(() -> ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK)).checkBlock(position)).join();
 
             plugin.getApi().getSyncExecutor().submit(() -> {
-                try {
-                    updateLightClient(bukkitWorld, position.toChunkCoords());
-                } catch (VarLightNotActiveException e) {
-                    e.printStackTrace();
-                }
-
-                future.complete(null);
+                updateLightClient(lightStorage, position.toChunkCoords());
             });
-        }, plugin.getApi().getAsyncExecutor());
+        });
 
         return future;
     }
@@ -134,9 +111,9 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public void updateLightClient(World bukkitWorld, ChunkCoords centerChunk) throws VarLightNotActiveException {
+    public void updateLightClient(CustomLightStorage lightStorage, ChunkCoords centerChunk) {
+        World bukkitWorld = lightStorage.getForBukkitWorld();
         WorldServer nmsWorld = bukkitWorld.toNmsWorld();
-        plugin.getApi().requireVarLightEnabled(bukkitWorld);
 
         LightEngine let = nmsWorld.e();
 
@@ -149,6 +126,11 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
 
             nmsWorld.getChunkProvider().playerChunkMap.a(chunkCoordIntPair, false).forEach(e -> e.playerConnection.sendPacket(ppolu));
         }
+    }
+
+    @Override
+    public VarLightPlugin getPlugin() {
+        return plugin;
     }
 
     private void injectCustomILightAccess(World bukkitWorld) {

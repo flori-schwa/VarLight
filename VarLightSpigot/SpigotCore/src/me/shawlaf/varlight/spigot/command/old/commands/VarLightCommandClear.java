@@ -8,7 +8,7 @@ import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.util.ChunkCoords;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -148,7 +148,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         int regionZ = (source.getLocation().getBlockZ() >> 4) >> 5;
 
         try {
-            WorldLightPersistence manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
+            CustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
 
             return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
         } catch (VarLightNotActiveException e) {
@@ -164,7 +164,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         int regionZ = context.getArgument(ARG_REGION_Z.getName(), int.class);
 
         try {
-            WorldLightPersistence manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
+            CustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
 
             return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
         } catch (VarLightNotActiveException e) {
@@ -184,7 +184,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
 
         createTickets(world, chunks).join();
 
-        @NotNull WorldLightPersistence manager;
+        @NotNull CustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(world);

@@ -12,7 +12,7 @@ import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
 import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.RegionIterator;
 import me.shawlaf.varlight.util.ChunkCoords;
@@ -193,7 +193,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
         World world = source.getWorld();
 
-        @NotNull WorldLightPersistence manager;
+        @NotNull CustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(world);

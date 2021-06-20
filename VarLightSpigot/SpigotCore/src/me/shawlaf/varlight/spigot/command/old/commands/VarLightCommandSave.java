@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.WorldLightPersistence;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -69,7 +69,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
     }
 
     private int saveAll(CommandContext<CommandSender> context) {
-        for (WorldLightPersistence wlp : plugin.getApi().getAllActiveVarLightWorlds()) {
+        for (CustomLightStorage wlp : plugin.getApi().getAllActiveVarLightWorlds()) {
             wlp.save(context.getSource(), true);
         }
 
