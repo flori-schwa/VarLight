@@ -97,19 +97,35 @@ public class RegionIterator implements Iterator<IntPosition> {
                 return nextCoords;
             }
 
+            private boolean zInRange(int z) {
+                if (startChunkZ < endChunkZ) {
+                    return z >= startChunkZ && z <= endChunkZ;
+                }
+
+                return z >= endChunkZ && z <= startChunkZ;
+            }
+
+            private boolean xInRange(int x) {
+                if (startChunkX < endChunkX) {
+                    return x >= startChunkX && x <= endChunkX;
+                }
+
+                return x >= endChunkX && x <= startChunkX;
+            }
+
+            private boolean stepZ() {
+                nextZ += zDirection;
+                return zInRange(nextZ);
+            }
+
+            private boolean  stepX() {
+                nextX += xDirection;
+                return xInRange(nextX);
+            }
+
             private void step() {
                 if (zDirection != 0) {
-                    nextZ += zDirection;
-
-                    boolean zOutOfRange;
-
-                    if (zDirection > 0) {
-                        zOutOfRange = nextZ < startChunkZ || nextZ > endChunkZ;
-                    } else {
-                        zOutOfRange = nextZ > startChunkZ || nextX < endChunkZ;
-                    }
-
-                    if (zOutOfRange) {
+                    if (!stepZ()) {
                         nextZ = startChunkZ;
                     } else {
                         return;
@@ -117,20 +133,12 @@ public class RegionIterator implements Iterator<IntPosition> {
                 }
 
                 if (xDirection != 0) {
-                    nextX += xDirection;
-
-                    boolean xOutOfRange;
-
-                    if (xDirection > 0) {
-                        xOutOfRange = nextX < startChunkX || nextX > endChunkX;
-                    } else {
-                        xOutOfRange = nextX > startChunkX || nextX < endChunkX;
-                    }
-
-                    if (xOutOfRange) {
-                        next = false;
+                    if (stepX()) {
+                        return;
                     }
                 }
+
+                next = false;
             }
         };
     }
@@ -157,19 +165,49 @@ public class RegionIterator implements Iterator<IntPosition> {
 
     // region Util
 
+    private boolean zInRange(int z) {
+        if (start.z < end.z) {
+            return z >= start.z && z <= end.z;
+        }
+
+        return z >= end.z && z <= start.z;
+    }
+
+    private boolean xInRange(int x) {
+        if (start.x < end.x) {
+            return x >= start.x && x <= end.x;
+        }
+
+        return x >= end.x && x <= start.x;
+    }
+
+    private boolean yInRange(int y) {
+        if (start.y < end.y) {
+            return y >= start.y && y <= end.y;
+        }
+
+        return y >= end.y && y <= start.y;
+    }
+
+    private boolean stepZ() {
+        nextZ += zDirection;
+        return zInRange(nextZ);
+    }
+
+    private boolean stepX() {
+        nextX += xDirection;
+        return xInRange(nextX);
+    }
+
+    private boolean stepY() {
+        nextY += yDirection;
+        return yInRange(nextY);
+    }
+
     private void step() {
+
         if (zDirection != 0) {
-            nextZ += zDirection;
-
-            boolean zOutOfRange;
-
-            if (zDirection > 0) {
-                zOutOfRange = nextZ < start.z || nextZ > end.z;
-            } else {
-                zOutOfRange = nextZ > start.z || nextZ < end.z;
-            }
-
-            if (zOutOfRange) {
+            if (!stepZ()) {
                 nextZ = start.z;
             } else {
                 return;
@@ -177,17 +215,7 @@ public class RegionIterator implements Iterator<IntPosition> {
         }
 
         if (xDirection != 0) {
-            nextX += xDirection;
-
-            boolean xOutOfRange;
-
-            if (xDirection > 0) {
-                xOutOfRange = nextX < start.x || nextX > end.x;
-            } else {
-                xOutOfRange = nextX > start.x || nextX < end.x;
-            }
-
-            if (xOutOfRange) {
+            if (!stepX()) {
                 nextX = start.x;
             } else {
                 return;
@@ -195,20 +223,12 @@ public class RegionIterator implements Iterator<IntPosition> {
         }
 
         if (yDirection != 0) {
-            nextY += yDirection;
-
-            boolean yOutOfRange;
-
-            if (yDirection > 0) {
-                yOutOfRange = nextY < start.y || nextY > end.y;
-            } else {
-                yOutOfRange = nextY > start.y || nextY < end.y;
-            }
-
-            if (yOutOfRange) {
-                next = false;
+            if (stepY()) {
+                return;
             }
         }
+
+        next = false;
     }
 
     private static int binaryStep(int x) {

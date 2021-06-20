@@ -154,6 +154,10 @@ public class VarLightAPIImpl implements IVarLightAPI {
 
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update) {
+        if (!Bukkit.isPrimaryThread()) {
+            return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update)).join();
+        }
+
         world.requireNonNull("World may not be null");
         position.requireNonNull("Position may not be null");
 
@@ -185,6 +189,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
         int finalFromLight = wlp.getCustomLuminance(position, 0);
 
         final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(block, finalFromLight, customLuminance);
+
         Bukkit.getPluginManager().callEvent(updateEvent);
 
         if (updateEvent.isCancelled()) {
@@ -204,6 +209,14 @@ public class VarLightAPIImpl implements IVarLightAPI {
                 throw new LightUpdateFailedException(exception);
             }
         });
+    }
+
+    private void ensureMainThread(Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+        } else {
+            syncExecutor.submit(runnable);
+        }
     }
 
     @Override

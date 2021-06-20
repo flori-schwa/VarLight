@@ -38,14 +38,14 @@ public class ChatPrompts implements IPluginLifeCycleOperations {
         if (sender instanceof Entity) {
             prompt = activePrompts.get(((Entity) sender));
 
-            if (prompt.isTerminated()) {
+            if (prompt != null && prompt.isTerminated()) {
                 activePrompts.remove(((Entity) sender));
                 prompt = null;
             }
         } else if (sender instanceof ConsoleCommandSender) {
             prompt = consolePrompt;
 
-            if (prompt.isTerminated()) {
+            if (prompt != null && prompt.isTerminated()) {
                 consolePrompt = prompt = null;
             }
         } else {

@@ -86,9 +86,9 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> updateLightServer(World bukkitWorld, ChunkCoords chunk) throws VarLightNotActiveException {
+    public CompletableFuture<Void> updateLightServer(CustomLightStorage lightStorage, ChunkCoords chunk) {
+        World bukkitWorld = lightStorage.getForBukkitWorld();
         WorldServer nmsWorld = bukkitWorld.toNmsWorld();
-        plugin.getApi().requireVarLightEnabled(bukkitWorld);
 
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
         IChunkAccess iChunkAccess = nmsWorld.getChunkProvider().a(chunk.x, chunk.z);

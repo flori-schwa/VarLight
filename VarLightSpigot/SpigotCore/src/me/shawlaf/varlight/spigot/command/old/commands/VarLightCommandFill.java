@@ -218,7 +218,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
         createTickets(world, affectedChunks).join();
 
-        plugin.getApi().getSyncExecutor().submit(() -> {
+        plugin.getApi().getAsyncExecutor().submit(() -> {
             try {
                 int totalSize = iterator.getSize();
                 // TODO Implement Progress Reports

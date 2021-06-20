@@ -48,6 +48,8 @@ public class Ticks {
             if (amount > 0) {
                 builder.append(String.format("%d %s ", amount, unit.name));
             }
+
+            tmp -= amount * unit.invfactor;
         }
 
         if (tmp > 0) {

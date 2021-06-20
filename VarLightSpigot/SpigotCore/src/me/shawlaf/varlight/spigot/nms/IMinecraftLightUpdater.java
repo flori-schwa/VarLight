@@ -55,6 +55,8 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
      */
     CompletableFuture<Void> updateLightServer(World bukkitWorld, Collection<IntPosition> positions) throws VarLightNotActiveException;
 
+    CompletableFuture<Void> updateLightServer(CustomLightStorage lightStorage, ChunkCoords chunk);
+
     /**
      * Updates the Light at all Blocks in the Chunk where the custom stored luminance in NLS is not 0.
      *
@@ -64,7 +66,9 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
      * @throws VarLightNotActiveException When VarLight is not active in the specified {@link World}
      * @see IMinecraftLightUpdater#updateLightServer(World, IntPosition)
      */
-    CompletableFuture<Void> updateLightServer(World bukkitWorld, ChunkCoords chunk) throws VarLightNotActiveException;
+    default CompletableFuture<Void> updateLightServer(World bukkitWorld, ChunkCoords chunk) throws VarLightNotActiveException {
+        return updateLightServer(getPlugin().getApi().requireVarLightEnabled(bukkitWorld), chunk);
+    }
 
     void updateLightClient(CustomLightStorage lightStorage, ChunkCoords center);
 

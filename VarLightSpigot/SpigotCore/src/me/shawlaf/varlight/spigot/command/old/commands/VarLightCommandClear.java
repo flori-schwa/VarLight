@@ -176,7 +176,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
     private void clear(CommandSender source, World world, Set<ChunkCoords> chunks) {
         if (Bukkit.isPrimaryThread()) {
             // Ensure this is running on a different thread
-            plugin.getApi().getSyncExecutor().submit(() -> clear(source, world, chunks));
+            plugin.getApi().getAsyncExecutor().submit(() -> clear(source, world, chunks));
             return;
         }
 
@@ -209,15 +209,13 @@ public class VarLightCommandClear extends VarLightSubCommand {
             for (ChunkCoords chunkCoords : chunks) {
                 CompletableFuture<Void> future = new CompletableFuture<>();
 
-                // TODO
-
-//                plugin.getNmsAdapter().updateChunk(world, chunkCoords).thenRun(() -> {
-//                    try {
-//                        plugin.getNmsAdapter().sendLightUpdates(world, chunkCoords);
-//                    } finally {
-//                        future.complete(null);
-//                    }
-//                });
+                plugin.getLightUpdater().updateLightServer(manager, chunkCoords).thenRun(() -> {
+                    try {
+                        plugin.getLightUpdater().updateLightClient(manager, chunkCoords);
+                    } finally {
+                        future.complete(null);
+                    }
+                });
 
                 futures.add(future);
             }
