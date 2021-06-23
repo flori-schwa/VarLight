@@ -7,7 +7,6 @@ import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
-import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
@@ -198,17 +197,17 @@ public class VarLightAPIImpl implements IVarLightAPI {
 
         wlp.setCustomLuminance(position, updateEvent.getToLight());
 
-        return asyncExecutor.submit(() -> {
-            try {
-                if (update) {
-                    plugin.getLightUpdater().updateLightFull(world, position).join();
-                }
+        LightUpdateResult result = LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());
 
-                return LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());
-            } catch (VarLightNotActiveException exception) {
-                throw new LightUpdateFailedException(exception);
-            }
-        });
+        if (update) {
+            return asyncExecutor.submit(() -> {
+                plugin.getLightUpdater().updateLightSingleBlock(wlp, position).join();
+
+                return result;
+            });
+        }
+
+        return CompletableFuture.completedFuture(result);
     }
 
     private void ensureMainThread(Runnable runnable) {

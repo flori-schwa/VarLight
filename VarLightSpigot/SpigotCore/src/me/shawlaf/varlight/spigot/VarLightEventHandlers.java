@@ -111,11 +111,11 @@ public class VarLightEventHandlers implements Listener {
                         cls.setCustomLuminance(position, 0);
                     } else {
                         // Probably not possible, but /shrug
-                        plugin.getLightUpdater().updateLightFull(cls, position);
+                        plugin.getLightUpdater().updateLightSingleBlock(cls, position);
                     }
                 } else {
                     // The Light source Block received an update from another Block
-                    plugin.getLightUpdater().updateLightFull(cls, position);
+                    plugin.getLightUpdater().updateLightSingleBlock(cls, position);
                 }
             }
         } catch (VarLightNotActiveException ex) {

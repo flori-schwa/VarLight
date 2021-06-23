@@ -1,12 +1,10 @@
 package me.shawlaf.varlight.spigot.util.collections;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class EntityToObjectMap<V> {
 
@@ -38,7 +36,11 @@ public class EntityToObjectMap<V> {
     }
 
     public V remove(Entity key) {
-        return wrapped.remove(key.getUniqueId());
+        return removeId(key.getUniqueId());
+    }
+
+    public V removeId(UUID id) {
+        return wrapped.remove(id);
     }
 
     public void putAll(@NotNull Map<? extends Entity, ? extends V> m) {
@@ -52,8 +54,8 @@ public class EntityToObjectMap<V> {
     }
 
     @NotNull
-    public Set<Entity> keySet() {
-        return this.wrapped.keySet().stream().map(Bukkit::getEntity).collect(Collectors.toSet());
+    public Set<@NotNull UUID> keySet() {
+        return this.wrapped.keySet();
     }
 
     @NotNull

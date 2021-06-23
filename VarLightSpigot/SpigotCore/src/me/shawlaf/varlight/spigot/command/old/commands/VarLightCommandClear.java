@@ -18,11 +18,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -184,48 +182,27 @@ public class VarLightCommandClear extends VarLightSubCommand {
 
         createTickets(world, chunks).join();
 
-        @NotNull CustomLightStorage manager;
-
         try {
-            manager = plugin.getApi().requireVarLightEnabled(world);
-        } catch (VarLightNotActiveException e) {
-            failure(this, source, e.getMessage());
-            return;
-        }
+            @NotNull CustomLightStorage manager;
 
-        List<CompletableFuture<Void>> futures = new ArrayList<>(chunks.size());
-        int i = 0;
-
-        for (ChunkCoords chunk : chunks) {
-            manager.getNLSFile(chunk.toRegionCoords()).clearChunk(chunk);
-//            futures.add(plugin.getNmsAdapter().recalculateChunk(world, chunk)); // TODO
-        }
-
-        futures.forEach(CompletableFuture::join);
-
-        plugin.getApi().getSyncExecutor().submit(() -> {
-            futures.clear();
-
-            for (ChunkCoords chunkCoords : chunks) {
-                CompletableFuture<Void> future = new CompletableFuture<>();
-
-                plugin.getLightUpdater().updateLightServer(manager, chunkCoords).thenRun(() -> {
-                    try {
-                        plugin.getLightUpdater().updateLightClient(manager, chunkCoords);
-                    } finally {
-                        future.complete(null);
-                    }
-                });
-
-                futures.add(future);
+            try {
+                manager = plugin.getApi().requireVarLightEnabled(world);
+            } catch (VarLightNotActiveException e) {
+                failure(this, source, e.getMessage());
+                return;
             }
 
-            plugin.getApi().getAsyncExecutor().submit(() -> {
-                futures.forEach(CompletableFuture::join);
+            for (ChunkCoords chunk : chunks) {
+                manager.getNLSFile(chunk.toRegionCoords()).clearChunk(chunk);
+            }
 
-                releaseTickets(world, chunks).join();
-                CommandResult.successBroadcast(this, source, "Cleared Custom Light sources in " + chunks.size() + " chunks");
-            });
-        });
+            plugin.getLightUpdater().clearLightMultiChunk(manager, chunks, Collections.singleton(source)).join();
+
+            CommandResult.successBroadcast(this, source, "Cleared Custom Light sources in " + chunks.size() + " chunks");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            releaseTickets(world, chunks).join();
+        }
     }
 }

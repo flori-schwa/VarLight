@@ -21,9 +21,9 @@
     <property name="lib-spigot-1.16.5" value="spigot-1.16.5.jar"/>
 
     <property name="annotations-version" value="20.1.0"/>
-    <property name="joor-java-8-version" value="0.9.13"/> 
-    <property name="lombok-version" value="1.18.20"/> 
-    <property name="worldedit-version" value="7.2.5"/> 
+    <property name="joor-java-8-version" value="0.9.13"/>
+    <property name="lombok-version" value="1.18.20"/>
+    <property name="worldedit-version" value="7.2.5"/>
     <property name="worldguard-version" value="7.0.4"/>
 
     <property name="lib-annotations" value="annotations-${annotations-version}.jar"/>
@@ -36,32 +36,32 @@
 
     <target name="download-libs">
         <get
-            src="https://repo1.maven.org/maven2/org/jetbrains/annotations/${annotations-version}/${lib-annotations}"
-            dest="${libraries}/${lib-annotations}" />
+                src="https://repo1.maven.org/maven2/org/jetbrains/annotations/${annotations-version}/${lib-annotations}"
+                dest="${libraries}/${lib-annotations}"/>
 
         <get
-            src="https://repo1.maven.org/maven2/org/jooq/joor-java-8/${joor-java-8-version}/${lib-joor}"
-            dest="${libraries}/${lib-joor}" />
+                src="https://repo1.maven.org/maven2/org/jooq/joor-java-8/${joor-java-8-version}/${lib-joor}"
+                dest="${libraries}/${lib-joor}"/>
 
         <get
-            src="https://repo1.maven.org/maven2/org/projectlombok/lombok/${lombok-version}/${lib-lombok}"
-            dest="${libraries}/${lib-lombok}" />
+                src="https://repo1.maven.org/maven2/org/projectlombok/lombok/${lombok-version}/${lib-lombok}"
+                dest="${libraries}/${lib-lombok}"/>
 
         <get
-            src="https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-bukkit/${worldedit-version}/${lib-worldedit}"
-            dest="${libraries}/${lib-worldedit}" />
+                src="https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-bukkit/${worldedit-version}/${lib-worldedit}"
+                dest="${libraries}/${lib-worldedit}"/>
 
         <get
-            src="https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-core/${worldedit-version}/${lib-worldedit-core}"
-            dest="${libraries}/${lib-worldedit-core}" />
+                src="https://maven.enginehub.org/repo/com/sk89q/worldedit/worldedit-core/${worldedit-version}/${lib-worldedit-core}"
+                dest="${libraries}/${lib-worldedit-core}"/>
 
         <get
-            src="https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-bukkit/${worldguard-version}/${lib-worldguard}"
-            dest="${libraries}/${lib-worldguard}" />
+                src="https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-bukkit/${worldguard-version}/${lib-worldguard}"
+                dest="${libraries}/${lib-worldguard}"/>
 
         <get
-            src="https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-core/${worldguard-version}/${lib-worldguard-core}"
-            dest="${libraries}/${lib-worldguard-core}" />
+                src="https://maven.enginehub.org/repo/com/sk89q/worldguard/worldguard-core/${worldguard-version}/${lib-worldguard-core}"
+                dest="${libraries}/${lib-worldguard-core}"/>
     </target>
 
     <target name="clean">
@@ -105,19 +105,20 @@
 
         <replace file="${build}/plugin.yml" token="plugin.version" value="${plugin.version}"/>
 
-        <javac  srcdir="${spigot-core-src}"
-                destdir="${build}"
-                includeantruntime="false"
-                debug="true"
-                debuglevel="source,vars,lines"
-                source="1.8"
-                target="1.8"
-                compiler="modern"
+        <javac srcdir="${spigot-core-src}"
+               destdir="${build}"
+               includeantruntime="false"
+               debug="true"
+               debuglevel="source,vars,lines"
+               source="1.8"
+               target="1.8"
+               compiler="modern"
         >
             <classpath>
                 <fileset dir="${libraries}">
                     <include name="**/${lib-lombok}"/>
-                    <include name="**/${lib-spigot-1.16.5}"/> <!-- TODO: Switch back to using 1.12.2 and include brigadier in final JAR -->
+                    <include
+                            name="**/${lib-spigot-1.16.5}"/> <!-- TODO: Switch back to using 1.12.2 and include brigadier in final JAR -->
                     <include name="**/${lib-worldedit}"/>
                     <include name="**/${lib-worldedit-core}"/>
                     <include name="**/${lib-worldguard}"/>
