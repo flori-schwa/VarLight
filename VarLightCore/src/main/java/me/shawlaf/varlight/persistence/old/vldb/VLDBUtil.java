@@ -1,6 +1,6 @@
-package me.shawlaf.varlight.persistence.vldb;
+package me.shawlaf.varlight.persistence.old.vldb;
 
-import me.shawlaf.varlight.persistence.ICustomLightSource;
+import me.shawlaf.varlight.persistence.old.ICustomLightSource;
 
 import java.nio.charset.StandardCharsets;
 

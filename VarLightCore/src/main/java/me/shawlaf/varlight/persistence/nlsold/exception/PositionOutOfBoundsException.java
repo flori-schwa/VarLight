@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.persistence.nls.exception;
+package me.shawlaf.varlight.persistence.nlsold.exception;
 
 import me.shawlaf.varlight.util.IntPosition;
 

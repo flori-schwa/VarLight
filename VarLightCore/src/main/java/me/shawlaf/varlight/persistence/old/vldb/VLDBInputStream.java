@@ -1,6 +1,6 @@
-package me.shawlaf.varlight.persistence.vldb;
+package me.shawlaf.varlight.persistence.old.vldb;
 
-import me.shawlaf.varlight.persistence.ICustomLightSource;
+import me.shawlaf.varlight.persistence.old.ICustomLightSource;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.FileUtil;
 import me.shawlaf.varlight.util.IntPosition;
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.function.IntFunction;
 import java.util.zip.GZIPInputStream;
 
-import static me.shawlaf.varlight.persistence.vldb.VLDBUtil.SIZEOF_OFFSET_TABLE_ENTRY;
+import static me.shawlaf.varlight.persistence.old.vldb.VLDBUtil.SIZEOF_OFFSET_TABLE_ENTRY;
 
 @Deprecated
 public class VLDBInputStream implements Closeable {

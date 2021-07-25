@@ -1,9 +1,7 @@
-package me.shawlaf.varlight.persistence.nls;
+package me.shawlaf.varlight.persistence.nls.common;
 
 import me.shawlaf.varlight.util.Preconditions;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
 
 public class NibbleArray {
@@ -64,10 +62,4 @@ public class NibbleArray {
     public byte[] toByteArray() {
         return Arrays.copyOf(array, array.length);
     }
-
-    public void write(OutputStream out) throws IOException {
-        out.write(array, 0, array.length);
-    }
-
-
 }

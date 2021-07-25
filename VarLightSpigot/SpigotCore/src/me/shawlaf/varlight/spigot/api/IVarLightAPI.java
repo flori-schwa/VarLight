@@ -3,7 +3,7 @@ package me.shawlaf.varlight.spigot.api;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
+import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
@@ -32,10 +32,10 @@ public interface IVarLightAPI {
 
     Material getLightUpdateItem();
 
-    @Nullable CustomLightStorage getLightStorage(World world);
+    @Nullable ICustomLightStorage getLightStorage(World world);
 
-    default @NotNull CustomLightStorage requireVarLightEnabled(World world) throws VarLightNotActiveException {
-        CustomLightStorage cls = getLightStorage(world);
+    default @NotNull ICustomLightStorage requireVarLightEnabled(World world) throws VarLightNotActiveException {
+        ICustomLightStorage cls = getLightStorage(world);
 
         if (cls == null) {
             throw new VarLightNotActiveException(world);
@@ -44,7 +44,7 @@ public interface IVarLightAPI {
         return cls;
     }
 
-    @NotNull Collection<CustomLightStorage> getAllActiveVarLightWorlds();
+    @NotNull Collection<ICustomLightStorage> getAllActiveVarLightWorlds();
 
     void setLightUpdateItem(Material item);
 

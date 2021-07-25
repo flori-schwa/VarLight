@@ -1,6 +1,7 @@
-package me.shawlaf.varlight.persistence;
+package me.shawlaf.varlight.persistence.old;
 
-import me.shawlaf.varlight.persistence.vldb.VLDBFile;
+import me.shawlaf.varlight.persistence.LightPersistFailedException;
+import me.shawlaf.varlight.persistence.old.vldb.VLDBFile;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.persistence;
+package me.shawlaf.varlight.persistence.old;
 
 import lombok.Getter;
 import me.shawlaf.varlight.util.IntPosition;

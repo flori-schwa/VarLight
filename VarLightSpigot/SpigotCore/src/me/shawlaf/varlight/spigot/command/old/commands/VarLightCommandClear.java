@@ -8,7 +8,7 @@ import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
+import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.ChunkCoords;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -146,7 +146,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         int regionZ = (source.getLocation().getBlockZ() >> 4) >> 5;
 
         try {
-            CustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
+            ICustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
 
             return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
         } catch (VarLightNotActiveException e) {
@@ -162,7 +162,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         int regionZ = context.getArgument(ARG_REGION_Z.getName(), int.class);
 
         try {
-            CustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
+            ICustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
 
             return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
         } catch (VarLightNotActiveException e) {
@@ -183,7 +183,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         createTickets(world, chunks).join();
 
         try {
-            @NotNull CustomLightStorage manager;
+            @NotNull ICustomLightStorage manager;
 
             try {
                 manager = plugin.getApi().requireVarLightEnabled(world);
@@ -193,7 +193,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
             }
 
             for (ChunkCoords chunk : chunks) {
-                manager.getNLSFile(chunk.toRegionCoords()).clearChunk(chunk);
+                manager.clearChunk(chunk);
             }
 
             plugin.getLightUpdater().clearLightMultiChunk(manager, chunks, Collections.singleton(source)).join();

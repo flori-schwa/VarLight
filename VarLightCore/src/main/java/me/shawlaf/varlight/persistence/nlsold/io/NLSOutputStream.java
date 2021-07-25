@@ -1,6 +1,4 @@
-package me.shawlaf.varlight.persistence.nls.io;
-
-import me.shawlaf.varlight.persistence.nls.NLSUtil;
+package me.shawlaf.varlight.persistence.nlsold.io;
 
 import java.io.Closeable;
 import java.io.Flushable;
@@ -22,6 +20,7 @@ import java.io.OutputStream;
     [int16] Section Mask
     [NibbleArray(4096)[]] LIGHT DATA (2048 Bytes)
  */
+@Deprecated
 public class NLSOutputStream implements Flushable, Closeable, AutoCloseable {
 
     private OutputStream out;
@@ -30,10 +29,10 @@ public class NLSOutputStream implements Flushable, Closeable, AutoCloseable {
         this.out = out;
     }
 
-    public void writeHeader(int regionX, int regionZ) throws IOException {
+    public void writeHeader(int x, int regionZ) throws IOException {
         writeInt32(NLSUtil.NLS_MAGIC);
         writeInt32(NLSUtil.CURRENT_VERSION);
-        writeInt32(regionX);
+        writeInt32(x);
         writeInt32(regionZ);
     }
 

@@ -3,7 +3,7 @@ package me.shawlaf.varlight.spigot.nms.v1_16_R3;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.nms.IMinecraftLightUpdater;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
+import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
 import me.shawlaf.varlight.spigot.util.RegionIterator;
 import me.shawlaf.varlight.spigot.util.collections.IteratorUtils;
@@ -19,7 +19,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.joor.Reflect;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -47,15 +50,15 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
         }
     }
 
-    private boolean isLightSource(Tuple<IChunkAccess, CustomLightStorage> data, IntPosition position) {
+    private boolean isLightSource(Tuple<IChunkAccess, ICustomLightStorage> data, IntPosition position) {
         return data.item1.getType(position.toBlockPosition()).f() != 0 || data.item2.getCustomLuminance(position, 0) != 0;
     }
 
-    private Stream<IntPosition> streamChunkBlocks(CustomLightStorage cls, ChunkCoords chunkPos) {
+    private Stream<IntPosition> streamChunkBlocks(ICustomLightStorage cls, ChunkCoords chunkPos) {
         return streamChunkBlocks(cls,chunkPos, (tup, pos) -> true);
     }
 
-    private Stream<IntPosition> streamChunkBlocks(CustomLightStorage cls, ChunkCoords chunkPos, BiPredicate<Tuple<IChunkAccess, CustomLightStorage>, IntPosition> pred) {
+    private Stream<IntPosition> streamChunkBlocks(ICustomLightStorage cls, ChunkCoords chunkPos, BiPredicate<Tuple<IChunkAccess, ICustomLightStorage>, IntPosition> pred) {
         if (!Bukkit.isPrimaryThread()) {
             return plugin.getApi().getSyncExecutor().submit(() -> streamChunkBlocks(cls, chunkPos, pred)).join();
         }
@@ -67,7 +70,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
             return Stream.of(); // Empty
         }
 
-        Tuple<IChunkAccess, CustomLightStorage> tuple = new Tuple<>(chunk, cls);
+        Tuple<IChunkAccess, ICustomLightStorage> tuple = new Tuple<>(chunk, cls);
         RegionIterator it = new RegionIterator(chunkPos.getChunkStart(), chunkPos.getChunkEnd());
 
         return StreamSupport.stream(
@@ -162,7 +165,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> updateLightSingleBlock(CustomLightStorage lightStorage, IntPosition position) {
+    public CompletableFuture<Void> updateLightSingleBlock(ICustomLightStorage lightStorage, IntPosition position) {
         World bukkitWorld = lightStorage.getForBukkitWorld();
         WorldServer nmsWorld = bukkitWorld.toNmsWorld();
 
@@ -179,7 +182,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> updateLightMultiBlock(CustomLightStorage lightStorage, Collection<IntPosition> positions, Collection<CommandSender> progressSubscribers) {
+    public CompletableFuture<Void> updateLightMultiBlock(ICustomLightStorage lightStorage, Collection<IntPosition> positions, Collection<CommandSender> progressSubscribers) {
         WorldServer nmsWorld = lightStorage.getForBukkitWorld().toNmsWorld();
 
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
@@ -209,7 +212,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> updateLightChunk(CustomLightStorage lightStorage, ChunkCoords center, Collection<CommandSender> progressSubscribers) {
+    public CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkCoords center, Collection<CommandSender> progressSubscribers) {
         WorldServer nmsWorld = lightStorage.getForBukkitWorld().toNmsWorld();
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
         LightEngineBlock leb = ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK));
@@ -234,7 +237,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> updateLightMultiChunk(CustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers) {
+    public CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers) {
         WorldServer nmsWorld = lightStorage.getForBukkitWorld().toNmsWorld();
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
         LightEngineBlock leb = ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK));
@@ -262,7 +265,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> clearLightChunk(CustomLightStorage lightStorage, ChunkCoords center, Collection<CommandSender> progressSubscribers) {
+    public CompletableFuture<Void> clearLightChunk(ICustomLightStorage lightStorage, ChunkCoords center, Collection<CommandSender> progressSubscribers) {
         WorldServer nmsWorld = lightStorage.getForBukkitWorld().toNmsWorld();
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
         LightEngineBlock leb = ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK));
@@ -287,7 +290,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
     }
 
     @Override
-    public CompletableFuture<Void> clearLightMultiChunk(CustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers) {
+    public CompletableFuture<Void> clearLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers) {
         WorldServer nmsWorld = lightStorage.getForBukkitWorld().toNmsWorld();
         LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
         LightEngineBlock leb = ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK));

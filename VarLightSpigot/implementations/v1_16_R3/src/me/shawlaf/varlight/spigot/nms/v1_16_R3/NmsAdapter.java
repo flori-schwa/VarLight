@@ -66,6 +66,11 @@ public class NmsAdapter implements INmsMethods {
     }
 
     @Override
+    public boolean hasPersistenceApi() {
+        return true;
+    }
+
+    @Override
     public @NotNull File getRegionRoot(@NotNull World bukkitWorld) {
         return Reflect.on(bukkitWorld.toNmsWorld().getChunkProvider().playerChunkMap).get("w");
     }

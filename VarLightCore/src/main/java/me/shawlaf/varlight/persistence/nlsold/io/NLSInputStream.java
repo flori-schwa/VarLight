@@ -1,10 +1,10 @@
-package me.shawlaf.varlight.persistence.nls.io;
+package me.shawlaf.varlight.persistence.nlsold.io;
 
-import me.shawlaf.varlight.persistence.nls.NLSUtil;
-import me.shawlaf.varlight.persistence.nls.NibbleArray;
+import me.shawlaf.varlight.persistence.nls.common.NibbleArray;
 
 import java.io.*;
 
+@Deprecated
 public class NLSInputStream implements Closeable {
 
     private DataInputStream in;

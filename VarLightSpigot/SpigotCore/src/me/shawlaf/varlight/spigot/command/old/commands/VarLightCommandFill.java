@@ -12,7 +12,7 @@ import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
 import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorageNLS;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.Pointer;
@@ -192,7 +192,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
         World world = source.getWorld();
 
-        @NotNull CustomLightStorage manager;
+        @NotNull CustomLightStorageNLS manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(world);

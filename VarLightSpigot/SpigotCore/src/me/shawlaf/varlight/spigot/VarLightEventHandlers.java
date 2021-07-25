@@ -3,7 +3,8 @@ package me.shawlaf.varlight.spigot;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
+import me.shawlaf.varlight.spigot.persistence.CustomLightStorageNLS;
+import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.IntPosition;
@@ -33,7 +34,7 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler
     public void playerModifyLightSource(PlayerInteractEvent e) {
-        CustomLightStorage cls = plugin.getApi().getLightStorage(e.getPlayer().getWorld());
+        ICustomLightStorage cls = plugin.getApi().getLightStorage(e.getPlayer().getWorld());
 
         if (cls == null) {
             return;
@@ -97,7 +98,7 @@ public class VarLightEventHandlers implements Listener {
     @EventHandler
     public void lightSourceReceiveUpdate(BlockPhysicsEvent e) {
         try {
-            CustomLightStorage cls = plugin.getApi().requireVarLightEnabled(e.getBlock().getWorld());
+            ICustomLightStorage cls = plugin.getApi().requireVarLightEnabled(e.getBlock().getWorld());
 
             IntPosition position = e.getBlock().toIntPosition();
             int luminance = cls.getCustomLuminance(position, 0);

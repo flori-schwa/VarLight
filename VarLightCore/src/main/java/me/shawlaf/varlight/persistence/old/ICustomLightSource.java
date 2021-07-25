@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.persistence;
+package me.shawlaf.varlight.persistence.old;
 
 import me.shawlaf.varlight.util.IntPosition;
 

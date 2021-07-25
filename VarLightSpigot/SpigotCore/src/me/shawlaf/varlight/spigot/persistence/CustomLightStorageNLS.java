@@ -5,7 +5,7 @@ import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.persistence.LightPersistFailedException;
 import me.shawlaf.varlight.persistence.nls.NLSFile;
-import me.shawlaf.varlight.persistence.nls.exception.PositionOutOfBoundsException;
+import me.shawlaf.varlight.persistence.nlsold.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.ChunkCoords;
@@ -28,7 +28,7 @@ import java.util.function.IntSupplier;
 @ExtensionMethod({
         IntPositionExtension.class
 })
-public class CustomLightStorage {
+public class CustomLightStorageNLS implements ICustomLightStorage {
 
     @Getter
     private final World forBukkitWorld;
@@ -37,22 +37,19 @@ public class CustomLightStorage {
 
     private final Map<RegionCoords, NLSFile> worldMap = new HashMap<>();
 
-    public CustomLightStorage(World forBukkitWorld, VarLightPlugin plugin) {
+    public CustomLightStorageNLS(World forBukkitWorld, VarLightPlugin plugin) {
         this.forBukkitWorld = forBukkitWorld;
         this.plugin = plugin;
 
-        synchronized (worldMap) {
-            // Create VarLight save directory if it does not exist
-            plugin.getNmsAdapter().getVarLightSaveDirectory(forBukkitWorld);
-
-            // TODO run migrations
-        }
+        plugin.getNmsAdapter().getVarLightSaveDirectory(forBukkitWorld);
     }
 
+    @Override
     public int getCustomLuminance(IntPosition position, int def) {
         return getCustomLuminance(position, () -> def);
     }
 
+    @Override
     public int getCustomLuminance(IntPosition position, IntSupplier def) {
         int lum;
 
@@ -69,22 +66,32 @@ public class CustomLightStorage {
         return lum;
     }
 
+    @Override
     public boolean hasChunkCustomLightData(ChunkCoords chunkCoords) {
         return getNLSFile(chunkCoords.toRegionCoords()).hasChunkData(chunkCoords);
     }
 
+    @Override
     public void setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException {
         setCustomLuminance(location.toIntPosition(), luminance);
     }
 
+    @Override
     public void setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException {
         getNLSFile(position.toRegionCoords()).setCustomLuminance(position, luminance);
     }
 
+    @Override
+    public void clearChunk(ChunkCoords chunkCoords) {
+        getNLSFile(chunkCoords.toRegionCoords()).clearChunk(chunkCoords);
+    }
+
+    @Override
     public void runAutosave() {
         save(Bukkit.getConsoleSender(), plugin.getVarLightConfig().isLogVerbose());
     }
 
+    @Override
     public void save(CommandSender commandSender, boolean log) {
         int modified = 0, deleted = 0;
         List<RegionCoords> regionsToUnload = new ArrayList<>();

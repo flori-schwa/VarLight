@@ -3,7 +3,7 @@ package me.shawlaf.varlight.spigot.nms;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorage;
+import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.World;
@@ -17,36 +17,36 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
 
-    CompletableFuture<Void> updateLightSingleBlock(CustomLightStorage lightStorage, IntPosition position);
+    CompletableFuture<Void> updateLightSingleBlock(ICustomLightStorage lightStorage, IntPosition position);
 
-    CompletableFuture<Void> updateLightMultiBlock(CustomLightStorage lightStorage, Collection<IntPosition> positions, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> updateLightMultiBlock(ICustomLightStorage lightStorage, Collection<IntPosition> positions, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> updateLightChunk(CustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> updateLightMultiChunk(CustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> clearLightChunk(CustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> clearLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> clearLightMultiChunk(CustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> clearLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
 
 
-    default CompletableFuture<Void> updateLightMultiBlock(CustomLightStorage lightStorage, Collection<IntPosition> positions) {
+    default CompletableFuture<Void> updateLightMultiBlock(ICustomLightStorage lightStorage, Collection<IntPosition> positions) {
         return updateLightMultiBlock(lightStorage, positions, null);
     }
 
-    default CompletableFuture<Void> updateLightChunk(CustomLightStorage lightStorage, ChunkCoords chunk) {
+    default CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk) {
         return updateLightChunk(lightStorage, chunk, null);
     }
 
-    default CompletableFuture<Void> updateLightMultiChunk(CustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions) {
+    default CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions) {
         return updateLightMultiChunk(lightStorage, chunkPositions, null);
     }
 
-    default CompletableFuture<Void> clearLightChunk(CustomLightStorage lightStorage, ChunkCoords chunk) {
+    default CompletableFuture<Void> clearLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk) {
         return clearLightChunk(lightStorage, chunk, null);
     }
 
-    default CompletableFuture<Void> clearLightMultiChunk(CustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions) {
+    default CompletableFuture<Void> clearLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions) {
         return clearLightMultiChunk(lightStorage, chunkPositions, null);
     }
 

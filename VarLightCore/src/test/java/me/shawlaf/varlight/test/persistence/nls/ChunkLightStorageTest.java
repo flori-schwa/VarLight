@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.test.persistence.nls;
 
-import me.shawlaf.varlight.persistence.nls.ChunkLightStorage;
-import me.shawlaf.varlight.persistence.nls.exception.PositionOutOfBoundsException;
+import me.shawlaf.varlight.persistence.nls.common.implementations.v1.ChunkLightStorage_V1;
+import me.shawlaf.varlight.persistence.nlsold.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.util.IntPosition;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ public class ChunkLightStorageTest {
 
     @Test
     public void testGetSetLightStorage() {
-        ChunkLightStorage cls = new ChunkLightStorage(0, 0);
+        ChunkLightStorage_V1 cls = new ChunkLightStorage_V1(0, 0);
 
         IntPosition position = new IntPosition(0, 0, 0);
 
@@ -28,7 +28,7 @@ public class ChunkLightStorageTest {
 
     @Test
     public void testOutOfBounds() {
-        ChunkLightStorage cls = new ChunkLightStorage(0, 0);
+        ChunkLightStorage_V1 cls = new ChunkLightStorage_V1(0, 0);
 
         assertThrows(PositionOutOfBoundsException.class, () -> cls.getCustomLuminance(new IntPosition(16, 0, 0))); // x out of bounds
         assertThrows(PositionOutOfBoundsException.class, () -> cls.getCustomLuminance(new IntPosition(0, 0, 16))); // z out of bounds

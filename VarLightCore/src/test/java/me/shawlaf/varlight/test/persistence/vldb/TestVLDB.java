@@ -1,9 +1,9 @@
 package me.shawlaf.varlight.test.persistence.vldb;
 
-import me.shawlaf.varlight.persistence.BasicCustomLightSource;
-import me.shawlaf.varlight.persistence.vldb.VLDBFile;
-import me.shawlaf.varlight.persistence.vldb.VLDBInputStream;
-import me.shawlaf.varlight.persistence.vldb.VLDBOutputStream;
+import me.shawlaf.varlight.persistence.old.BasicCustomLightSource;
+import me.shawlaf.varlight.persistence.old.vldb.VLDBFile;
+import me.shawlaf.varlight.persistence.old.vldb.VLDBInputStream;
+import me.shawlaf.varlight.persistence.old.vldb.VLDBOutputStream;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.FileUtil;
 import me.shawlaf.varlight.util.IntPosition;

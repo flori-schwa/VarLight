@@ -1,6 +1,6 @@
-package me.shawlaf.varlight.persistence.vldb;
+package me.shawlaf.varlight.persistence.old.vldb;
 
-import me.shawlaf.varlight.persistence.ICustomLightSource;
+import me.shawlaf.varlight.persistence.old.ICustomLightSource;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.FileUtil;
 import me.shawlaf.varlight.util.IntPosition;
@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import static java.util.Objects.requireNonNull;
-import static me.shawlaf.varlight.persistence.vldb.VLDBUtil.SIZEOF_INT32;
-import static me.shawlaf.varlight.persistence.vldb.VLDBUtil.SIZEOF_MAGIC;
+import static me.shawlaf.varlight.persistence.old.vldb.VLDBUtil.SIZEOF_INT32;
+import static me.shawlaf.varlight.persistence.old.vldb.VLDBUtil.SIZEOF_MAGIC;
 
 @Deprecated
 public abstract class VLDBFile<L extends ICustomLightSource> {
