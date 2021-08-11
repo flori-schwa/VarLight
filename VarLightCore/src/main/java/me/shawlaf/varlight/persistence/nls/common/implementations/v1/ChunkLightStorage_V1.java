@@ -4,7 +4,7 @@ import lombok.Getter;
 import me.shawlaf.varlight.persistence.IChunkCustomLightAccess;
 import me.shawlaf.varlight.persistence.nls.common.ChunkSectionNibbleArray;
 import me.shawlaf.varlight.persistence.nls.common.NibbleArray;
-import me.shawlaf.varlight.persistence.nlsold.exception.PositionOutOfBoundsException;
+import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import org.jetbrains.annotations.NotNull;

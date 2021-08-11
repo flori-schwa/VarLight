@@ -5,9 +5,10 @@ import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.persistence.LightPersistFailedException;
 import me.shawlaf.varlight.persistence.nls.NLSFile;
-import me.shawlaf.varlight.persistence.nlsold.exception.PositionOutOfBoundsException;
+import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.RegionIterator;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import me.shawlaf.varlight.util.RegionCoords;
@@ -19,10 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.IntSupplier;
 
 @ExtensionMethod({
@@ -69,6 +67,46 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
     @Override
     public boolean hasChunkCustomLightData(ChunkCoords chunkCoords) {
         return getNLSFile(chunkCoords.toRegionCoords()).hasChunkData(chunkCoords);
+    }
+
+    @Override
+    public Iterator<IntPosition> iterateAllLightSources(IntPosition a, IntPosition b) {
+        RegionIterator iterator = new RegionIterator(a, b);
+        IntSupplier defaultSupplier = () -> 0;
+
+        return new Iterator<IntPosition>() {
+
+            IntPosition next;
+
+            {
+                findNext();
+            }
+
+            private void findNext() {
+                next = null;
+
+                while (iterator.hasNext()) {
+                    IntPosition pos = iterator.next();
+
+                    if (getCustomLuminance(pos, defaultSupplier) != 0) {
+                        next = pos;
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public IntPosition next() {
+                IntPosition tmp = next;
+                findNext();
+                return tmp;
+            }
+        };
     }
 
     @Override

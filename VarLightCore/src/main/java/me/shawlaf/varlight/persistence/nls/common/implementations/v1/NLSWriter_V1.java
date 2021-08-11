@@ -6,6 +6,21 @@ import me.shawlaf.varlight.persistence.nls.common.io.NLSCommonOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/*
+    V1 File Format:
+
+    Header:
+    [int32] MAGIC_VALUE 0x4E 0x41 0x4C 0x53
+    [int32] VERSION
+    [int32] REGION X
+    [int32] REGION Z
+    [Chunk[]]
+
+    Chunk:
+    [int16] POS IN REGION (ZZZZZ_XXXXX)
+    [int16] Section Mask
+    [NibbleArray(4096)[]] LIGHT DATA (2048 Bytes)
+ */
 public class NLSWriter_V1 implements AutoCloseable {
 
     private final NLSCommonOutputStream out;

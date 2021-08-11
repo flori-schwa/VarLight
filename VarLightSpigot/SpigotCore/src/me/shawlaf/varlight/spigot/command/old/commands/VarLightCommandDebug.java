@@ -3,14 +3,13 @@ package me.shawlaf.varlight.spigot.command.old.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import lombok.experimental.ExtensionMethod;
+import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.CustomLightStorageNLS;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
-import me.shawlaf.varlight.util.Paginator;
-import me.shawlaf.varlight.util.RegionCoords;
+import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
+import me.shawlaf.varlight.util.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -20,7 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Iterator;
 
 import static me.shawlaf.command.result.CommandResult.failure;
 import static me.shawlaf.command.result.CommandResult.success;
@@ -28,6 +27,9 @@ import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
 @SuppressWarnings("DuplicatedCode")
+@ExtensionMethod({
+        CollectionUtil.class
+})
 public class VarLightCommandDebug extends VarLightSubCommand {
 
     private static final int PAGE_SIZE = 10;
@@ -177,7 +179,8 @@ public class VarLightCommandDebug extends VarLightSubCommand {
     }
 
     private void listLightSourcesInRegion(Player player, int regionX, int regionZ, int page) {
-        @NotNull CustomLightStorageNLS manager;
+
+        @NotNull ICustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
@@ -186,19 +189,27 @@ public class VarLightCommandDebug extends VarLightSubCommand {
             return;
         }
 
-        List<IntPosition> all = manager.getNLSFile(new RegionCoords(regionX, regionZ)).getAllLightSources();
+        RegionCoords regionCoords = new RegionCoords(regionX, regionZ);
 
-        int pages = Paginator.getAmountPages(all.size(), PAGE_SIZE);
-        page = Math.min(page, pages);
+        CountingIterator<IntPosition> all = manager.iterateAllLightSources(regionCoords.getRegionStart(), regionCoords.getRegionEnd()).count();
 
-        List<IntPosition> pageList = Paginator.paginateEntries(all, PAGE_SIZE, page);
+        try {
+            Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
 
-        player.sendMessage(String.format("Light sources in region (%d | %d): %d (Showing Page %d / %d)", regionX, regionZ, all.size(), page, pages));
-        listInternal(player, pageList);
+            int totalCount = all.countToEnd();
+
+            int pages = Paginator.getAmountPages(totalCount, PAGE_SIZE);
+            page = Math.min(page, pages);
+
+            player.sendMessage(String.format("Light sources in region (%d | %d): %d (Showing Page %d / %d)", regionX, regionZ, totalCount, page, pages));
+            listInternal(player, manager, pageList);
+        } catch (IndexOutOfBoundsException e) {
+            CommandResult.failure(this, player, String.format("The specified page %d (out of %d) is out of bounds!", page, Paginator.getAmountPages(all.countToEnd(), PAGE_SIZE)));
+        }
     }
 
     private void listLightSourcesInChunk(Player player, int chunkX, int chunkZ, int page) {
-        @NotNull CustomLightStorageNLS manager;
+        @NotNull ICustomLightStorage manager;
 
         try {
             manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
@@ -209,30 +220,29 @@ public class VarLightCommandDebug extends VarLightSubCommand {
 
         ChunkCoords chunkCoords = new ChunkCoords(chunkX, chunkZ);
 
-        List<IntPosition> all = manager.getNLSFile(chunkCoords.toRegionCoords()).getAllLightSources(chunkCoords);
+        CountingIterator<IntPosition> all = manager.iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd()).count();
 
-        int pages = Paginator.getAmountPages(all.size(), PAGE_SIZE);
-        page = Math.min(page, pages);
+        try {
+            Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
 
-        List<IntPosition> pageList = Paginator.paginateEntries(all, PAGE_SIZE, page);
+            int totalCount = all.countToEnd();
 
-        player.sendMessage(String.format("Light sources in chunk (%d | %d): %d (Showing Page %d / %d)", chunkX, chunkZ, all.size(), page, pages));
-        listInternal(player, pageList);
+            int pages = Paginator.getAmountPages(totalCount, PAGE_SIZE);
+            page = Math.min(page, pages);
+
+            player.sendMessage(String.format("Light sources in chunk (%d | %d): %d (Showing Page %d / %d)", chunkX, chunkZ, totalCount, page, pages));
+            listInternal(player, manager, pageList);
+        } catch (IndexOutOfBoundsException e) {
+            CommandResult.failure(this, player, String.format("The specified page %d (out of %d) is out of bounds!", page, Paginator.getAmountPages(all.countToEnd(), PAGE_SIZE)));
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
     // All Methods that call this Method already assert that the WorldLightSourceManager exists!
-    private void listInternal(Player player, List<IntPosition> list) {
-        @NotNull CustomLightStorageNLS manager;
+    private void listInternal(Player player, ICustomLightStorage manager, Iterator<IntPosition> iterator) {
+        while (iterator.hasNext()) {
+            IntPosition lightSource = iterator.next();
 
-        try {
-            manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
-        } catch (VarLightNotActiveException notPossible) {
-            notPossible.printStackTrace(); // Print incase this somehow still happens
-            return;
-        }
-
-        for (IntPosition lightSource : list) {
             TextComponent textComponent = new TextComponent(String.format(
                     "%s = %d (%s)",
                     lightSource.toShortString(),

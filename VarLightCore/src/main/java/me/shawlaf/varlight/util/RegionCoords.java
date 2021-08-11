@@ -14,6 +14,22 @@ public class RegionCoords {
         this.z = z;
     }
 
+    public ChunkCoords getRegionStartChunk() {
+        return new ChunkCoords(x * 32, z * 32);
+    }
+
+    public ChunkCoords getRegionEndChunk() {
+        return new ChunkCoords((x * 32) + 31, (z * 32) + 31);
+    }
+
+    public IntPosition getRegionStart() {
+        return getRegionStartChunk().getChunkStart();
+    }
+
+    public IntPosition getRegionEnd() {
+        return getRegionEndChunk().getChunkEnd();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

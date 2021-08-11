@@ -1,12 +1,13 @@
 package me.shawlaf.varlight.spigot.persistence;
 
-import me.shawlaf.varlight.persistence.nlsold.exception.PositionOutOfBoundsException;
+import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.util.ChunkCoords;
 import me.shawlaf.varlight.util.IntPosition;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
+import java.util.Iterator;
 import java.util.function.IntSupplier;
 
 public interface ICustomLightStorage {
@@ -18,6 +19,12 @@ public interface ICustomLightStorage {
     int getCustomLuminance(IntPosition position, IntSupplier def);
 
     boolean hasChunkCustomLightData(ChunkCoords chunkCoords);
+
+    Iterator<IntPosition> iterateAllLightSources(IntPosition a, IntPosition b);
+
+    default Iterator<IntPosition> iterateLightSources(ChunkCoords chunkCoords) {
+        return iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd());
+    }
 
     void setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException;
 
