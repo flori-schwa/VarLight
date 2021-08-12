@@ -2,16 +2,19 @@ package me.shawlaf.varlight.spigot;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
+import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.IntPosition;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPhysicsEvent;
@@ -31,7 +34,48 @@ public class VarLightEventHandlers implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void playerInspectLightSource(PlayerInteractEvent e) {
+        if (!plugin.getNmsAdapter().isVarLightDebugStick(e.getItem())) {
+            return;
+        }
+
+        e.setCancelled(true);
+
+        if (e.getClickedBlock() == null) {
+            return;
+        }
+
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
+        if (!e.getPlayer().hasVarLightDebugPermission()) {
+            CommandResult.failure(plugin.getCommand(), e.getPlayer(), "You do not have permission to use the debug stick!");
+            return;
+        }
+
+        ICustomLightStorage cls;
+
+        try {
+            cls = plugin.getApi().requireVarLightEnabled(e.getClickedBlock().getWorld());
+        } catch (VarLightNotActiveException ex) {
+            CommandResult.failure(plugin.getCommand(), e.getPlayer(), ex.getMessage());
+            return;
+        }
+
+        IntPosition clickedBlock = e.getClickedBlock().toIntPosition();
+
+        int customLuminance = cls.getCustomLuminance(clickedBlock, 0);
+
+        if (customLuminance == 0) {
+            CommandResult.info(plugin.getCommand(), e.getPlayer(), String.format("No custom light source present at Position %s", clickedBlock.toShortString()), ChatColor.RED);
+        } else {
+            CommandResult.info(plugin.getCommand(), e.getPlayer(), String.format("Custom Light Level of Block at Position %s: %d", clickedBlock.toShortString(), customLuminance), ChatColor.GREEN);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void playerModifyLightSource(PlayerInteractEvent e) {
         ICustomLightStorage cls = plugin.getApi().getLightStorage(e.getPlayer().getWorld());
 

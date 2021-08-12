@@ -74,6 +74,10 @@ public interface INmsMethods extends IPluginLifeCycleOperations {
 
     @NotNull ItemStack makeGlowingStack(@NotNull ItemStack base, int lightLevel);
 
+    @NotNull ItemStack makeVarLightDebugStick();
+
+    boolean isVarLightDebugStick(ItemStack itemStack);
+
     @NotNull String getLocalizedBlockName(Material type);
 
     /**

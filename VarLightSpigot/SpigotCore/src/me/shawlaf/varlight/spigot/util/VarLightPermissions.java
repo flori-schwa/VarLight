@@ -10,4 +10,8 @@ public class VarLightPermissions {
         return self.hasPermission("varlight.use");
     }
 
+    public boolean hasVarLightDebugPermission(Permissible self) {
+        return self.hasPermission("varlight.admin.debug");
+    }
+
 }

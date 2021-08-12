@@ -109,8 +109,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
                         return FAILURE;
                     }
 
-                    // TODO Implement Debug Stick
-//                    ((Player) context.getSource()).getInventory().addItem(plugin.getNmsAdapter().getVarLightDebugStick());
+                    ((Player) context.getSource()).getInventory().addItem(plugin.getNmsAdapter().makeVarLightDebugStick());;
 
                     return SUCCESS;
                 })

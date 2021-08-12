@@ -4,10 +4,7 @@ import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.nms.INmsMethods;
 import me.shawlaf.varlight.spigot.util.NamespacedID;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.LocaleLanguage;
-import net.minecraft.server.v1_16_R3.MinecraftKey;
-import net.minecraft.server.v1_16_R3.NBTTagInt;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -15,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +22,7 @@ import org.joor.Reflect;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @ExtensionMethod({
@@ -33,8 +32,22 @@ public class NmsAdapter implements INmsMethods {
 
     private final VarLightPlugin plugin;
 
+    private final ItemStack varLightDebugStick;
+
     public NmsAdapter(VarLightPlugin plugin) {
         this.plugin = plugin;
+
+        net.minecraft.server.v1_16_R3.ItemStack nmsStack = new net.minecraft.server.v1_16_R3.ItemStack(Items.STICK);
+
+        nmsStack.addEnchantment(Enchantments.DURABILITY, 1);
+        nmsStack.a("CustomType", NBTTagString.a("varlight:debug_stick"));
+
+        this.varLightDebugStick = CraftItemStack.asBukkitCopy(nmsStack);
+        ItemMeta meta = varLightDebugStick.getItemMeta();
+
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.setDisplayName(ChatColor.RESET + "" + ChatColor.GOLD + "VarLight Debug Stick");
+        varLightDebugStick.setItemMeta(meta);
     }
 
     @Override
@@ -82,7 +95,6 @@ public class NmsAdapter implements INmsMethods {
 
     @Override
     public @Nullable Material getBlockFromKey(@NotNull NamespacedID namespacedID) {
-        MinecraftKey key = new MinecraftKey(namespacedID.getNamespace(), namespacedID.getName());
         return CraftMagicNumbers.getMaterial(IRegistry.BLOCK.get(namespacedID.toMinecraftKey()));
     }
 
@@ -117,6 +129,34 @@ public class NmsAdapter implements INmsMethods {
         stack.setItemMeta(meta);
 
         return stack;
+    }
+
+    @Override
+    public boolean isVarLightDebugStick(ItemStack itemStack) {
+        if (itemStack == null || itemStack.getType() != Material.STICK) {
+            return false;
+        }
+
+        net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+
+        NBTTagCompound tag = nmsStack.getTag();
+
+        if (tag == null) {
+            return false;
+        }
+
+        return tag.getString("CustomType").equals("varlight:debug_stick");
+    }
+
+    @Override
+    public @NotNull ItemStack makeVarLightDebugStick() {
+        net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(varLightDebugStick);
+
+        UUID id = UUID.randomUUID();
+
+        nmsStack.getOrCreateTag().a("id", id);
+
+        return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
     @Override
