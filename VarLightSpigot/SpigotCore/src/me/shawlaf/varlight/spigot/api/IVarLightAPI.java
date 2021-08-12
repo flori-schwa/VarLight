@@ -7,7 +7,7 @@ import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+// TODO document
 public interface IVarLightAPI {
 
     AbstractBukkitExecutor getSyncExecutor();

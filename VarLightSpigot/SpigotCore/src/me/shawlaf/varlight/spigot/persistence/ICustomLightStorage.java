@@ -1,8 +1,8 @@
 package me.shawlaf.varlight.spigot.persistence;
 
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;

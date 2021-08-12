@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.persistence.old.vldb;
 
 import me.shawlaf.varlight.persistence.old.ICustomLightSource;
-import me.shawlaf.varlight.util.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

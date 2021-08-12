@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.spigot.util.collections;
+package me.shawlaf.varlight.util.collections;
 
 import lombok.experimental.UtilityClass;
 

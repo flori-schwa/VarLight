@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.spigot.util;
+package me.shawlaf.varlight.util.collections;
 
 import org.jetbrains.annotations.NotNull;
 

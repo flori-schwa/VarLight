@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.util;
 
 import lombok.experimental.UtilityClass;
+import me.shawlaf.varlight.util.collections.CountingIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;

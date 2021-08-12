@@ -15,7 +15,7 @@ import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -30,7 +30,6 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-// TODO document
 @ExtensionMethod({
         Objects.class,
         IntPositionExtension.class

@@ -1,8 +1,6 @@
-package me.shawlaf.varlight.spigot.util;
+package me.shawlaf.varlight.util.pos;
 
-import me.shawlaf.varlight.spigot.util.collections.IteratorUtils;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.collections.IteratorUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -19,11 +17,11 @@ public class RegionIterator implements Iterator<IntPosition> {
     private boolean next;
     private int nextX, nextY, nextZ;
 
-    public static Iterator<ChunkCoords> squareChunkArea(ChunkCoords center, int radius) {
+    public static ChunkIterator squareChunkArea(ChunkCoords center, int radius) {
         ChunkCoords a = center.getRelativeChunk(-radius, -radius);
         ChunkCoords b = center.getRelativeChunk(radius, radius);
 
-        return new RegionIterator(a.getChunkStart(), b.getChunkStart()).iterateChunks();
+        return new ChunkIterator(a, b);
     }
 
     public RegionIterator(@NotNull IntPosition start, @NotNull IntPosition end) {
@@ -45,7 +43,7 @@ public class RegionIterator implements Iterator<IntPosition> {
         return Math.abs(end.x - start.x) + 1;
     }
 
-    public int getLengthY()  {
+    public int getLengthY() {
         return Math.abs(end.y - start.y) + 1;
     }
 
@@ -63,84 +61,8 @@ public class RegionIterator implements Iterator<IntPosition> {
         return IteratorUtils.collectFromIterator(iterateChunks(), Collectors.toSet());
     }
 
-    public Iterator<ChunkCoords> iterateChunks() {
-        final int startChunkX = start.getChunkX();
-        final int startChunkZ = start.getChunkZ();
-
-        final int endChunkX = end.getChunkX();
-        final int endChunkZ = end.getChunkZ();
-
-        final int xDirection = binaryStep(endChunkX - startChunkX);
-        final int zDirection = binaryStep(endChunkZ - startChunkZ);
-
-        return new Iterator<ChunkCoords>() {
-
-            int nextX = startChunkX;
-            int nextZ = startChunkZ;
-
-            boolean next = true;
-
-            @Override
-            public boolean hasNext() {
-                return next;
-            }
-
-            @Override
-            public ChunkCoords next() {
-                if (!next) {
-                    throw new IndexOutOfBoundsException("There are no more elements left to iterate over");
-                }
-
-                ChunkCoords nextCoords = new ChunkCoords(nextX, nextZ);
-                step();
-
-                return nextCoords;
-            }
-
-            private boolean zInRange(int z) {
-                if (startChunkZ < endChunkZ) {
-                    return z >= startChunkZ && z <= endChunkZ;
-                }
-
-                return z >= endChunkZ && z <= startChunkZ;
-            }
-
-            private boolean xInRange(int x) {
-                if (startChunkX < endChunkX) {
-                    return x >= startChunkX && x <= endChunkX;
-                }
-
-                return x >= endChunkX && x <= startChunkX;
-            }
-
-            private boolean stepZ() {
-                nextZ += zDirection;
-                return zInRange(nextZ);
-            }
-
-            private boolean  stepX() {
-                nextX += xDirection;
-                return xInRange(nextX);
-            }
-
-            private void step() {
-                if (zDirection != 0) {
-                    if (!stepZ()) {
-                        nextZ = startChunkZ;
-                    } else {
-                        return;
-                    }
-                }
-
-                if (xDirection != 0) {
-                    if (stepX()) {
-                        return;
-                    }
-                }
-
-                next = false;
-            }
-        };
+    public ChunkIterator iterateChunks() {
+        return new ChunkIterator(start.toChunkCoords(), end.toChunkCoords());
     }
 
     // endregion
@@ -231,7 +153,7 @@ public class RegionIterator implements Iterator<IntPosition> {
         next = false;
     }
 
-    private static int binaryStep(int x) {
+    static int binaryStep(int x) {
         /*
          * x < 0 -> -1
          * x = 0 ->  0

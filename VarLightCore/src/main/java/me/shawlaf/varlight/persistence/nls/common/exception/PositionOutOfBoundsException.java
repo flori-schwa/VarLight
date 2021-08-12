@@ -1,6 +1,6 @@
 package me.shawlaf.varlight.persistence.nls.common.exception;
 
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 
 public class PositionOutOfBoundsException extends RuntimeException {
 

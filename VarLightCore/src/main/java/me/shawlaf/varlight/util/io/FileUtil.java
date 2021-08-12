@@ -1,6 +1,7 @@
-package me.shawlaf.varlight.util;
+package me.shawlaf.varlight.util.io;
 
 import lombok.experimental.UtilityClass;
+import me.shawlaf.varlight.util.pos.RegionCoords;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;

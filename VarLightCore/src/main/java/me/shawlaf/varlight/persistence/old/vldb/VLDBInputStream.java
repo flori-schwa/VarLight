@@ -1,9 +1,9 @@
 package me.shawlaf.varlight.persistence.old.vldb;
 
 import me.shawlaf.varlight.persistence.old.ICustomLightSource;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.FileUtil;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.io.FileUtil;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.Tuple;
 
 import java.io.*;

@@ -3,7 +3,7 @@ package me.shawlaf.varlight.spigot.progressbar;
 import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
-import me.shawlaf.varlight.spigot.util.StringUtil;
+import me.shawlaf.varlight.util.StringUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;

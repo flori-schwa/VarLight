@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.spigot.util;
+package me.shawlaf.varlight.util;
 
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;

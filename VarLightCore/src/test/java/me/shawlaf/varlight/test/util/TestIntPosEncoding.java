@@ -1,6 +1,6 @@
 package me.shawlaf.varlight.test.util;
 
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

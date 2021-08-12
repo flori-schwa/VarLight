@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.persistence.nls.common.migrate;
 
 import me.shawlaf.varlight.persistence.nls.common.NLSHeader;
-import me.shawlaf.varlight.util.FileUtil;
+import me.shawlaf.varlight.util.io.FileUtil;
 
 import java.io.File;
 import java.io.IOException;

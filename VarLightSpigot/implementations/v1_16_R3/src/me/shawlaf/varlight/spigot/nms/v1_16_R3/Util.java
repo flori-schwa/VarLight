@@ -2,7 +2,7 @@ package me.shawlaf.varlight.spigot.nms.v1_16_R3;
 
 import lombok.experimental.UtilityClass;
 import me.shawlaf.varlight.spigot.util.NamespacedID;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;

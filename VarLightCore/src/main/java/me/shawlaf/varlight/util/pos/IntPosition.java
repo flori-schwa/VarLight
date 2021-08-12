@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.util;
+package me.shawlaf.varlight.util.pos;
 
 import org.jetbrains.annotations.NotNull;
 

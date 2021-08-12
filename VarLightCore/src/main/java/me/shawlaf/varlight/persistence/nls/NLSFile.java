@@ -9,10 +9,10 @@ import me.shawlaf.varlight.persistence.nls.common.implementations.v1.NLSReader_V
 import me.shawlaf.varlight.persistence.nls.common.implementations.v1.NLSWriter_V1;
 import me.shawlaf.varlight.persistence.IRegionCustomLightAccess;
 import me.shawlaf.varlight.persistence.nls.common.migrate.NLSMigrators;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.FileUtil;
-import me.shawlaf.varlight.util.IntPosition;
-import me.shawlaf.varlight.util.RegionCoords;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.io.FileUtil;
+import me.shawlaf.varlight.util.pos.IntPosition;
+import me.shawlaf.varlight.util.pos.RegionCoords;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

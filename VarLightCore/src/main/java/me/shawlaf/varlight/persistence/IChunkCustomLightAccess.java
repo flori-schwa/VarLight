@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.persistence;
 
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

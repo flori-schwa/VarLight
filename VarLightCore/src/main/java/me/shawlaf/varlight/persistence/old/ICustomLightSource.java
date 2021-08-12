@@ -1,6 +1,6 @@
 package me.shawlaf.varlight.persistence.old;
 
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 
 @Deprecated
 public interface ICustomLightSource {

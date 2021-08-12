@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.spigot.util;
 
 import lombok.experimental.UtilityClass;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;

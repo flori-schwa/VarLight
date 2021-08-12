@@ -16,7 +16,7 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.CollectionArgumentType;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.ItemTypeArgumentType;
-import me.shawlaf.varlight.util.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;

@@ -4,8 +4,8 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 

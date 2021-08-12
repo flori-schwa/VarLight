@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.spigot.util;
 
 import lombok.experimental.UtilityClass;
-import me.shawlaf.varlight.util.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
 import org.bukkit.Chunk;
 
 @UtilityClass

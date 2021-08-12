@@ -1,8 +1,8 @@
 package me.shawlaf.varlight.test.persistence.nls;
 
 import me.shawlaf.varlight.persistence.nls.NLSFile;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

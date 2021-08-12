@@ -1,4 +1,6 @@
-package me.shawlaf.varlight.util;
+package me.shawlaf.varlight.util.pos;
+
+import me.shawlaf.varlight.util.*;
 
 import java.util.Objects;
 

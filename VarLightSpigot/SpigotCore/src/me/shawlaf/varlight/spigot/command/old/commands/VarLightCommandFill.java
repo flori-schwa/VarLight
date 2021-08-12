@@ -15,10 +15,10 @@ import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.spigot.util.Pointer;
-import me.shawlaf.varlight.spigot.util.RegionIterator;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.Pointer;
+import me.shawlaf.varlight.util.pos.RegionIterator;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -212,11 +212,11 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
         Set<ChunkCoords> affectedChunks = iterator.getAllContainingChunks();
 
-//        if (affectedChunks.size() > 25) { // TODO make configurable
-//            failure(this, source, "The fill command may only affect a maximum of 25 chunks, you are trying to manipulate an area affecting " + affectedChunks.size() + " chunks.");
-//
-//            return FAILURE;
-//        }
+        if (affectedChunks.size() > 25) { // TODO make configurable
+            failure(this, source, "The fill command may only affect a maximum of 25 chunks, you are trying to manipulate an area affecting " + affectedChunks.size() + " chunks.");
+
+            return FAILURE;
+        }
 
         final int progressBarThreshold = 100_000;
 

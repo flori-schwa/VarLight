@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.persistence.old;
 
 import lombok.Getter;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.IntPosition;
 
 import java.util.Objects;
 

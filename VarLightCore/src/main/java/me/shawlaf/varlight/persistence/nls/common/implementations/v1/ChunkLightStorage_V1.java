@@ -5,8 +5,8 @@ import me.shawlaf.varlight.persistence.IChunkCustomLightAccess;
 import me.shawlaf.varlight.persistence.nls.common.ChunkSectionNibbleArray;
 import me.shawlaf.varlight.persistence.nls.common.NibbleArray;
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
-import me.shawlaf.varlight.util.ChunkCoords;
-import me.shawlaf.varlight.util.IntPosition;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.IntPosition;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

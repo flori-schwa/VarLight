@@ -1,4 +1,7 @@
-package me.shawlaf.varlight.util;
+package me.shawlaf.varlight.util.pos;
+
+import me.shawlaf.varlight.util.MathUtil;
+import me.shawlaf.varlight.util.Preconditions;
 
 import java.util.Objects;
 
