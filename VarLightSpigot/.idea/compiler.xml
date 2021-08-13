@@ -8,8 +8,6 @@
           <entry name="$PROJECT_DIR$/libraries/lombok-1.18.16.jar" />
         </processorPath>
         <module name="SpigotCore" />
-        <module name="v1_12_R1" />
-        <module name="v1_15_R1" />
       </profile>
     </annotationProcessing>
   </component>

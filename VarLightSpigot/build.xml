@@ -16,8 +16,6 @@
 
     <property name="lib-varlight-core" value="VarLightCommons-0.0.1.jar"/>
 
-    <property name="lib-spigot-1.12.2" value="spigot-1.12.2.jar"/>
-    <property name="lib-spigot-1.15.2" value="spigot-1.15.2.jar"/>
     <property name="lib-spigot-1.16.5" value="spigot-1.16.5.jar"/>
 
     <property name="annotations-version" value="20.1.0"/>
@@ -164,18 +162,6 @@
                 </javac>
             </sequential>
         </macrodef>
-
-        <build src-dir="${v1_12_R1-src}">
-            <libraries>
-                <include name="**/${lib-spigot-1.12.2}"/>
-            </libraries>
-        </build>
-
-        <build src-dir="${v1_15_R1-src}">
-            <libraries>
-                <include name="**/${lib-spigot-1.15.2}"/>
-            </libraries>
-        </build>
 
         <build src-dir="${v1_16_R3-src}">
             <libraries>
