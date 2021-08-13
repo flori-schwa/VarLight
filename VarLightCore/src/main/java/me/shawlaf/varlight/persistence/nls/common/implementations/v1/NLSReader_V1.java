@@ -14,7 +14,16 @@ public class NLSReader_V1 implements AutoCloseable {
     @Getter
     private final int regionX, regionZ;
 
-    public NLSReader_V1(NLSHeader header, InputStream in) throws IOException {
+    /**
+     * Constructs a new NLSReader for Version 1, parses and verifies the Header from the InputStream
+     * @param in The Stream to read from
+     * @throws IOException if an {@link IOException} occurs
+     */
+    public NLSReader_V1(InputStream in) throws IOException {
+        this(NLSHeader.readFromStream(in), in);
+    }
+
+    private NLSReader_V1(NLSHeader header, InputStream in) throws IOException {
         header.validRequired();
 
         if (header.getVersion() != 1) {

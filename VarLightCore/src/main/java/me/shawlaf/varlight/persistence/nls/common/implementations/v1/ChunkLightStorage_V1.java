@@ -31,7 +31,7 @@ public class ChunkLightStorage_V1 implements IChunkCustomLightAccess {
     public int getCustomLuminance(IntPosition position) {
         int y = position.y >> 4;
 
-        if (position.getChunkX() != position.x || position.getChunkZ() != position.z) {
+        if (position.getChunkX() != chunkPosition.x || position.getChunkZ() != chunkPosition.z) {
             throw new PositionOutOfBoundsException(position);
         }
 
@@ -51,7 +51,7 @@ public class ChunkLightStorage_V1 implements IChunkCustomLightAccess {
     public void setCustomLuminance(IntPosition position, int value) {
         int y = position.y >> 4;
 
-        if (position.getChunkX() != position.x || position.getChunkZ() != position.z) {
+        if (position.getChunkX() != chunkPosition.x || position.getChunkZ() != chunkPosition.z) {
             throw new PositionOutOfBoundsException(position);
         }
 

@@ -13,7 +13,7 @@ public class ChunkIterator implements Iterator<ChunkCoords> {
     private int nextX;
     private int nextZ;
 
-    private boolean next;
+    private boolean next = true;
 
     public ChunkIterator(ChunkCoords start, ChunkCoords end) {
         this.start = start;

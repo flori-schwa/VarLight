@@ -66,10 +66,8 @@ public class NLSFile implements IRegionCustomLightAccess {
 
             boolean needsMigration = false;
 
-            NLSHeader header;
-
             try (InputStream iStream = FileUtil.openStreamInflate(file)) {
-                header = NLSHeader.read(iStream);
+                NLSHeader header = NLSHeader.readFromStream(iStream);
 
                 if (header.getVersion() < NLSConstants.CURRENT_VERSION) {
                     needsMigration = true;
@@ -79,11 +77,13 @@ public class NLSFile implements IRegionCustomLightAccess {
             }
 
             if (needsMigration) {
-                header = NLSMigrators.migrateFileToVersion(NLSConstants.CURRENT_VERSION, file);
+                NLSMigrators.migrateFileToVersion(NLSConstants.CURRENT_VERSION, file);
             }
 
             try (InputStream iStream = FileUtil.openStreamInflate(file)) {
-                try (NLSReader_V1 reader = new NLSReader_V1(header, iStream)) {
+                try (NLSReader_V1 reader = new NLSReader_V1(iStream)) {
+                    // Header already parsed and verified by constructor
+
                     this.regionX = reader.getRegionX();
                     this.regionZ = reader.getRegionZ();
 

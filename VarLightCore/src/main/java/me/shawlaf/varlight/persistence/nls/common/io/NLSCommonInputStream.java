@@ -7,6 +7,7 @@ import me.shawlaf.varlight.persistence.nls.common.exception.ExpectedMagicNumberE
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,10 +33,16 @@ public class NLSCommonInputStream extends DataInputStream {
     }
 
     public void readFillBytes(byte[] buffer) throws IOException {
-        int read = 0;
+        int totalRead = 0;
 
-        while (read < buffer.length) {
-            read += read(buffer, read, buffer.length - read);
+        while (totalRead < buffer.length) {
+            int read = read(buffer, totalRead, buffer.length - totalRead);
+
+            if (read < 0) {
+                throw new EOFException();
+            }
+
+            totalRead += read;
         }
     }
 

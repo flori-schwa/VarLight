@@ -17,8 +17,10 @@ public class NLSHeader {
     @Getter
     private final int version;
 
-    public static NLSHeader read(InputStream iStream) throws IOException {
-        try (NLSCommonInputStream in = new NLSCommonInputStream(iStream)) {
+    public static NLSHeader readFromStream(InputStream iStream) throws IOException {
+        NLSCommonInputStream in = new NLSCommonInputStream(iStream);
+
+        try {
             in.verifyMagic();
 
             return new NLSHeader(in.readInt(), null);

@@ -18,11 +18,11 @@ public class NLSMigrators {
         // Register Migrators here
     }
 
-    public static NLSHeader migrateFileToVersion(int targetVersion, File file) throws IOException {
+    public static void migrateFileToVersion(int targetVersion, File file) throws IOException {
         NLSHeader header;
 
         try (InputStream in = FileUtil.openStreamInflate(file)) {
-            header = NLSHeader.read(in);
+            header = NLSHeader.readFromStream(in);
         }
 
         header.validRequired();
@@ -38,7 +38,6 @@ public class NLSMigrators {
             header = migrator.migrateFile(file);
         }
 
-        return header;
     }
 
 }

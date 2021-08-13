@@ -191,4 +191,15 @@
             </zipgroupfileset>
         </jar>
     </target>
+
+    <target name="full-rebuild">
+        <exec dir="./../VarLightCore" executable="cmd">
+            <arg value="/C"/>
+            <arg value="mvn"/>
+            <arg line="-B clean install"/>
+        </exec>
+
+        <antcall target="master">
+        </antcall>
+    </target>
 </project>

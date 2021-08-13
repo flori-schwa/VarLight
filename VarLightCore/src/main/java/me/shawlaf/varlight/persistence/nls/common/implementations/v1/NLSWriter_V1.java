@@ -37,6 +37,9 @@ public class NLSWriter_V1 implements AutoCloseable {
     public void writeHeader(int regionX, int regionZ) throws IOException {
         out.writeNLSMagic();
 
+        // Version
+        out.writeInt(1); // Not using CURRENT_VERSION Constant because this class is explicitly for version 1
+
         out.writeInt(regionX);
         out.writeInt(regionZ);
     }
