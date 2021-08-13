@@ -57,9 +57,6 @@ pipeline {
         stage("Build Plugin") {
             steps {
                 dir("VarLightSpigot/libraries") {
-                    copyArtifacts(projectName: 'Spigot 1.16.5')
-                    copyArtifacts(projectName: 'Spigot 1.16.1')
-                    copyArtifacts(projectName: 'Spigot 1.15.2')
                     copyArtifacts(projectName: 'Spigot 1.12.2')
                 }
                 
