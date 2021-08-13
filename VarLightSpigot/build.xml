@@ -148,10 +148,11 @@
                         </fileset>
 
                         <fileset dir="${libraries}">
-                            <include name="**/*${lib-annotations}"/>
-                            <include name="**/*${lib-lombok}"/>
-                            <include name="**/*${lib-varlight-core}"/>
-                            <include name="**/*${lib-joor}"/>
+                            <include name="**/${lib-spigot-1.12.2}"/>
+                            <include name="**/${lib-annotations}"/>
+                            <include name="**/${lib-lombok}"/>
+                            <include name="**/${lib-varlight-core}"/>
+                            <include name="**/${lib-joor}"/>
                             <libraries/>
                         </fileset>
                     </classpath>
