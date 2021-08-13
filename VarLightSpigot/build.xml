@@ -9,16 +9,12 @@
     <property name="spigot-core-res" location="SpigotCore/resources"/>
 
     <property name="v1_12_R1-src" location="implementations/v1_12_R1/src"/>
-    <property name="v1_15_R1-src" location="implementations/v1_15_R1/src"/>
-    <property name="v1_16_R3-src" location="implementations/v1_16_R3/src"/>
 
     <property name="libraries" location="libraries"/>
 
     <property name="lib-varlight-core" value="VarLightCommons-0.0.1.jar"/>
 
     <property name="lib-spigot-1.12.2" value="spigot-1.12.2.jar"/>
-    <property name="lib-spigot-1.15.2" value="spigot-1.15.2.jar"/>
-    <property name="lib-spigot-1.16.5" value="spigot-1.16.5.jar"/>
 
     <property name="annotations-version" value="20.1.0"/>
     <property name="joor-java-8-version" value="0.9.13"/>
@@ -117,8 +113,6 @@
             <classpath>
                 <fileset dir="${libraries}">
                     <include name="**/${lib-lombok}"/>
-                    <include
-                            name="**/${lib-spigot-1.16.5}"/> <!-- TODO: Switch back to using 1.12.2 and include brigadier in final JAR -->
                     <include name="**/${lib-worldedit}"/>
                     <include name="**/${lib-worldedit-core}"/>
                     <include name="**/${lib-worldguard}"/>
@@ -168,18 +162,6 @@
         <build src-dir="${v1_12_R1-src}">
             <libraries>
                 <include name="**/${lib-spigot-1.12.2}"/>
-            </libraries>
-        </build>
-
-        <build src-dir="${v1_15_R1-src}">
-            <libraries>
-                <include name="**/${lib-spigot-1.15.2}"/>
-            </libraries>
-        </build>
-
-        <build src-dir="${v1_16_R3-src}">
-            <libraries>
-                <include name="**/${lib-spigot-1.16.5}"/>
             </libraries>
         </build>
 
