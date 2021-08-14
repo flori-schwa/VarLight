@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.persistence.nls.common.implementations.v1;
+package me.shawlaf.varlight.persistence.nls.implementations.v1;
 
 import lombok.Getter;
 import me.shawlaf.varlight.persistence.nls.common.NLSHeader;

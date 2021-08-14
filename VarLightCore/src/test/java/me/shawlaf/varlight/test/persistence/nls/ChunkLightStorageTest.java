@@ -1,6 +1,6 @@
 package me.shawlaf.varlight.test.persistence.nls;
 
-import me.shawlaf.varlight.persistence.nls.common.implementations.v1.ChunkLightStorage_V1;
+import me.shawlaf.varlight.persistence.nls.implementations.v1.ChunkLightStorage_V1;
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.junit.jupiter.api.Test;
