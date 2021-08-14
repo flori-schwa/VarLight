@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.persistence.nls.common.implementations.v1;
+package me.shawlaf.varlight.persistence.nls.implementations.v1;
 
 import me.shawlaf.varlight.persistence.nls.common.ChunkSectionNibbleArray;
 import me.shawlaf.varlight.persistence.nls.common.io.NLSCommonOutputStream;
