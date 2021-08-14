@@ -58,6 +58,7 @@ pipeline {
             steps {
                 dir("VarLightSpigot/libraries") {
                     copyArtifacts(projectName: 'Spigot 1.12.2')
+                    copyArtifacts(projectName: 'Brigadier')
                 }
                 
                 dir ("VarLightSpigot") {

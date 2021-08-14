@@ -10,13 +10,13 @@ public class PlayerRaytrace {
     }
 
     public static Block getTargetBlock(Player player, int maxDistance) {
-        try {
-            Class.forName("org.bukkit.FluidCollisionMode");
-
-            return PlayerRaytracePost1_13.getTargetBlock(player, maxDistance);
-        } catch (ClassNotFoundException e) {
+//        try {
+//            Class.forName("org.bukkit.FluidCollisionMode");
+//
+//            return PlayerRaytracePost1_13.getTargetBlock(player, maxDistance);
+//        } catch (ClassNotFoundException e) {
             return PlayerRaytracePre1_13.getTargetBlock(player, maxDistance);
-        }
+//        }
     }
 
 }

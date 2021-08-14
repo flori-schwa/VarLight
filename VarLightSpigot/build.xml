@@ -22,6 +22,7 @@
     <property name="worldedit-version" value="7.2.5"/>
     <property name="worldguard-version" value="7.0.4"/>
 
+    <property name="lib-brigadier" value="brigadier-1.0.0-SNAPSHOT.jar"/>
     <property name="lib-annotations" value="annotations-${annotations-version}.jar"/>
     <property name="lib-joor" value="joor-java-8-${joor-java-8-version}.jar"/>
     <property name="lib-lombok" value="lombok-${lombok-version}.jar"/>
@@ -113,6 +114,7 @@
             <classpath>
                 <fileset dir="${libraries}">
                     <include name="**/${lib-spigot-1.12.2}"/>
+                    <include name="**/${lib-brigadier}"/>
                     <include name="**/${lib-lombok}"/>
                     <include name="**/${lib-worldedit}"/>
                     <include name="**/${lib-worldedit-core}"/>
@@ -150,6 +152,7 @@
 
                         <fileset dir="${libraries}">
                             <include name="**/${lib-spigot-1.12.2}"/>
+                            <include name="**/${lib-brigadier}"/>
                             <include name="**/${lib-annotations}"/>
                             <include name="**/${lib-lombok}"/>
                             <include name="**/${lib-varlight-core}"/>
@@ -169,6 +172,7 @@
 
         <jar destfile="${dist}/VarLight-${plugin.version}.jar" basedir="${build}">
             <zipgroupfileset dir="${libraries}">
+                <include name="**/${lib-brigadier}"/>
                 <include name="**/${lib-annotations}"/>
                 <include name="**/${lib-varlight-core}"/>
                 <include name="**/${lib-joor}"/>
