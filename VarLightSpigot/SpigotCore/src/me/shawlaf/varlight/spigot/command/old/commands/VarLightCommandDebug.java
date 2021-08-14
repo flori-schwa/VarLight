@@ -9,7 +9,7 @@ import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.util.*;
+import me.shawlaf.varlight.util.Paginator;
 import me.shawlaf.varlight.util.collections.CollectionUtil;
 import me.shawlaf.varlight.util.collections.CountingIterator;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
@@ -109,7 +109,8 @@ public class VarLightCommandDebug extends VarLightSubCommand {
                         return FAILURE;
                     }
 
-                    ((Player) context.getSource()).getInventory().addItem(plugin.getNmsAdapter().makeVarLightDebugStick());;
+                    ((Player) context.getSource()).getInventory().addItem(plugin.getNmsAdapter().makeVarLightDebugStick());
+                    ;
 
                     return SUCCESS;
                 })
@@ -187,7 +188,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
         @NotNull ICustomLightStorage manager;
 
         try {
-            manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
+            manager = plugin.getApi().unsafe().requireVarLightEnabled(player.getWorld());
         } catch (VarLightNotActiveException e) {
             success(this, player, e.getMessage());
             return;
@@ -216,7 +217,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
         @NotNull ICustomLightStorage manager;
 
         try {
-            manager = plugin.getApi().requireVarLightEnabled(player.getWorld());
+            manager = plugin.getApi().unsafe().requireVarLightEnabled(player.getWorld());
         } catch (VarLightNotActiveException e) {
             success(this, player, e.getMessage());
             return;
@@ -250,7 +251,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
             TextComponent textComponent = new TextComponent(String.format(
                     "%s = %d (%s)",
                     lightSource.toShortString(),
-                    manager.getCustomLuminance(lightSource, 0),
+                    manager.getCustomLuminance(lightSource),
                     plugin.getNmsAdapter().getKey(player.getWorld().getBlockAt(lightSource.x, lightSource.y, lightSource.z).getType()))
             );
 

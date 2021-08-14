@@ -39,7 +39,7 @@ public class WrappedLightAccess implements ILightAccess, Listener {
         int vanilla = blockAccess.getType(bPos).f();
 
         try {
-            ICustomLightStorage wlp = plugin.getApi().requireVarLightEnabled(world.getWorld());
+            ICustomLightStorage wlp = plugin.getApi().unsafe().requireVarLightEnabled(world.getWorld());
 
             return wlp.getCustomLuminance(new IntPosition(bPos.getX(), bPos.getY(), bPos.getZ()), vanilla);
         } catch (VarLightNotActiveException e) {

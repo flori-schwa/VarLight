@@ -29,7 +29,7 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
     public void onDisable() {
         for (World world : plugin.getVarLightConfig().getVarLightEnabledWorlds()) {
             try {
-                plugin.getApi().requireVarLightEnabled(world).runAutosave();
+                plugin.getApi().unsafe().requireVarLightEnabled(world).runAutosave();
             } catch (VarLightNotActiveException ignored) {
 
             }
@@ -88,7 +88,7 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
         }
 
         try {
-            plugin.getApi().requireVarLightEnabled(e.getWorld()).runAutosave();
+            plugin.getApi().unsafe().requireVarLightEnabled(e.getWorld()).runAutosave();
         } catch (VarLightNotActiveException ignored) {
             // Ignore any worlds, that are not VarLight enabled
         }
@@ -122,7 +122,7 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
         autosaveTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (World world : plugin.getVarLightConfig().getVarLightEnabledWorlds()) {
                 try {
-                    plugin.getApi().requireVarLightEnabled(world).runAutosave();
+                    plugin.getApi().unsafe().requireVarLightEnabled(world).runAutosave();
                 } catch (VarLightNotActiveException notPossible) {
                     notPossible.printStackTrace();
                 }

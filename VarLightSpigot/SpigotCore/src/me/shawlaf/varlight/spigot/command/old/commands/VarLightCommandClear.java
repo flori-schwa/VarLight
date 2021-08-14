@@ -146,7 +146,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         int regionZ = (source.getLocation().getBlockZ() >> 4) >> 5;
 
         try {
-            ICustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
+            ICustomLightStorage manager = plugin.getApi().unsafe().requireVarLightEnabled(source.getWorld());
 
             return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
         } catch (VarLightNotActiveException e) {
@@ -162,7 +162,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
         int regionZ = context.getArgument(ARG_REGION_Z.getName(), int.class);
 
         try {
-            ICustomLightStorage manager = plugin.getApi().requireVarLightEnabled(source.getWorld());
+            ICustomLightStorage manager = plugin.getApi().unsafe().requireVarLightEnabled(source.getWorld());
 
             return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
         } catch (VarLightNotActiveException e) {
@@ -186,7 +186,7 @@ public class VarLightCommandClear extends VarLightSubCommand {
             @NotNull ICustomLightStorage manager;
 
             try {
-                manager = plugin.getApi().requireVarLightEnabled(world);
+                manager = plugin.getApi().unsafe().requireVarLightEnabled(world);
             } catch (VarLightNotActiveException e) {
                 failure(this, source, e.getMessage());
                 return;

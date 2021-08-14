@@ -17,10 +17,7 @@ public class VarLightPlugin extends JavaPlugin {
     /*
         TODO
          - Check for WorldGuard and WorldEdit
-         - Commands
          - Maybe Version Check?
-         - Persistence
-         - Player Modify Light Source Events
      */
 
     private static final String SERVER_VERSION;

@@ -1,13 +1,17 @@
 package me.shawlaf.varlight.spigot.api;
 
+import lombok.SneakyThrows;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
+import me.shawlaf.varlight.spigot.bulk.BulkFillTask;
+import me.shawlaf.varlight.spigot.bulk.BulkFillTaskResult;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.module.APIModule;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.CustomLightStorageNLS;
@@ -21,12 +25,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -34,17 +40,7 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
         Objects.class,
         IntPositionExtension.class
 })
-public class VarLightAPIImpl implements IVarLightAPI {
-
-    public static IVarLightAPI getAPI() {
-        Plugin varLightPlugin = Bukkit.getPluginManager().getPlugin("VarLight");
-
-        if (varLightPlugin == null) {
-            throw new IllegalStateException("VarLight not present");
-        }
-
-        return ((VarLightPlugin) varLightPlugin).getApi();
-    }
+public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     private final VarLightPlugin plugin;
     private final Map<UUID, ICustomLightStorage> persistenceManagers = new HashMap<>();
@@ -53,20 +49,38 @@ public class VarLightAPIImpl implements IVarLightAPI {
 
     private final AbstractBukkitExecutor syncExecutor;
     private final AbstractBukkitExecutor asyncExecutor;
-    private final Autosave autosaveHandler;
-    private final ChatPrompts chatPromptManager;
-    private final StepsizeHandler stepsizeManager;
+
+    @APIModule
+    private Autosave autosaveHandler;
+    @APIModule
+    private ChatPrompts chatPromptManager;
+    @APIModule
+    private StepsizeHandler stepsizeManager;
+
     private Material lightUpdateItem;
 
+    @SneakyThrows
     public VarLightAPIImpl(VarLightPlugin plugin) {
         this.plugin = plugin;
 
         this.syncExecutor = new BukkitSyncExecutorService(plugin);
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
 
-        addModule(this.autosaveHandler = new Autosave(plugin));
-        addModule(this.chatPromptManager = new ChatPrompts(plugin));
-        addModule(this.stepsizeManager = new StepsizeHandler(plugin));
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (!field.isAnnotationPresent(APIModule.class)) {
+                continue;
+            }
+
+            if (!IPluginLifeCycleOperations.class.isAssignableFrom(field.getType())) {
+                throw new IllegalStateException("Fields annotated with @" + APIModule.class.getName() + " must implement " + IPluginLifeCycleOperations.class.getName());
+            }
+            
+            Constructor<?> constructor = field.getType().getConstructor(VarLightPlugin.class);
+            Object module = constructor.newInstance(plugin);
+
+            field.set(this, module);
+            addModule(((IPluginLifeCycleOperations) module));
+        }
 
         loadLightUpdateItem();
 
@@ -115,6 +129,11 @@ public class VarLightAPIImpl implements IVarLightAPI {
         return lightUpdateItem;
     }
 
+    @Override
+    public Internal unsafe() {
+        return this;
+    }
+
     // endregion
 
     @Override
@@ -145,7 +164,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
         position.requireNonNull("Position may not be null");
 
         try {
-            return requireVarLightEnabled(world).getCustomLuminance(position, 0);
+            return requireVarLightEnabled(world).getCustomLuminance(position);
         } catch (VarLightNotActiveException exception) {
             return 0;
         }
@@ -185,7 +204,7 @@ public class VarLightAPIImpl implements IVarLightAPI {
             return completedFuture(LightUpdateResult.notActive(fromLight, customLuminance, e));
         }
 
-        int finalFromLight = wlp.getCustomLuminance(position, 0);
+        int finalFromLight = wlp.getCustomLuminance(position);
 
         final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(block, finalFromLight, customLuminance);
 
@@ -225,6 +244,11 @@ public class VarLightAPIImpl implements IVarLightAPI {
                 result.displayMessage(source);
             }
         });
+    }
+
+    @Override
+    public CompletableFuture<BulkFillTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter) {
+        return new BulkFillTask(plugin, world, source, start, end, lightLevel, filter).run();
     }
 
     @Override

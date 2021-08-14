@@ -8,10 +8,10 @@ import me.shawlaf.varlight.persistence.nls.NLSFile;
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.util.pos.RegionIterator;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionCoords;
+import me.shawlaf.varlight.util.pos.RegionIterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.IntSupplier;
 
 @ExtensionMethod({
         IntPositionExtension.class
@@ -44,21 +43,16 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
 
     @Override
     public int getCustomLuminance(IntPosition position, int def) {
-        return getCustomLuminance(position, () -> def);
-    }
-
-    @Override
-    public int getCustomLuminance(IntPosition position, IntSupplier def) {
         int lum;
 
         try {
             lum = getNLSFile(position.toRegionCoords()).getCustomLuminance(position);
         } catch (PositionOutOfBoundsException e) {
-            return def.getAsInt();
+            return def;
         }
 
         if (lum == 0) {
-            return def.getAsInt();
+            return def;
         }
 
         return lum;
@@ -72,7 +66,6 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
     @Override
     public Iterator<IntPosition> iterateAllLightSources(IntPosition a, IntPosition b) {
         RegionIterator iterator = new RegionIterator(a, b);
-        IntSupplier defaultSupplier = () -> 0;
 
         return new Iterator<IntPosition>() {
 
@@ -88,7 +81,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
                 while (iterator.hasNext()) {
                     IntPosition pos = iterator.next();
 
-                    if (getCustomLuminance(pos, defaultSupplier) != 0) {
+                    if (getCustomLuminance(pos) != 0) {
                         next = pos;
                         break;
                     }
