@@ -58,7 +58,7 @@ public class VarLightEventHandlers implements Listener {
         ICustomLightStorage cls;
 
         try {
-            cls = plugin.getApi().requireVarLightEnabled(e.getClickedBlock().getWorld());
+            cls = plugin.getApi().unsafe().requireVarLightEnabled(e.getClickedBlock().getWorld());
         } catch (VarLightNotActiveException ex) {
             CommandResult.failure(plugin.getCommand(), e.getPlayer(), ex.getMessage());
             return;
@@ -66,7 +66,7 @@ public class VarLightEventHandlers implements Listener {
 
         IntPosition clickedBlock = e.getClickedBlock().toIntPosition();
 
-        int customLuminance = cls.getCustomLuminance(clickedBlock, 0);
+        int customLuminance = cls.getCustomLuminance(clickedBlock);
 
         if (customLuminance == 0) {
             CommandResult.info(plugin.getCommand(), e.getPlayer(), String.format("No custom light source present at Position %s", clickedBlock.toShortString()), ChatColor.RED);
@@ -77,7 +77,7 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void playerModifyLightSource(PlayerInteractEvent e) {
-        ICustomLightStorage cls = plugin.getApi().getLightStorage(e.getPlayer().getWorld());
+        ICustomLightStorage cls = plugin.getApi().unsafe().getLightStorage(e.getPlayer().getWorld());
 
         if (cls == null) {
             return;
@@ -126,7 +126,7 @@ public class VarLightEventHandlers implements Listener {
 
         e.setCancelled(creative && e.getAction() == Action.LEFT_CLICK_BLOCK); // Prevent Block break in creative
 
-        plugin.getApi().setCustomLuminance(clicked.getLocation(), cls.getCustomLuminance(clicked.toIntPosition(), 0) + mod).thenAccept(result -> {
+        plugin.getApi().setCustomLuminance(clicked.getLocation(), cls.getCustomLuminance(clicked.toIntPosition()) + mod).thenAccept(result -> {
             if (result.isSuccess()) {
 
                 if (plugin.getVarLightConfig().isConsumeLui() && !creative && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -141,10 +141,10 @@ public class VarLightEventHandlers implements Listener {
     @EventHandler
     public void lightSourceReceiveUpdate(BlockPhysicsEvent e) {
         try {
-            ICustomLightStorage cls = plugin.getApi().requireVarLightEnabled(e.getBlock().getWorld());
+            ICustomLightStorage cls = plugin.getApi().unsafe().requireVarLightEnabled(e.getBlock().getWorld());
 
             IntPosition position = e.getBlock().toIntPosition();
-            int luminance = cls.getCustomLuminance(position, 0);
+            int luminance = cls.getCustomLuminance(position);
 
             if (luminance > 0) {
                 if (e.getBlock() == e.getSourceBlock()) {

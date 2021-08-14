@@ -56,7 +56,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
         Player player = (Player) context.getSource();
 
         try {
-            plugin.getApi().requireVarLightEnabled(player.getWorld()).save(player, true);
+            plugin.getApi().unsafe().requireVarLightEnabled(player.getWorld()).save(player, true);
 
             return SUCCESS;
         } catch (VarLightNotActiveException e) {
@@ -80,7 +80,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
         World world = context.getArgument(ARG_WORLD.getName(), World.class);
 
         try {
-            plugin.getApi().requireVarLightEnabled(world).save(context.getSource(), true);
+            plugin.getApi().unsafe().requireVarLightEnabled(world).save(context.getSource(), true);
 
             return SUCCESS;
         } catch (VarLightNotActiveException e) {

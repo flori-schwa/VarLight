@@ -112,6 +112,7 @@
         >
             <classpath>
                 <fileset dir="${libraries}">
+                    <include name="**/${lib-spigot-1.12.2}"/>
                     <include name="**/${lib-lombok}"/>
                     <include name="**/${lib-worldedit}"/>
                     <include name="**/${lib-worldedit-core}"/>

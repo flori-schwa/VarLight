@@ -6,36 +6,22 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
-import me.shawlaf.varlight.spigot.api.LightUpdateResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
-import me.shawlaf.varlight.spigot.exceptions.LightUpdateFailedException;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.util.Pointer;
-import me.shawlaf.varlight.util.pos.RegionIterator;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
-import me.shawlaf.varlight.util.pos.IntPosition;
+import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import static me.shawlaf.command.result.CommandResult.failure;
-import static me.shawlaf.command.result.CommandResult.successBroadcast;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
@@ -62,7 +48,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
     @Override
     public @NotNull String getRequiredPermission() {
-        return "varlight.admin.fill";
+        return VarLightPermissions.VARLIGHT_FILL_PERMISSION;
     }
 
     @Override
@@ -192,106 +178,9 @@ public class VarLightCommandFill extends VarLightSubCommand {
     }
 
     private int fill(Player source, Location pos1, Location pos2, int lightLevel, Predicate<Material> filter) {
-
-        World world = source.getWorld();
-
-        @NotNull ICustomLightStorage manager;
-
-        try {
-            manager = plugin.getApi().requireVarLightEnabled(world);
-        } catch (VarLightNotActiveException e) {
-            failure(this, source, "VarLight is not active in World \"" + world.getName() + "\"");
-
-            return FAILURE;
-        }
-
-        IntPosition a = pos1.toIntPosition();
-        IntPosition b = pos2.toIntPosition();
-
-        RegionIterator iterator = new RegionIterator(a, b);
-
-        Set<ChunkCoords> affectedChunks = iterator.getAllContainingChunks();
-
-        if (affectedChunks.size() > 25) { // TODO make configurable
-            failure(this, source, "The fill command may only affect a maximum of 25 chunks, you are trying to manipulate an area affecting " + affectedChunks.size() + " chunks.");
-
-            return FAILURE;
-        }
-
-        final int progressBarThreshold = 100_000;
-
-        createTickets(world, affectedChunks).join();
-
-        plugin.getApi().getAsyncExecutor().submit(() -> {
-            try {
-                Pointer<Integer>
-                        total = new Pointer<>(0),
-                        illegal = new Pointer<>(0),
-                        updated = new Pointer<>(0),
-                        skipped = new Pointer<>(0),
-                        failed = new Pointer<>(0);
-
-                Set<IntPosition> blockUpdates = new HashSet<>();
-
-                plugin.getApi().getSyncExecutor().submit(() -> {
-                    try (ProgressBar progressBar = iterator.getSize() < progressBarThreshold ? ProgressBar.VOID : new ProgressBar(plugin, "VarLight fill | Iterating Blocks", iterator.getSize())) {
-                        progressBar.subscribe(source);
-                        IntPosition next;
-
-                        while (iterator.hasNext()) {
-                            next = iterator.next();
-                            Block block = next.toBlock(world);
-                            total.value++;
-                            progressBar.step();
-
-                            if (!filter.test(block.getType())) {
-                                skipped.value++;
-                                continue;
-                            }
-
-                            if (plugin.getNmsAdapter().isIllegalBlock(block)) {
-                                illegal.value++;
-                                continue;
-                            }
-
-                            LightUpdateResult result = plugin.getApi().setCustomLuminance(block.getLocation(), lightLevel, false).join();
-
-                            if (!result.isSuccess()) {
-                                failed.value++;
-                                continue;
-                            } else {
-                                updated.value++;
-                            }
-
-                            blockUpdates.add(next);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }).join();
-
-                plugin.getLightUpdater().updateLightMultiBlock(manager, blockUpdates, iterator.getSize() < progressBarThreshold ? null : Collections.singletonList(source)).join();
-
-                successBroadcast(this, source, String.format("Successfully updated %d Light sources in Region [%d, %d, %d] to [%d, %d, %d]. (Total blocks: %d, Invalid Blocks: %d, Skipped Blocks: %d, Failed Blocks: %d)",
-                        updated.value,
-                        iterator.start.x,
-                        iterator.start.y,
-                        iterator.start.z,
-                        iterator.end.x,
-                        iterator.end.y,
-                        iterator.end.z,
-                        total.value,
-                        illegal.value,
-                        skipped.value,
-                        failed.value
-                ));
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new LightUpdateFailedException("Failed to run fill command", e);
-            } finally {
-                releaseTickets(world, affectedChunks).join();
-            }
-        });
+        plugin.getApi().getAsyncExecutor().submit(
+                () -> plugin.getApi().runBulkFill(source.getWorld(), source, pos1.toIntPosition(), pos2.toIntPosition(), lightLevel, filter).join().finish(source)
+        );
 
         return SUCCESS;
     }

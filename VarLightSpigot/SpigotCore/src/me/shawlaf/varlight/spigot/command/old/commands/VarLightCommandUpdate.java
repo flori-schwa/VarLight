@@ -91,14 +91,14 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
         @NotNull ICustomLightStorage manager;
 
         try {
-            manager = plugin.getApi().requireVarLightEnabled(world);
+            manager = plugin.getApi().unsafe().requireVarLightEnabled(world);
         } catch (VarLightNotActiveException e) {
             failure(this, source, String.format("VarLight is not active in world \"%s\"", world.getName()));
 
             return FAILURE;
         }
 
-        int fromLight = manager.getCustomLuminance(location.toIntPosition(), 0);
+        int fromLight = manager.getCustomLuminance(location.toIntPosition());
 
         if (!world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) {
             failure(this, source, "The target chunk is not loaded!");
