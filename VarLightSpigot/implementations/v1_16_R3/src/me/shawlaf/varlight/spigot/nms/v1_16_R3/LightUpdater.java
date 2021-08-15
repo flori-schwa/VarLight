@@ -5,11 +5,11 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.nms.IMinecraftLightUpdater;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
-import me.shawlaf.varlight.util.pos.RegionIterator;
+import me.shawlaf.varlight.util.Tuple;
 import me.shawlaf.varlight.util.collections.IteratorUtils;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
-import me.shawlaf.varlight.util.Tuple;
+import me.shawlaf.varlight.util.pos.RegionIterator;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -19,10 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.joor.Reflect;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
@@ -262,6 +259,48 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
             joinAllWithProgress("Light Chunks", lightChunks(nmsWorld, toUpdate), progressSubscribers).join();
             sendClientUpdates(nmsWorld, toUpdate, progressSubscribers).join();
         }, null);
+    }
+
+    @Override
+    public CompletableFuture<Set<IntPosition>> clearLightCubicArea(ICustomLightStorage lightStorage, IntPosition start, IntPosition end, Collection<CommandSender> progressSubscribers) {
+        WorldServer nmsWorld = lightStorage.getForBukkitWorld().toNmsWorld();
+        LightEngineThreaded let = ((LightEngineThreaded) nmsWorld.getLightProvider());
+        LightEngineBlock leb = ((LightEngineBlock) let.getLightingView(EnumSkyBlock.BLOCK));
+
+        return plugin.getApi().getAsyncExecutor().submit(() -> {
+            Set<IntPosition> affectedBlocks = new HashSet<>();
+            Set<ChunkCoords> updatedChunks = new HashSet<>();
+
+            let.runLightEngineSync(() -> {
+                RegionIterator iterator = new RegionIterator(start, end);
+                IntPosition next;
+
+                try (ProgressBar progressBar = nullOrEmpty(progressSubscribers) ? ProgressBar.VOID : new ProgressBar(plugin, "Clear Light", iterator.getSize())) {
+                    progressBar.subscribeAll(progressSubscribers);
+
+                    while (iterator.hasNext()) {
+                        next = iterator.next();
+
+                        if (lightStorage.setCustomLuminance(next, 0) != 0) {
+                            affectedBlocks.add(next);
+                            updatedChunks.add(next.toChunkCoords());
+                        }
+
+                        progressBar.step();
+                    }
+                }
+            }).join();
+
+            Set<ChunkCoords> toUpdate = updatedChunks.parallelStream()
+                    .map(c -> RegionIterator.squareChunkArea(c, 1))
+                    .flatMap(it -> IteratorUtils.collectFromIterator(it, Collectors.toSet()).stream())
+                    .collect(Collectors.toSet());
+
+            joinAllWithProgress("Light Chunks", lightChunks(nmsWorld, toUpdate), progressSubscribers).join();
+            sendClientUpdates(nmsWorld, toUpdate, progressSubscribers).join();
+
+            return affectedBlocks;
+        });
     }
 
     @Override

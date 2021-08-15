@@ -2,7 +2,7 @@ package me.shawlaf.varlight.spigot.api;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
-import me.shawlaf.varlight.spigot.bulk.BulkFillTaskResult;
+import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
@@ -105,7 +105,13 @@ public interface IVarLightAPI {
         return clearCustomLuminance(location, true);
     }
 
-    CompletableFuture<BulkFillTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter);
+    CompletableFuture<BulkTaskResult> runBulkClear(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end);
+
+    CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter);
+
+    default CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel) {
+        return runBulkFill(world, source, start, end, lightLevel, x -> true);
+    }
 
     /**
      * <p>

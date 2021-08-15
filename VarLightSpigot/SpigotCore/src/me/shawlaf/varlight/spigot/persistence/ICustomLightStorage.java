@@ -64,16 +64,18 @@ public interface ICustomLightStorage {
      * @param location The {@link Location} of the Custom Light Source
      * @param luminance The Light Level that should be saved
      * @throws PositionOutOfBoundsException if the Position is out of bounds of the underlying {@link World}
+     * @return The old Custom Light Level
      */
-    void setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException;
+    int setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException;
 
     /**
      * Set the Custom Light Data at the given position
      * @param position The {@link IntPosition} of the Custom Light Source
      * @param luminance The Light Level that should be saved
      * @throws PositionOutOfBoundsException if the Position is out of bounds of the underlying {@link World}
+     * @return The old Custom Light Level
      */
-    void setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException;
+    int setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException;
 
     /**
      * Removes all Custom Light Data from the specified Chunk

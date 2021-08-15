@@ -103,13 +103,13 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
     }
 
     @Override
-    public void setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException {
-        setCustomLuminance(location.toIntPosition(), luminance);
+    public int setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException {
+        return setCustomLuminance(location.toIntPosition(), luminance);
     }
 
     @Override
-    public void setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException {
-        getNLSFile(position.toRegionCoords()).setCustomLuminance(position, luminance);
+    public int setCustomLuminance(IntPosition position, int luminance) throws PositionOutOfBoundsException {
+        return getNLSFile(position.toRegionCoords()).setCustomLuminance(position, luminance);
     }
 
     @Override

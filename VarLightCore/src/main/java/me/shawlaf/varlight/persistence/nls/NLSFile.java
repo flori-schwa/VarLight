@@ -154,16 +154,19 @@ public class NLSFile implements IRegionCustomLightAccess {
     }
 
     @Override
-    public void setCustomLuminance(IntPosition position, int value) {
+    public int setCustomLuminance(IntPosition position, int value) {
         ChunkCoords chunkCoords = position.toChunkCoords();
         int index = chunkIndex(chunkCoords);
+        int ret = 0;
 
         synchronized (lock) {
             ChunkLightStorage_V1 chunk = chunks[index];
 
             if (chunk == null) {
+                // No Data present
+
                 if (value == 0) {
-                    return;
+                    return 0;
                 }
 
                 chunk = new ChunkLightStorage_V1(chunkCoords);
@@ -174,10 +177,12 @@ public class NLSFile implements IRegionCustomLightAccess {
 
                 chunks[index] = chunk;
                 ++nonEmptyChunks;
-
+                return 0;
             } else {
-                if (chunk.getCustomLuminance(position) == value) {
-                    return;
+                ret = chunk.getCustomLuminance(position);
+
+                if (ret == value) {
+                    return ret;
                 }
 
                 chunk.setCustomLuminance(position, value);
@@ -190,6 +195,8 @@ public class NLSFile implements IRegionCustomLightAccess {
 
             dirty = true;
         }
+
+        return ret;
     }
 
     @Override
