@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -114,8 +115,10 @@ public class ProgressBar implements AutoCloseable {
         this.totalUnits = totalUnits;
     }
 
-    public void subscribeAll(Collection<CommandSender> subscribers) {
-        subscribers.forEach(this::subscribe);
+    public void subscribeAll(@Nullable Collection<CommandSender> subscribers) {
+        if (subscribers != null) {
+            subscribers.forEach(this::subscribe);
+        }
     }
 
     public void subscribe(CommandSender sender) {

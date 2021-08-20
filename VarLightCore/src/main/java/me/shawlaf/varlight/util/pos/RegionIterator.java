@@ -1,14 +1,14 @@
 package me.shawlaf.varlight.util.pos;
 
 import me.shawlaf.varlight.util.collections.IteratorUtils;
+import me.shawlaf.varlight.util.collections.PredictableSizeIterator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RegionIterator implements Iterator<IntPosition> {
+public class RegionIterator implements PredictableSizeIterator<IntPosition> {
 
     @NotNull
     public final IntPosition start, end;
@@ -51,6 +51,7 @@ public class RegionIterator implements Iterator<IntPosition> {
         return Math.abs(end.z - start.z) + 1;
     }
 
+    @Override
     public int getSize() {
         return getLengthX() * getLengthY() * getLengthZ();
     }

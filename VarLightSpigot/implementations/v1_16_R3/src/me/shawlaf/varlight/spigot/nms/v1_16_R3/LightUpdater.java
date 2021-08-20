@@ -188,7 +188,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
         return plugin.getApi().getAsyncExecutor().submit(() -> {
             let.runLightEngineSync(() -> {
                 try (ProgressBar progressBar = nullOrEmpty(progressSubscribers) ? ProgressBar.VOID : new ProgressBar(plugin, "Update Light", positions.size())) {
-                    progressSubscribers.forEach(progressBar::subscribe);
+                    progressBar.subscribeAll(progressSubscribers);
 
                     for (IntPosition position : positions) {
                         leb.checkBlock(position);
@@ -284,6 +284,7 @@ public class LightUpdater implements IMinecraftLightUpdater, Listener {
                         if (lightStorage.setCustomLuminance(next, 0) != 0) {
                             affectedBlocks.add(next);
                             updatedChunks.add(next.toChunkCoords());
+                            leb.checkBlock(next);
                         }
 
                         progressBar.step();
