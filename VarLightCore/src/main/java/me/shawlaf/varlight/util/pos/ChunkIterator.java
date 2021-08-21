@@ -1,8 +1,8 @@
 package me.shawlaf.varlight.util.pos;
 
-import java.util.Iterator;
+import me.shawlaf.varlight.util.collections.PredictableSizeIterator;
 
-public class ChunkIterator implements Iterator<ChunkCoords> {
+public class ChunkIterator implements PredictableSizeIterator<ChunkCoords> {
 
     private final ChunkCoords start;
     private final ChunkCoords end;
@@ -41,6 +41,19 @@ public class ChunkIterator implements Iterator<ChunkCoords> {
         step();
 
         return nextCoords;
+    }
+
+    public int getLengthX() {
+        return Math.abs(end.x - start.x) + 1;
+    }
+
+    public int getLengthZ() {
+        return Math.abs(end.z - start.z) + 1;
+    }
+
+    @Override
+    public int getSize() {
+        return getLengthX() * getLengthZ();
     }
 
     private boolean zInRange(int z) {

@@ -40,7 +40,7 @@ public abstract class AbstractBulkTask {
     
     public final CompletableFuture<BulkTaskResult> run() {
         if (forcePrimaryThread() && !Bukkit.isPrimaryThread()) {
-            throw new IllegalStateException("Must be run from Main Thread");
+            return plugin.getApi().getSyncExecutor().submit(this::doRun).join();
         }
 
         return doRun();

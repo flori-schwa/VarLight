@@ -9,6 +9,7 @@ import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
+import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import org.bukkit.Bukkit;
@@ -29,7 +30,7 @@ import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 @ExtensionMethod({
         IntPositionExtension.class
 })
-public class VarLightCommandFill extends VarLightSubCommand {
+public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSelection {
 
     public static final String ARG_NAME_POS1 = "position 1";
     public static final String ARG_NAME_POS2 = "position 2";
@@ -44,6 +45,10 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
     public VarLightCommandFill(VarLightCommand command) {
         super(command, "fill");
+
+        if (Bukkit.getPluginManager().getPlugin("WorldEdit") != null) {
+            this.worldEditUtil = new WorldEditUtil(plugin);
+        }
     }
 
     @Override
@@ -81,9 +86,7 @@ public class VarLightCommandFill extends VarLightSubCommand {
                 )
         );
 
-        if (Bukkit.getPluginManager().getPlugin("WorldEdit") != null) {
-            this.worldEditUtil = new WorldEditUtil(plugin);
-
+        if (this.worldEditUtil != null) {
             node.then(
                     integerArgument(ARG_NAME_LIGHT_LEVEL, 0, 15)
                             .executes(c -> fillNoFilter(c, true))
@@ -107,19 +110,19 @@ public class VarLightCommandFill extends VarLightSubCommand {
         return node;
     }
 
-    private Location[] getSelection(CommandContext<CommandSender> context, boolean worldEdit) throws CommandSyntaxException {
-        Player player = (Player) context.getSource();
+    @Override
+    public RequiredArgumentBuilder<CommandSender, ICoordinates> getPositionArgumentA() {
+        return ARG_POS_1;
+    }
 
-        if (worldEdit) {
-            return worldEditUtil.getSelection(player, player.getWorld());
-        }
+    @Override
+    public RequiredArgumentBuilder<CommandSender, ICoordinates> getPositionArgumentB() {
+        return ARG_POS_2;
+    }
 
-        Location a, b;
-
-        a = context.getArgument(ARG_POS_1.getName(), ICoordinates.class).toLocation(context.getSource());
-        b = context.getArgument(ARG_POS_2.getName(), ICoordinates.class).toLocation(context.getSource());
-
-        return new Location[]{a, b};
+    @Override
+    public WorldEditUtil getWorldEditUtil() {
+        return worldEditUtil;
     }
 
     private int fillNoFilter(CommandContext<CommandSender> context, boolean worldedit) throws CommandSyntaxException {
@@ -179,7 +182,9 @@ public class VarLightCommandFill extends VarLightSubCommand {
 
     private int fill(Player source, Location pos1, Location pos2, int lightLevel, Predicate<Material> filter) {
         plugin.getApi().getAsyncExecutor().submit(
-                () -> plugin.getApi().runBulkFill(source.getWorld(), source, pos1.toIntPosition(), pos2.toIntPosition(), lightLevel, filter).join().finish(source)
+                () -> {
+                    plugin.getApi().runBulkFill(source.getWorld(), source, pos1.toIntPosition(), pos2.toIntPosition(), lightLevel, filter).join().finish(source);
+                }
         );
 
         return SUCCESS;

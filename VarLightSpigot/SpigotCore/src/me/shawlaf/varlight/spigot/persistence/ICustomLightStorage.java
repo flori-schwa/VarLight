@@ -26,7 +26,7 @@ public interface ICustomLightStorage {
      * @return The Custom Light Level at the given Position, or {@code 0} if none present
      */
     default int getCustomLuminance(IntPosition position) {
-        return getCustomLuminance(position);
+        return getCustomLuminance(position, 0);
     }
 
     /**

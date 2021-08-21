@@ -3,61 +3,65 @@ package me.shawlaf.varlight.spigot.command.old.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import me.shawlaf.command.result.CommandResult;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.experimental.ExtensionMethod;
+import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
+import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.VarLightPermissions;
+import me.shawlaf.varlight.util.pos.IntPosition;
+import me.shawlaf.varlight.util.pos.RegionIterator;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-import static me.shawlaf.command.result.CommandResult.failure;
 import static me.shawlaf.command.result.CommandResult.info;
-import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
-public class VarLightCommandClear extends VarLightSubCommand {
+@ExtensionMethod({
+        IntPositionExtension.class
+})
+public class VarLightCommandClear extends VarLightSubCommand implements IPlayerSelection {
 
-    private static final RequiredArgumentBuilder<CommandSender, Integer> ARG_REGION_X = integerArgument("regionX");
-    private static final RequiredArgumentBuilder<CommandSender, Integer> ARG_REGION_Z = integerArgument("regionZ");
+    public static final String ARG_NAME_POS1 = "position 1";
+    public static final String ARG_NAME_POS2 = "position 2";
 
-    private static final RequiredArgumentBuilder<CommandSender, Integer> ARG_CHUNK_X = integerArgument("chunkX");
-    private static final RequiredArgumentBuilder<CommandSender, Integer> ARG_CHUNK_Z = integerArgument("chunkZ");
+    private static final RequiredArgumentBuilder<CommandSender, ICoordinates> ARG_POS_1 = positionArgument(ARG_NAME_POS1);
+    private static final RequiredArgumentBuilder<CommandSender, ICoordinates> ARG_POS_2 = positionArgument(ARG_NAME_POS2);
+
+    private WorldEditUtil worldEditUtil;
 
     public VarLightCommandClear(VarLightCommand rootCommand) {
         super(rootCommand, "clear");
+
+        if (Bukkit.getPluginManager().getPlugin("WorldEdit") != null) {
+            this.worldEditUtil = new WorldEditUtil(plugin);
+        }
     }
 
     @Override
     public @NotNull String getRequiredPermission() {
-        return "varlight.admin.clear";
+        return VarLightPermissions.VARLIGHT_CLEAR_PERMISSION;
     }
 
     @Override
     public @NotNull String getDescription() {
-        return "Remove Custom Light sources in a certain chunk or region";
+        return "Remove Custom Light sources in the specified area";
     }
 
     @Override
     public @NotNull LiteralArgumentBuilder<CommandSender> build(LiteralArgumentBuilder<CommandSender> node) {
-        suggestCoordinate(ARG_CHUNK_X, e -> e.getLocation().getBlockX() >> 4);
-        suggestCoordinate(ARG_CHUNK_Z, e -> e.getLocation().getBlockZ() >> 4);
-
-        suggestCoordinate(ARG_REGION_X, e -> (e.getLocation().getBlockX() >> 4) >> 5);
-        suggestCoordinate(ARG_REGION_Z, e -> (e.getLocation().getBlockZ() >> 4) >> 5);
 
         if (node.getRequirement() != null) {
             Predicate<CommandSender> requirement = node.getRequirement();
@@ -68,141 +72,69 @@ public class VarLightCommandClear extends VarLightSubCommand {
         }
 
         node.then(
-                literalArgument("chunk")
-                        .executes(this::executeChunkImplicit)
-                        .then(
-                                ARG_CHUNK_X
-                                        .then(
-                                                ARG_CHUNK_Z.executes(this::executeChunkExplicit)
-                                        )
-                        )
+                ARG_POS_1.then(
+                        ARG_POS_2.executes(this::clearExplicitSelection)
+                )
         );
 
-        node.then(
-                literalArgument("region")
-                        .executes(this::executeRegionImplicit)
-                        .then(
-                                ARG_REGION_X
-                                        .then(
-                                                ARG_REGION_Z.executes(this::executeRegionExplicit)
-                                        )
-                        )
-        );
+        if (this.worldEditUtil != null) {
+            node.executes(this::clearImplicitSelection);
+        }
 
         return node;
     }
 
-    private int startPrompt(LivingEntity source, Set<ChunkCoords> chunks) {
+    private int clearImplicitSelection(CommandContext<CommandSender> context) throws CommandSyntaxException {
+        return startPrompt(((LivingEntity) context.getSource()), getSelection(context, true));
+    }
+
+    private int clearExplicitSelection(CommandContext<CommandSender> context) throws CommandSyntaxException {
+        return startPrompt(((LivingEntity) context.getSource()), getSelection(context, false));
+    }
+
+    private int startPrompt(LivingEntity source, Location[] selection) {
         World world = source.getWorld();
+        RegionIterator targetArea = new RegionIterator(selection[0].toIntPosition(), selection[1].toIntPosition());
 
         plugin.getApi().getChatPromptManager().runPrompt(
                 source,
                 new ComponentBuilder("[VarLight] Are you sure, you want to ")
-                        .append("delete Light sources in " + chunks.size() + " chunks? ").color(ChatColor.RED)
+                        .append("delete all Light sources in your selected area? (" + targetArea.getSize() + " total blocks, " + targetArea.iterateChunks().getSize() + " chunks)").color(ChatColor.RED)
                         .append("This action cannot be undone.").color(ChatColor.RED).underlined(true).create(),
-                () -> clear(source, world, chunks),
+                () -> clear(source, world, selection),
                 Ticks.of(1, TimeUnit.MINUTES)
         );
 
         return SUCCESS;
     }
 
-    private Set<ChunkCoords> collectionRegionChunks(int regionX, int regionZ, Predicate<ChunkCoords> filter) {
-        Set<ChunkCoords> chunks = new HashSet<>();
-
-        for (int cx = 0; cx < 32; cx++) {
-            for (int cz = 0; cz < 32; cz++) {
-                ChunkCoords coords = new ChunkCoords(32 * regionX + cx, 32 * regionZ + cz);
-
-                if (!filter.test(coords)) {
-                    continue;
-                }
-
-                chunks.add(coords);
-            }
-        }
-
-        return chunks;
-    }
-
-    private int executeChunkImplicit(CommandContext<CommandSender> context) {
-        LivingEntity source = (LivingEntity) context.getSource();
-        Set<ChunkCoords> chunks = new HashSet<>();
-        chunks.add(new ChunkCoords(source.getLocation().getBlockX() >> 4, source.getLocation().getBlockZ() >> 4));
-        return startPrompt(source, chunks);
-    }
-
-    private int executeChunkExplicit(CommandContext<CommandSender> context) {
-        LivingEntity source = (LivingEntity) context.getSource();
-        Set<ChunkCoords> chunks = new HashSet<>();
-        chunks.add(new ChunkCoords(context.getArgument(ARG_CHUNK_X.getName(), int.class), context.getArgument(ARG_CHUNK_Z.getName(), int.class)));
-        return startPrompt(source, chunks);
-    }
-
-    private int executeRegionImplicit(CommandContext<CommandSender> context) {
-        LivingEntity source = (LivingEntity) context.getSource();
-
-        int regionX = (source.getLocation().getBlockX() >> 4) >> 5;
-        int regionZ = (source.getLocation().getBlockZ() >> 4) >> 5;
-
-        try {
-            ICustomLightStorage manager = plugin.getApi().unsafe().requireVarLightEnabled(source.getWorld());
-
-            return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
-        } catch (VarLightNotActiveException e) {
-            failure(this, source, e.getMessage());
-            return FAILURE;
-        }
-    }
-
-    private int executeRegionExplicit(CommandContext<CommandSender> context) {
-        LivingEntity source = (LivingEntity) context.getSource();
-
-        int regionX = context.getArgument(ARG_REGION_X.getName(), int.class);
-        int regionZ = context.getArgument(ARG_REGION_Z.getName(), int.class);
-
-        try {
-            ICustomLightStorage manager = plugin.getApi().unsafe().requireVarLightEnabled(source.getWorld());
-
-            return startPrompt(source, collectionRegionChunks(regionX, regionZ, manager::hasChunkCustomLightData));
-        } catch (VarLightNotActiveException e) {
-            failure(this, source, e.getMessage());
-            return FAILURE;
-        }
-    }
-
-    private void clear(CommandSender source, World world, Set<ChunkCoords> chunks) {
+    private void clear(LivingEntity source, World world, Location[] selection) {
         if (Bukkit.isPrimaryThread()) {
             // Ensure this is running on a different thread
-            plugin.getApi().getAsyncExecutor().submit(() -> clear(source, world, chunks));
+            plugin.getApi().getAsyncExecutor().submit(() -> clear(source, world, selection));
             return;
         }
 
-        info(this, source, "Clearing Custom Light data in " + chunks.size() + " chunks...");
+        IntPosition a = selection[0].toIntPosition();
+        IntPosition b = selection[1].toIntPosition();
 
-        createTickets(world, chunks).join();
+        info(this, source, "Clearing Custom Light data in selection...");
 
-        try {
-            @NotNull ICustomLightStorage manager;
+        plugin.getApi().runBulkClear(source.getWorld(), source, a, b).join().finish(source);
+    }
 
-            try {
-                manager = plugin.getApi().unsafe().requireVarLightEnabled(world);
-            } catch (VarLightNotActiveException e) {
-                failure(this, source, e.getMessage());
-                return;
-            }
+    @Override
+    public RequiredArgumentBuilder<CommandSender, ICoordinates> getPositionArgumentA() {
+        return ARG_POS_1;
+    }
 
-            for (ChunkCoords chunk : chunks) {
-                manager.clearChunk(chunk);
-            }
+    @Override
+    public RequiredArgumentBuilder<CommandSender, ICoordinates> getPositionArgumentB() {
+        return ARG_POS_2;
+    }
 
-            plugin.getLightUpdater().clearLightMultiChunk(manager, chunks, Collections.singleton(source)).join();
-
-            CommandResult.successBroadcast(this, source, "Cleared Custom Light sources in " + chunks.size() + " chunks");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            releaseTickets(world, chunks).join();
-        }
+    @Override
+    public WorldEditUtil getWorldEditUtil() {
+        return worldEditUtil;
     }
 }
