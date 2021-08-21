@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -24,6 +25,8 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
     CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
 
     CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
+
+    CompletableFuture<Set<IntPosition>> clearLightCubicArea(ICustomLightStorage lightStorage, IntPosition start, IntPosition end, Collection<CommandSender> progressSubscribers);
 
     CompletableFuture<Void> clearLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
 

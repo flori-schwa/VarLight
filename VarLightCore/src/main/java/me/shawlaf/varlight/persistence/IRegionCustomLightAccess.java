@@ -14,7 +14,7 @@ public interface IRegionCustomLightAccess {
 
     int getCustomLuminance(IntPosition position);
 
-    void setCustomLuminance(IntPosition position, int value);
+    int setCustomLuminance(IntPosition position, int value);
 
     int getNonEmptyChunks();
 

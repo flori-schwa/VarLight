@@ -5,11 +5,11 @@ import me.shawlaf.command.result.CommandResult;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class BulkFillTaskResult {
+public class BulkTaskResult {
 
     @NotNull
     @Getter
-    private final BulkFillTask task;
+    private final AbstractBulkTask task;
 
     @NotNull
     @Getter
@@ -18,13 +18,13 @@ public class BulkFillTaskResult {
     @NotNull
     private final CommandResult result;
 
-    public BulkFillTaskResult(@NotNull BulkFillTask task, @NotNull Type resultType, @NotNull CommandResult result) {
+    public BulkTaskResult(@NotNull AbstractBulkTask task, @NotNull Type resultType, @NotNull CommandResult result) {
         this.task = task;
         this.resultType = resultType;
         this.result = result;
     }
 
-    public boolean isSucess() {
+    public boolean isSuccess() {
         return resultType.isSuccess();
     }
 

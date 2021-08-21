@@ -7,8 +7,9 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
+import me.shawlaf.varlight.spigot.bulk.BulkClearTask;
 import me.shawlaf.varlight.spigot.bulk.BulkFillTask;
-import me.shawlaf.varlight.spigot.bulk.BulkFillTaskResult;
+import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.APIModule;
@@ -247,7 +248,12 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public CompletableFuture<BulkFillTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter) {
+    public CompletableFuture<BulkTaskResult> runBulkClear(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end) {
+        return new BulkClearTask(plugin, world, source, start, end).run();
+    }
+
+    @Override
+    public CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter) {
         return new BulkFillTask(plugin, world, source, start, end, lightLevel, filter).run();
     }
 

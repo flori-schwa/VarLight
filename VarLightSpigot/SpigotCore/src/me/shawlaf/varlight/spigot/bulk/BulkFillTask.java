@@ -6,6 +6,7 @@ import me.shawlaf.command.result.CommandResultFailure;
 import me.shawlaf.command.result.CommandResultSuccessBroadcast;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.api.LightUpdateResult;
+import me.shawlaf.varlight.spigot.bulk.exception.BulkTaskTooLargeException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
@@ -14,7 +15,6 @@ import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -66,33 +66,36 @@ public class BulkFillTask extends AbstractBulkTask {
         this.filter = filter == null ? x -> true : filter;
     }
 
-    public CompletableFuture<BulkFillTaskResult> run() {
-        if (!Bukkit.isPrimaryThread()) {
-            throw new IllegalStateException("Must be run from Main Thread");
-        }
+    @Override
+    protected boolean forcePrimaryThread() {
+        return true;
+    }
 
+    @Override
+    public CompletableFuture<BulkTaskResult> doRun() {
         @NotNull ICustomLightStorage manager;
 
         try {
             manager = plugin.getApi().unsafe().requireVarLightEnabled(this.world);
         } catch (VarLightNotActiveException e) {
-            return CompletableFuture.completedFuture(new BulkFillTaskResult(this, BulkFillTaskResult.Type.NOT_ACTIVE, new CommandResultFailure(plugin.getCommand(), e.getMessage())));
+            return CompletableFuture.completedFuture(new BulkTaskResult(this, BulkTaskResult.Type.NOT_ACTIVE, new CommandResultFailure(plugin.getCommand(), e.getMessage())));
         }
 
         RegionIterator regionIterator = new RegionIterator(this.start, this.end);
 
         Set<ChunkCoords> affectedChunks = regionIterator.getAllContainingChunks();
 
-        final int fillChunkLimit = 25; // TODO make configurable
-
-        if (affectedChunks.size() > fillChunkLimit) {
+        try {
+            checkSizeRestrictions(affectedChunks);
+        } catch (BulkTaskTooLargeException e) {
             return CompletableFuture.completedFuture(
-                    new BulkFillTaskResult(this,
-                            BulkFillTaskResult.Type.TOO_LARGE,
+                    new BulkTaskResult(this,
+                            BulkTaskResult.Type.TOO_LARGE,
                             new CommandResultFailure(
                                     plugin.getCommand(),
-                                    String.format("The fill command may only affect a maximum of %d chunks, you are trying to manipulate an area affecting %d chunks.", fillChunkLimit, affectedChunks.size())
-                            ))
+                                    String.format("The fill command may only affect a maximum of %d chunks, you are trying to manipulate an area affecting %d chunks.", e.getChunkLimit(), e.getNChunksTryingToModify())
+                            )
+                    )
             );
         }
 
@@ -137,7 +140,7 @@ public class BulkFillTask extends AbstractBulkTask {
 
                 plugin.getLightUpdater().updateLightMultiBlock(manager, updatedBlocks, useProgressBar ? this.progressSubscribers : null).join();
 
-                return new BulkFillTaskResult(this, BulkFillTaskResult.Type.SUCCESS,
+                return new BulkTaskResult(this, BulkTaskResult.Type.SUCCESS,
                         new CommandResultSuccessBroadcast(plugin.getCommand(),
                                 String.format("Successfully updated %d Light sources in Region %s to %s. (Total blocks: %d, Invalid Blocks: %d, Skipped Blocks: %d, Failed Blocks: %d)",
                                         updatedBlocks.size(),
@@ -150,7 +153,7 @@ public class BulkFillTask extends AbstractBulkTask {
                                 ), VarLightPermissions.VARLIGHT_FILL_PERMISSION));
             } catch (Exception e) {
                 e.printStackTrace();
-                return new BulkFillTaskResult(this, BulkFillTaskResult.Type.ERROR, new CommandResultFailure(plugin.getCommand(), String.format("Failed to run fill command: %s", e.getMessage())));
+                return new BulkTaskResult(this, BulkTaskResult.Type.ERROR, new CommandResultFailure(plugin.getCommand(), String.format("Failed to run fill command: %s", e.getMessage())));
             } finally {
                 releaseTickets(regionIterator.iterateChunks()).join();
             }
