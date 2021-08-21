@@ -67,7 +67,7 @@ pipeline {
                         def version;
 
                         if (params.VERSION.isEmpty()) {
-                            version = "${env.BRANCH_NAME}-${BUILD_NUMBER}"
+                            version = "${BUILD_NUMBER}"
                         } else {
                             version = params.VERSION
                         }

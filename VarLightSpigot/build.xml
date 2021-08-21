@@ -169,7 +169,7 @@
             </libraries>
         </build>
 
-        <jar destfile="${dist}/VarLight-${plugin.version}.jar" basedir="${build}">
+        <jar destfile="${dist}/VarLight-1.16.5-${plugin.version}.jar" basedir="${build}">
             <zipgroupfileset dir="${libraries}">
                 <include name="**/${lib-annotations}"/>
                 <include name="**/${lib-varlight-core}"/>
