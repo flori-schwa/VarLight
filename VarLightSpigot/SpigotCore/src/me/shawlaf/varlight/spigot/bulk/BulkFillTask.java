@@ -15,7 +15,6 @@ import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -49,14 +48,14 @@ public class BulkFillTask extends AbstractBulkTask {
     private int lightLevel;
 
     @NotNull
-    private final Predicate<Material> filter;
+    private final Predicate<Block> filter;
 
     private Set<IntPosition> illegalBlocks = new HashSet<>();
     private Set<IntPosition> skippedBlocks = new HashSet<>();
     private Set<IntPosition> failedBlocks = new HashSet<>();
     private Set<IntPosition> updatedBlocks = new HashSet<>();
 
-    public BulkFillTask(@NotNull VarLightPlugin plugin, @NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter) {
+    public BulkFillTask(@NotNull VarLightPlugin plugin, @NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Block> filter) {
         super(plugin, world, source);
 
         Objects.requireNonNull(this.start = start);
@@ -117,7 +116,7 @@ public class BulkFillTask extends AbstractBulkTask {
                             ++totalBlocks;
                             progressBar.step();
 
-                            if (!filter.test(block.getType())) {
+                            if (!filter.test(block)) {
                                 skippedBlocks.add(next);
                                 continue;
                             }

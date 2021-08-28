@@ -253,7 +253,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Material> filter) {
+    public CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Block> filter) {
         return new BulkFillTask(plugin, world, source, start, end, lightLevel, filter).run();
     }
 

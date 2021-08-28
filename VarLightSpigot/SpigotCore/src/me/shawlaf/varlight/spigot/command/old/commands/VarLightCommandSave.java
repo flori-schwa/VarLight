@@ -69,7 +69,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
     }
 
     private int saveAll(CommandContext<CommandSender> context) {
-        for (ICustomLightStorage wlp : plugin.getApi().getAllActiveVarLightWorlds()) {
+        for (ICustomLightStorage wlp : plugin.getApi().unsafe().getAllActiveVarLightWorlds()) {
             wlp.save(context.getSource(), true);
         }
 

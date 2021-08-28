@@ -15,6 +15,7 @@ import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -158,7 +159,7 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
 
         Collection<Material> positiveFilter = context.getArgument(ARG_NAME_POSITIVE_FILTER, Collection.class);
 
-        return fill((Player) context.getSource(), selection[0], selection[1], lightLevel, positiveFilter::contains);
+        return fill((Player) context.getSource(), selection[0], selection[1], lightLevel, block -> positiveFilter.contains(block.getType()));
     }
 
     private int fillNegFilter(CommandContext<CommandSender> context, boolean worldedit) throws CommandSyntaxException {
@@ -177,10 +178,10 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
 
         Collection<Material> negativeFilter = context.getArgument(ARG_NAME_NEGATIVE_FILTER, Collection.class);
 
-        return fill((Player) context.getSource(), selection[0], selection[1], lightLevel, o -> !negativeFilter.contains(o));
+        return fill((Player) context.getSource(), selection[0], selection[1], lightLevel, block -> !negativeFilter.contains(block.getType()));
     }
 
-    private int fill(Player source, Location pos1, Location pos2, int lightLevel, Predicate<Material> filter) {
+    private int fill(Player source, Location pos1, Location pos2, int lightLevel, Predicate<Block> filter) {
         plugin.getApi().getAsyncExecutor().submit(
                 () -> {
                     plugin.getApi().runBulkFill(source.getWorld(), source, pos1.toIntPosition(), pos2.toIntPosition(), lightLevel, filter).join().finish(source);
