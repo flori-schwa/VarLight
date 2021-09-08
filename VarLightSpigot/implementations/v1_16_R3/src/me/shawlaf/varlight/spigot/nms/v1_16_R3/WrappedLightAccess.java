@@ -14,16 +14,13 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class WrappedLightAccess implements ILightAccess, Listener {
 
-    // TODO MEMORY LEAK, The created Proxies are not Garbage collected
-
-    private final Map<ChunkCoords, IChunkAccess> proxies = Collections.synchronizedMap(new HashMap<>());
+    private final Map<ChunkCoords, WrappedIChunkAccess> proxies = Collections.synchronizedMap(new HashMap<>());
 
     private final VarLightPlugin plugin;
     private final WorldServer world;
@@ -47,42 +44,24 @@ public class WrappedLightAccess implements ILightAccess, Listener {
         }
     }
 
-    private IChunkAccess createProxy(ChunkCoords chunkCoords) {
+    private WrappedIChunkAccess createProxy(ChunkCoords chunkCoords) {
         IChunkAccess toWrap = (IChunkAccess) getWrapped().c(chunkCoords.x, chunkCoords.z);
 
         if (toWrap == null) {
             return null;
         }
 
-        // TODO use proper debug logging
-//        System.out.printf("Created new IChunkAccess Proxy for Chunk %s in world %s%n", chunkCoords.toShortString(), world.getWorld().getName());
-
-        return (IChunkAccess) Proxy.newProxyInstance(
-                IChunkAccess.class.getClassLoader(),
-                new Class[]{IChunkAccess.class},
-
-                (proxy, method, args) -> {
-                    if (method.getName().equals("g")) {
-                        return getCustomLuminance(toWrap, (BlockPosition) args[0]);
-                    }
-
-                    if (method.getName().equals("finalize")) {
-//                        System.out.printf("Deleted IChunkAccess Proxy for Chunk %s in world %s%n", chunkCoords.toShortString(), world.getWorld().getName());
-                    }
-
-                    return method.invoke(toWrap, args);
-                }
-        );
+        return new WrappedIChunkAccess(plugin, world.getWorld(), toWrap);
     }
 
     @Nullable
     @Override
     public IBlockAccess c(int i, int i1) {
         ChunkCoords chunkCoords = new ChunkCoords(i, i1);
-        IChunkAccess result;
+        WrappedIChunkAccess result;
 
         synchronized (proxies) {
-             result = proxies.get(chunkCoords);
+            result = proxies.get(chunkCoords);
 
             if (result == null) {
                 proxies.put(chunkCoords, result = createProxy(chunkCoords));
@@ -117,8 +96,11 @@ public class WrappedLightAccess implements ILightAccess, Listener {
 
         org.bukkit.Chunk chunk = e.getChunk();
 
-        if (proxies.remove(new ChunkCoords(chunk.getX(), chunk.getZ())) != null) {
-//            System.out.printf("Removed Proxy for Chunk [%d, %d] in world %s%n", chunk.getX(), chunk.getZ(), world.getName());
+        WrappedIChunkAccess proxy = proxies.remove(new ChunkCoords(chunk.getX(), chunk.getZ()));
+
+        if (proxy != null) {
+            proxy.unloaded();
+            // System.out.printf("Removed Proxy for Chunk [%d, %d] in world %s%n", chunk.getX(), chunk.getZ(), world.getName());
         }
     }
 
