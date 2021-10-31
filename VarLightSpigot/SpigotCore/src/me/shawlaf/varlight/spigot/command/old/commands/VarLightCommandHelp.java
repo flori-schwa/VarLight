@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.ChatPaginator;
@@ -25,7 +25,7 @@ public class VarLightCommandHelp extends VarLightSubCommand {
     }
 
     @Override
-    public @Nullable PermissioneNode getRequiredPermissionNode() {
+    public @Nullable PermissionNode getRequiredPermissionNode() {
         return null;
     }
 

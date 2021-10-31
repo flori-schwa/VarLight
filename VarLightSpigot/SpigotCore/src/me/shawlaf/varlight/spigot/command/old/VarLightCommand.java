@@ -13,7 +13,7 @@ import me.shawlaf.command.exception.CommandException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.command.old.commands.*;
 import me.shawlaf.varlight.spigot.command.old.commands.config.VarLightCommandConfig;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,7 @@ public final class VarLightCommand extends BrigadierCommand<VarLightPlugin> {
     }
 
     @Override
-    public @Nullable PermissioneNode getRequiredPermissionNode() {
+    public @Nullable PermissionNode getRequiredPermissionNode() {
         return null;
     }
 

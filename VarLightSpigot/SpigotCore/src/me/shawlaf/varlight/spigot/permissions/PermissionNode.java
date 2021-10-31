@@ -13,10 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class PermissioneNode {
+public class PermissionNode {
 
     @Getter @Nullable
-    private final PermissioneNode parent;
+    private final PermissionNode parent;
     @Getter @NotNull
     private final String name, fullName;
 
@@ -29,9 +29,9 @@ public class PermissioneNode {
     @Getter @Setter
     private boolean inherited = true;
 
-    private final HashMap<String, PermissioneNode> children = new HashMap<>();
+    private final HashMap<String, PermissionNode> children = new HashMap<>();
 
-    public PermissioneNode(@Nullable PermissioneNode parent, @NotNull String name) {
+    public PermissionNode(@Nullable PermissionNode parent, @NotNull String name) {
         this.parent = parent;
         this.name = Objects.requireNonNull(name);
 
@@ -43,7 +43,7 @@ public class PermissioneNode {
         }
     }
 
-    public PermissioneNode(@Nullable PermissioneNode parent, @NotNull String name, @Nullable String description, @NotNull PermissionDefault permissionDefault, boolean inherited) {
+    public PermissionNode(@Nullable PermissionNode parent, @NotNull String name, @Nullable String description, @NotNull PermissionDefault permissionDefault, boolean inherited) {
         this(parent, name);
 
         this.description = description;
@@ -51,18 +51,18 @@ public class PermissioneNode {
         this.inherited = inherited;
     }
 
-    public PermissioneNode(@Nullable PermissioneNode parent, @NotNull String name, @Nullable String description, @NotNull PermissionDefault permissionDefault) {
+    public PermissionNode(@Nullable PermissionNode parent, @NotNull String name, @Nullable String description, @NotNull PermissionDefault permissionDefault) {
         this(parent, name, description, permissionDefault, true);
     }
 
-    public PermissioneNode(@Nullable PermissioneNode parent, @NotNull String name, @Nullable String description) {
+    public PermissionNode(@Nullable PermissionNode parent, @NotNull String name, @Nullable String description) {
         this(parent, name, description, PermissionDefault.OP);
     }
 
     public void register() {
         Map<String, Boolean> bukkitChildren = new HashMap<>();
 
-        for (PermissioneNode child : this.children.values()) {
+        for (PermissionNode child : this.children.values()) {
             bukkitChildren.put(child.getFullName(), child.inherited);
 
             child.register();
@@ -90,7 +90,7 @@ public class PermissioneNode {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PermissioneNode that = (PermissioneNode) o;
+        PermissionNode that = (PermissionNode) o;
         return fullName.equals(that.fullName);
     }
 

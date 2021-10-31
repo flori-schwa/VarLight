@@ -1,7 +1,7 @@
 package me.shawlaf.command.result;
 
 import me.shawlaf.command.ICommandAccess;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -40,7 +40,7 @@ public abstract class CommandResult {
         new CommandResultSuccessBroadcast(command, message).finish(commandSender);
     }
 
-    public static void successBroadcast(ICommandAccess<?> command, CommandSender commandSender, String message, PermissioneNode node) {
+    public static void successBroadcast(ICommandAccess<?> command, CommandSender commandSender, String message, PermissionNode node) {
         new CommandResultSuccessBroadcast(command, message, node).finish(commandSender);
     }
 

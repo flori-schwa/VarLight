@@ -8,7 +8,7 @@ import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.Paginator;
@@ -53,7 +53,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
     }
 
     @Override
-    public @Nullable PermissioneNode getRequiredPermissionNode() {
+    public @Nullable PermissionNode getRequiredPermissionNode() {
         return VarLightPermissionTree.instance().admin.debug.debugBase;
     }
 

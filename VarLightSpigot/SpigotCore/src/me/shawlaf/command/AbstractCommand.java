@@ -2,7 +2,7 @@ package me.shawlaf.command;
 
 import me.shawlaf.command.exception.CommandException;
 import me.shawlaf.command.result.*;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
@@ -132,7 +132,7 @@ public abstract class AbstractCommand<P extends Plugin> implements ICommandAcces
     }
 
     public boolean meetsRequirement(Permissible permissible) {
-        PermissioneNode node = getRequiredPermissionNode();
+        PermissionNode node = getRequiredPermissionNode();
 
         return node == null || node.hasPermission(permissible);
     }
@@ -230,7 +230,7 @@ public abstract class AbstractCommand<P extends Plugin> implements ICommandAcces
         return new CommandResultSuccess(this, message);
     }
 
-    protected CommandResult successBroadcast(String message, PermissioneNode permissionNode) {
+    protected CommandResult successBroadcast(String message, PermissionNode permissionNode) {
         return new CommandResultSuccessBroadcast(this, message, permissionNode);
     }
 

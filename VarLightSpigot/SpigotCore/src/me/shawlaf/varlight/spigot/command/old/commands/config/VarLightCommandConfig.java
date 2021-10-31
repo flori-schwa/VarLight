@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -210,7 +210,7 @@ public class VarLightCommandConfig extends VarLightSubCommand {
     }
 
     @Override
-    public @Nullable PermissioneNode getRequiredPermissionNode() {
+    public @Nullable PermissionNode getRequiredPermissionNode() {
         return VarLightPermissionTree.instance().admin.config.configBase;
     }
 

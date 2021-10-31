@@ -14,7 +14,7 @@ public class VarLightPermissionTree {
         return INSTANCE;
     }
 
-    public final PermissioneNode base = new PermissioneNode(
+    public final PermissionNode base = new PermissionNode(
             null,
             "varlight",
             "VarLight root Permission Node",
@@ -25,7 +25,7 @@ public class VarLightPermissionTree {
     public final Player player = this.new Player();
 
     public class Admin {
-        public final PermissioneNode adminBase = new PermissioneNode(
+        public final PermissionNode adminBase = new PermissionNode(
                 base,
                 "admin",
                 "Provides access to all VarLight Administrative Features",
@@ -40,7 +40,7 @@ public class VarLightPermissionTree {
         public final Give give = this.new Give();
 
         public class Config {
-            public final PermissioneNode configBase = new PermissioneNode(
+            public final PermissionNode configBase = new PermissionNode(
                     adminBase,
                     "config",
                     "Provides access to all VarLight Configuration Options"
@@ -48,7 +48,7 @@ public class VarLightPermissionTree {
         }
 
         public class Save {
-            public final PermissioneNode saveBase = new PermissioneNode(
+            public final PermissionNode saveBase = new PermissionNode(
                     adminBase,
                     "save",
                     "Provides access to all VarLight Save Options"
@@ -56,7 +56,7 @@ public class VarLightPermissionTree {
         }
 
         public class Debug {
-            public final PermissioneNode debugBase = new PermissioneNode(
+            public final PermissionNode debugBase = new PermissionNode(
                     adminBase,
                     "debug",
                     "Provides access to all VarLight Debug Features",
@@ -65,20 +65,20 @@ public class VarLightPermissionTree {
         }
 
         public class Modify {
-            public final PermissioneNode modifyBase = new PermissioneNode(
+            public final PermissionNode modifyBase = new PermissionNode(
                     adminBase,
                     "modify",
                     "Provides access to all VarLight Commands to modify Light sources"
             );
 
-            public final PermissioneNode single = new PermissioneNode(
+            public final PermissionNode single = new PermissionNode(
                     modifyBase,
                     "single",
                     "Provides access to the /varlight update command"
             );
         }
         public class Give {
-            public final PermissioneNode giveBase = new PermissioneNode(
+            public final PermissionNode giveBase = new PermissionNode(
                     adminBase,
                     "give",
                     "Provides access to /varlight give"
@@ -87,7 +87,7 @@ public class VarLightPermissionTree {
     }
 
     public class Player {
-        public final PermissioneNode playerBase = new PermissioneNode(
+        public final PermissionNode playerBase = new PermissionNode(
                 base,
                 "player",
                 "Provides access to all non-administrative Features of VarLight",
@@ -95,13 +95,13 @@ public class VarLightPermissionTree {
                 false
         );
 
-        public final PermissioneNode stepsize = new PermissioneNode(
+        public final PermissionNode stepsize = new PermissionNode(
                 playerBase,
                 "stepsize",
                 "Provides access to /varlight stepsize"
         );
 
-        public final PermissioneNode use = new PermissioneNode(
+        public final PermissionNode use = new PermissionNode(
                 playerBase,
                 "use",
                 "Allows usage of the Light Update Item to modify Light Sources",

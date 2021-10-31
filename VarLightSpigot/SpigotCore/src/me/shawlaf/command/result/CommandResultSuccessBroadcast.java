@@ -2,7 +2,7 @@ package me.shawlaf.command.result;
 
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.ICommandAccess;
-import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.util.StreamUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,13 +18,13 @@ import org.bukkit.command.ConsoleCommandSender;
 public class CommandResultSuccessBroadcast extends CommandResult {
 
     private final String message;
-    private final PermissioneNode node;
+    private final PermissionNode node;
 
     public CommandResultSuccessBroadcast(ICommandAccess<?> command, String message) {
         this(command, message, command.getRequiredPermissionNode());
     }
 
-    public CommandResultSuccessBroadcast(ICommandAccess<?> command, String message, PermissioneNode node) {
+    public CommandResultSuccessBroadcast(ICommandAccess<?> command, String message, PermissionNode node) {
         super(command);
 
         this.message = message;

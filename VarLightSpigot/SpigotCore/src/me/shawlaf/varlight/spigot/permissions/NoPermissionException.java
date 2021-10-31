@@ -8,9 +8,9 @@ public class NoPermissionException extends Exception {
     @Getter
     private final Permissible permissible;
     @Getter
-    private final PermissioneNode node;
+    private final PermissionNode node;
 
-    public NoPermissionException(Permissible permissible, PermissioneNode node) {
+    public NoPermissionException(Permissible permissible, PermissionNode node) {
         super(String.format("%s does not have %s permission", permissible.toString(), node.getFullName()));
 
         this.permissible = permissible;
