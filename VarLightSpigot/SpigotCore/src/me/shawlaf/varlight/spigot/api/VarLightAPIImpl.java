@@ -11,6 +11,7 @@ import me.shawlaf.varlight.spigot.bulk.BulkClearTask;
 import me.shawlaf.varlight.spigot.bulk.BulkFillTask;
 import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
+import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.APIModule;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
@@ -26,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -172,7 +174,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @NotNull
-    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update) {
+    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
         if (!Bukkit.isPrimaryThread()) {
             return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update)).join();
         }
@@ -207,7 +209,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
         int finalFromLight = wlp.getCustomLuminance(position);
 
-        final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(block, finalFromLight, customLuminance);
+        final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(block, finalFromLight, customLuminance, cause);
 
         Bukkit.getPluginManager().callEvent(updateEvent);
 
@@ -239,8 +241,30 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public void setCustomLuminance(@Nullable CommandSender source, @NotNull World world, @NotNull IntPosition position, int customLuminance) {
-        setCustomLuminance(world, position, customLuminance, true).thenAccept(result -> {
+    public void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull World world, @NotNull IntPosition position, int customLuminance) {
+
+        LightUpdateCause cause;
+
+        switch (causeType) {
+            case PLAYER: {
+                cause = LightUpdateCause.player(source);
+                break;
+            }
+
+            case COMMAND: {
+                cause = LightUpdateCause.player(source);
+            }
+
+            case API: {
+                cause = LightUpdateCause.api();
+            }
+
+            default: {
+                throw new IllegalStateException("Default block reached");
+            }
+        }
+
+        setCustomLuminance(world, position, customLuminance, true, cause).thenAccept(result -> {
             if (source != null) {
                 result.displayMessage(source);
             }

@@ -1,4 +1,4 @@
-package me.shawlaf.varlight.spigot.command.old.commands;
+package me.shawlaf.varlight.spigot.adapters;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -6,21 +6,17 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import me.shawlaf.varlight.spigot.VarLightPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class WorldEditUtil {
+public class WorldEditAdapter {
 
-    private final VarLightPlugin plugin;
     private final WorldEditPlugin worldEditPlugin;
 
-    public WorldEditUtil(VarLightPlugin plugin) {
-        this.plugin = plugin;
-
+    public WorldEditAdapter() {
         if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
             throw new RuntimeException("WorldEdit not installed");
         }

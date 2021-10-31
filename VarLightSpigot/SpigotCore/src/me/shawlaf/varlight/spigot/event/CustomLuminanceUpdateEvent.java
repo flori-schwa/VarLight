@@ -17,11 +17,14 @@ public class CustomLuminanceUpdateEvent extends BlockEvent implements Cancellabl
     private final int fromLight;
     @Getter @Setter
     private int toLight;
+    @Getter
+    private LightUpdateCause cause;
 
-    public CustomLuminanceUpdateEvent(@NotNull Block theBlock, int fromLight, int toLight) {
+    public CustomLuminanceUpdateEvent(@NotNull Block theBlock, int fromLight, int toLight, LightUpdateCause cause) {
         super(theBlock);
         this.fromLight = fromLight;
         this.toLight = toLight;
+        this.cause = cause;
     }
 
     @Override

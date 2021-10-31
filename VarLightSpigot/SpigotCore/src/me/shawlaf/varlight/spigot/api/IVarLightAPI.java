@@ -4,6 +4,7 @@ import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
+import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
@@ -139,9 +140,14 @@ public interface IVarLightAPI {
      * @param position        The {@link IntPosition} of the custom Light Source
      * @param customLuminance The custom Luminance to set
      * @param update          Whether Server and Client Light Updates should be performed immediately
+     * @param cause           The {@link LightUpdateCause} of this Light update
      * @return A {@link CompletableFuture} returning a {@link LightUpdateResult} upon completion
      */
-    CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update);
+    CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause);
+
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update) {
+        return setCustomLuminance(world, position, customLuminance, update, LightUpdateCause.api());
+    }
 
     /**
      * <p>
@@ -155,6 +161,10 @@ public interface IVarLightAPI {
         return setCustomLuminance(world, position, customLuminance, true);
     }
 
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance, boolean update, LightUpdateCause cause) {
+        return setCustomLuminance(location.getWorld(), IntPositionExtension.toIntPosition(location), customLuminance, update, cause);
+    }
+
     /**
      * <p>
      * Same as {@link IVarLightAPI#setCustomLuminance(World, IntPosition, int, boolean)} but taking a {@link Location} as an Argument rather than
@@ -164,7 +174,7 @@ public interface IVarLightAPI {
      * @see IVarLightAPI#setCustomLuminance(World, IntPosition, int, boolean)
      */
     default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance, boolean update) {
-        return setCustomLuminance(location.getWorld(), IntPositionExtension.toIntPosition(location), customLuminance, update);
+        return setCustomLuminance(location, customLuminance, update, LightUpdateCause.api());
     }
 
     /**
@@ -185,7 +195,7 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#setCustomLuminance(World, IntPosition, int)
      */
-    void setCustomLuminance(@Nullable CommandSender source, @NotNull World world, @NotNull IntPosition position, int customLuminance);
+    void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull World world, @NotNull IntPosition position, int customLuminance);
 
     /**
      * <p>
@@ -193,10 +203,10 @@ public interface IVarLightAPI {
      * separate {@link World} and {@link IntPosition}
      * </p>
      *
-     * @see IVarLightAPI#setCustomLuminance(CommandSender, World, IntPosition, int)
+     * @see IVarLightAPI#setCustomLuminance(CommandSender, LightUpdateCause.Type, World, IntPosition, int) 
      */
-    default void setCustomLuminance(@Nullable CommandSender source, @NotNull Location location, int customLuminance) {
-        setCustomLuminance(source, location.getWorld(), IntPositionExtension.toIntPosition(location), customLuminance);
+    default void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull Location location, int customLuminance) {
+        setCustomLuminance(source, causeType, location.getWorld(), IntPositionExtension.toIntPosition(location), customLuminance);
     }
 
     /**

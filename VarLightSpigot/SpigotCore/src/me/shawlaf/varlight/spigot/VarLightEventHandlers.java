@@ -3,6 +3,7 @@ package me.shawlaf.varlight.spigot;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResult;
+import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
@@ -126,7 +127,7 @@ public class VarLightEventHandlers implements Listener {
 
         e.setCancelled(creative && e.getAction() == Action.LEFT_CLICK_BLOCK); // Prevent Block break in creative
 
-        plugin.getApi().setCustomLuminance(clicked.getLocation(), cls.getCustomLuminance(clicked.toIntPosition()) + mod).thenAccept(result -> {
+        plugin.getApi().setCustomLuminance(clicked.getLocation(), cls.getCustomLuminance(clicked.toIntPosition()) + mod, true, LightUpdateCause.player(player)).thenAccept(result -> {
             if (result.isSuccess()) {
 
                 if (plugin.getVarLightConfig().isConsumeLui() && !creative && e.getAction() == Action.RIGHT_CLICK_BLOCK) {

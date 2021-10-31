@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
+import me.shawlaf.varlight.spigot.adapters.WorldEditAdapter;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
@@ -42,13 +43,13 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
     private static final RequiredArgumentBuilder<CommandSender, ICoordinates> ARG_POS_1 = positionArgument(ARG_NAME_POS1);
     private static final RequiredArgumentBuilder<CommandSender, ICoordinates> ARG_POS_2 = positionArgument(ARG_NAME_POS2);
 
-    private WorldEditUtil worldEditUtil;
+    private WorldEditAdapter worldEditUtil;
 
     public VarLightCommandFill(VarLightCommand command) {
         super(command, "fill");
 
         if (Bukkit.getPluginManager().getPlugin("WorldEdit") != null) {
-            this.worldEditUtil = new WorldEditUtil(plugin);
+            this.worldEditUtil = new WorldEditAdapter();
         }
     }
 
@@ -122,7 +123,7 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
     }
 
     @Override
-    public WorldEditUtil getWorldEditUtil() {
+    public WorldEditAdapter getWorldEditAdapter() {
         return worldEditUtil;
     }
 
