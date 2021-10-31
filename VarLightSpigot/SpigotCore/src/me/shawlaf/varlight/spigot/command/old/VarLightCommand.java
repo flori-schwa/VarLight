@@ -2,9 +2,7 @@ package me.shawlaf.varlight.spigot.command.old;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.CommandNode;
@@ -13,17 +11,14 @@ import me.shawlaf.command.CommandSuggestions;
 import me.shawlaf.command.brigadier.BrigadierCommand;
 import me.shawlaf.command.exception.CommandException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
-import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.*;
 import me.shawlaf.varlight.spigot.command.old.commands.config.VarLightCommandConfig;
-import org.bukkit.Material;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @SuppressWarnings("rawtypes")
@@ -51,6 +46,11 @@ public final class VarLightCommand extends BrigadierCommand<VarLightPlugin> {
 
     public VarLightCommand(VarLightPlugin plugin) {
         super(plugin, "varlight");
+    }
+
+    @Override
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return null;
     }
 
     @Override
@@ -105,11 +105,6 @@ public final class VarLightCommand extends BrigadierCommand<VarLightPlugin> {
         builder.then(subCommandRoot);
 
         return builder;
-    }
-
-    @Override
-    public @Nullable String getRequiredPermission() {
-        return "";
     }
 
     public VarLightSubCommand[] getSubCommands() {

@@ -9,6 +9,8 @@ import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import org.bukkit.Location;
@@ -16,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static me.shawlaf.command.result.CommandResult.failure;
 import static me.shawlaf.command.result.CommandResult.successBroadcast;
@@ -42,8 +45,8 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
     }
 
     @Override
-    public @NotNull String getRequiredPermission() {
-        return "varlight.admin.update";
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return VarLightPermissionTree.instance().admin.modify.single;
     }
 
     @NotNull

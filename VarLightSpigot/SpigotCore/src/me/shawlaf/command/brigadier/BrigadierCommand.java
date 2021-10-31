@@ -73,15 +73,7 @@ public abstract class BrigadierCommand<P extends Plugin> extends AbstractCommand
     protected abstract LiteralArgumentBuilder<CommandSender> buildCommand(LiteralArgumentBuilder<CommandSender> baseNode);
 
     protected LiteralArgumentBuilder<CommandSender> buildRootNode(String name) {
-        return LiteralArgumentBuilder.<CommandSender>literal(name).requires(c -> {
-            String required = getRequiredPermission();
-
-            if (required == null || required.isEmpty()) {
-                return true;
-            }
-
-            return c.hasPermission(required);
-        });
+        return LiteralArgumentBuilder.<CommandSender>literal(name).requires(this::meetsRequirement);
     }
 
     protected final String getFullInput(ArgumentIterator args) {

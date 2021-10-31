@@ -5,9 +5,12 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static me.shawlaf.command.result.CommandResult.failure;
 import static me.shawlaf.command.result.CommandResult.success;
@@ -29,8 +32,8 @@ public class VarLightCommandStepSize extends VarLightSubCommand {
     }
 
     @Override
-    public @NotNull String getRequiredPermission() {
-        return "varlight.stepsize";
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return VarLightPermissionTree.instance().player.stepsize;
     }
 
     @NotNull

@@ -5,9 +5,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static me.shawlaf.command.result.CommandResult.info;
 import static me.shawlaf.command.result.CommandResult.successBroadcast;
@@ -207,8 +210,8 @@ public class VarLightCommandConfig extends VarLightSubCommand {
     }
 
     @Override
-    public @NotNull String getRequiredPermission() {
-        return "varlight.admin.config";
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return VarLightPermissionTree.instance().admin.config.configBase;
     }
 
     @Override

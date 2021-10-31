@@ -3,12 +3,19 @@ package me.shawlaf.varlight.spigot.command.old.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class VarLightCommandPrompt extends VarLightSubCommand {
     public VarLightCommandPrompt(VarLightCommand rootCommand) {
         super(rootCommand, "prompt");
+    }
+
+    @Override
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return null;
     }
 
     @Override

@@ -4,10 +4,12 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.ChatPaginator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -20,6 +22,11 @@ public class VarLightCommandHelp extends VarLightSubCommand {
 
     public VarLightCommandHelp(VarLightCommand rootCommand) {
         super(rootCommand, "help");
+    }
+
+    @Override
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return null;
     }
 
     @NotNull

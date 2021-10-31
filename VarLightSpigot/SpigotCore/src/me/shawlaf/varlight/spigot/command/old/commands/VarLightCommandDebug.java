@@ -8,6 +8,8 @@ import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.Paginator;
 import me.shawlaf.varlight.util.collections.CollectionUtil;
@@ -23,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -49,10 +52,9 @@ public class VarLightCommandDebug extends VarLightSubCommand {
         super(command, "debug");
     }
 
-    @NotNull
     @Override
-    public String getRequiredPermission() {
-        return "varlight.admin.debug";
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return VarLightPermissionTree.instance().admin.debug.debugBase;
     }
 
     @NotNull

@@ -11,8 +11,9 @@ import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
 import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -54,8 +56,8 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
     }
 
     @Override
-    public @NotNull String getRequiredPermission() {
-        return VarLightPermissions.VARLIGHT_FILL_PERMISSION;
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return VarLightPermissionTree.instance().admin.modify.modifyBase;
     }
 
     @Override

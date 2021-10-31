@@ -1,6 +1,8 @@
 package me.shawlaf.command;
 
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +33,12 @@ public interface ICommandAccess<P extends Plugin> {
      * @return The permission node required to run this command
      */
     @Nullable
-    String getRequiredPermission();
+    PermissioneNode getRequiredPermissionNode();
+
+    default boolean meetsRequirement(Permissible permissible) {
+        PermissioneNode node = getRequiredPermissionNode();
+        return node == null || node.hasPermission(permissible);
+    }
 
     /**
      * @return The description of this command

@@ -2,15 +2,16 @@ package me.shawlaf.command;
 
 import me.shawlaf.command.exception.CommandException;
 import me.shawlaf.command.result.*;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -61,7 +62,7 @@ public abstract class AbstractCommand<P extends Plugin> implements ICommandAcces
 
             pluginCommand.setDescription(getDescription());
             pluginCommand.setAliases(Stream.of(getAliases()).collect(Collectors.toList()));
-            pluginCommand.setPermission(getRequiredPermission());
+            Optional.ofNullable(getRequiredPermissionNode()).ifPresent(node -> pluginCommand.setPermission(node.getFullName()));
             pluginCommand.setUsage(getUsageString());
 
             pluginCommand.setExecutor((sender, cmd, label, args) -> {
@@ -130,12 +131,11 @@ public abstract class AbstractCommand<P extends Plugin> implements ICommandAcces
         return name;
     }
 
-    @Override
-    @Nullable
-    public String getRequiredPermission() {
-        return null;
-    }
+    public boolean meetsRequirement(Permissible permissible) {
+        PermissioneNode node = getRequiredPermissionNode();
 
+        return node == null || node.hasPermission(permissible);
+    }
 
     @NotNull
     @Override
@@ -230,12 +230,12 @@ public abstract class AbstractCommand<P extends Plugin> implements ICommandAcces
         return new CommandResultSuccess(this, message);
     }
 
-    protected CommandResult successBroadcast(String message, String permissionNode) {
+    protected CommandResult successBroadcast(String message, PermissioneNode permissionNode) {
         return new CommandResultSuccessBroadcast(this, message, permissionNode);
     }
 
     protected CommandResult successBroadcast(String message) {
-        return successBroadcast(message, getRequiredPermission());
+        return successBroadcast(message, getRequiredPermissionNode());
     }
 
     protected CommandResult malformedSyntax() {

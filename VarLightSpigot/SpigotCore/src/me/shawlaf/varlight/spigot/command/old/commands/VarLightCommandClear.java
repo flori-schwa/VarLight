@@ -11,8 +11,9 @@ import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
+import me.shawlaf.varlight.spigot.permissions.PermissioneNode;
+import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
 import net.md_5.bungee.api.ChatColor;
@@ -23,6 +24,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -52,8 +54,8 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
     }
 
     @Override
-    public @NotNull String getRequiredPermission() {
-        return VarLightPermissions.VARLIGHT_CLEAR_PERMISSION;
+    public @Nullable PermissioneNode getRequiredPermissionNode() {
+        return VarLightPermissionTree.instance().admin.modify.modifyBase;
     }
 
     @Override
