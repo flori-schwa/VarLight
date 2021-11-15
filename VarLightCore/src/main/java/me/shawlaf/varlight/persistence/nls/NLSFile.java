@@ -28,7 +28,6 @@ public class NLSFile implements IRegionCustomLightAccess {
 
     public final File file;
 
-    private final Object lock = new Object();
     @Getter
     private final int regionX, regionZ;
     private final boolean deflate;
@@ -139,7 +138,7 @@ public class NLSFile implements IRegionCustomLightAccess {
 
     @Override
     public int getCustomLuminance(IntPosition position) {
-        synchronized (lock) {
+        synchronized (this) {
             IChunkCustomLightAccess chunk = chunks[chunkIndex(position.toChunkCoords())];
 
             if (chunk == null) {
@@ -156,7 +155,7 @@ public class NLSFile implements IRegionCustomLightAccess {
         int index = chunkIndex(chunkCoords);
         int ret = 0;
 
-        synchronized (lock) {
+        synchronized (this) {
             ChunkLightStorage_V1 chunk = chunks[index];
 
             if (chunk == null) {
@@ -200,7 +199,7 @@ public class NLSFile implements IRegionCustomLightAccess {
     public int getNonEmptyChunks() {
         int count = 0;
 
-        synchronized (lock) {
+        synchronized (this) {
             for (IChunkCustomLightAccess chunk : chunks) {
                 if (chunk == null) {
                     continue;
@@ -219,7 +218,7 @@ public class NLSFile implements IRegionCustomLightAccess {
     public void clearChunk(ChunkCoords chunkCoords) {
         int index = chunkIndex(chunkCoords);
 
-        synchronized (lock) {
+        synchronized (this) {
             if (chunks[index] == null || !chunks[index].hasData()) {
                 return;
             }
@@ -232,7 +231,7 @@ public class NLSFile implements IRegionCustomLightAccess {
 
     @Override
     public int getMask(ChunkCoords chunkCoords) {
-        synchronized (lock) {
+        synchronized (this) {
             IChunkCustomLightAccess cls = chunks[chunkIndex(chunkCoords)];
 
             if (cls == null) {
@@ -256,7 +255,7 @@ public class NLSFile implements IRegionCustomLightAccess {
     }
 
     public boolean save() throws IOException {
-        synchronized (lock) {
+        synchronized (this) {
             if (!dirty) {
                 return false;
             }
@@ -288,7 +287,7 @@ public class NLSFile implements IRegionCustomLightAccess {
         List<ChunkCoords> list = new ArrayList<>(nonEmptyChunks);
         int found = 0;
 
-        synchronized (lock) {
+        synchronized (this) {
             for (ChunkLightStorage_V1 chunk : chunks) {
                 if (chunk == null) {
                     continue;
@@ -344,7 +343,7 @@ public class NLSFile implements IRegionCustomLightAccess {
     public List<IntPosition> getAllLightSources() {
         List<IntPosition> all = new ArrayList<>();
 
-        synchronized (lock) {
+        synchronized (this) {
             List<ChunkCoords> affected = getAffectedChunks();
 
             for (ChunkCoords chunkCoords : affected) {
@@ -361,7 +360,7 @@ public class NLSFile implements IRegionCustomLightAccess {
             new Exception().printStackTrace();
         }
 
-        synchronized (lock) {
+        synchronized (this) {
             for (int i = 0; i < chunks.length; ++i) {
                 if (chunks[i] == null) {
                     continue;
