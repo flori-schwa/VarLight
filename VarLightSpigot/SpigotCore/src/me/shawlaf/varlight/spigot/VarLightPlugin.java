@@ -128,8 +128,11 @@ public class VarLightPlugin extends JavaPlugin {
         doLoad = false;
     }
 
-    public void reload() {
-        // TODO implement
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+
+        this.varLightConfig = new VarLightConfig(this);
     }
 
     // endregion

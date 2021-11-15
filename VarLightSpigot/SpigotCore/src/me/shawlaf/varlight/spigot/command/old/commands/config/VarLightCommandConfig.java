@@ -222,7 +222,6 @@ public class VarLightCommandConfig extends VarLightSubCommand {
     private int runReload(CommandContext<CommandSender> context) throws CommandSyntaxException {
 
         plugin.reloadConfig();
-        plugin.reload();
 
         successBroadcast(this, context.getSource(), "Configuration reloaded!");
         info(this, context.getSource(), "Some configuration changes require a server restart to be applied:");
