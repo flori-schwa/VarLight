@@ -19,7 +19,7 @@ public class Ticks {
     }
 
     public static long calculate(long n, TimeUnit timeUnit) {
-        return timeUnit.toSeconds(n) * 20L;
+        return timeUnit.toMillis(n) / 50L;
     }
 
     public static long calculate(Duration duration) {
