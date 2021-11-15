@@ -15,12 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VarLightPlugin extends JavaPlugin {
 
-    /*
-        TODO
-         - Check for WorldGuard and WorldEdit
-         - Maybe Version Check?
-     */
-
     private static final String SERVER_VERSION;
 
     @Getter
