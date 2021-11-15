@@ -2,15 +2,15 @@ package me.shawlaf.varlight.persistence.nls;
 
 import lombok.Getter;
 import me.shawlaf.varlight.persistence.IChunkCustomLightAccess;
+import me.shawlaf.varlight.persistence.IRegionCustomLightAccess;
 import me.shawlaf.varlight.persistence.nls.common.NLSConstants;
 import me.shawlaf.varlight.persistence.nls.common.NLSHeader;
+import me.shawlaf.varlight.persistence.nls.common.migrate.NLSMigrators;
 import me.shawlaf.varlight.persistence.nls.implementations.v1.ChunkLightStorage_V1;
 import me.shawlaf.varlight.persistence.nls.implementations.v1.NLSReader_V1;
 import me.shawlaf.varlight.persistence.nls.implementations.v1.NLSWriter_V1;
-import me.shawlaf.varlight.persistence.IRegionCustomLightAccess;
-import me.shawlaf.varlight.persistence.nls.common.migrate.NLSMigrators;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.io.FileUtil;
+import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionCoords;
 import org.jetbrains.annotations.NotNull;
@@ -62,51 +62,48 @@ public class NLSFile implements IRegionCustomLightAccess {
         this.file = file;
         this.deflate = deflate;
 
-        synchronized (lock) {
+        boolean needsMigration = false;
 
-            boolean needsMigration = false;
+        try (InputStream iStream = FileUtil.openStreamInflate(file)) {
+            NLSHeader header = NLSHeader.readFromStream(iStream);
 
-            try (InputStream iStream = FileUtil.openStreamInflate(file)) {
-                NLSHeader header = NLSHeader.readFromStream(iStream);
-
-                if (header.getVersion() < NLSConstants.CURRENT_VERSION) {
-                    needsMigration = true;
-                } else if (header.getVersion() > NLSConstants.CURRENT_VERSION) {
-                    throw new IllegalStateException(String.format("Cannot downgrade from future NLS Version %d, current version: %d", header.getVersion(), NLSConstants.CURRENT_VERSION));
-                }
+            if (header.getVersion() < NLSConstants.CURRENT_VERSION) {
+                needsMigration = true;
+            } else if (header.getVersion() > NLSConstants.CURRENT_VERSION) {
+                throw new IllegalStateException(String.format("Cannot downgrade from future NLS Version %d, current version: %d", header.getVersion(), NLSConstants.CURRENT_VERSION));
             }
+        }
 
-            if (needsMigration) {
-                NLSMigrators.migrateFileToVersion(NLSConstants.CURRENT_VERSION, file);
-            }
+        if (needsMigration) {
+            NLSMigrators.migrateFileToVersion(NLSConstants.CURRENT_VERSION, file);
+        }
 
-            try (InputStream iStream = FileUtil.openStreamInflate(file)) {
-                try (NLSReader_V1 reader = new NLSReader_V1(iStream)) {
-                    // Header already parsed and verified by constructor
+        try (InputStream iStream = FileUtil.openStreamInflate(file)) {
+            try (NLSReader_V1 reader = new NLSReader_V1(iStream)) {
+                // Header already parsed and verified by constructor
 
-                    this.regionX = reader.getRegionX();
-                    this.regionZ = reader.getRegionZ();
+                this.regionX = reader.getRegionX();
+                this.regionZ = reader.getRegionZ();
 
-                    try {
-                        while (true) {
-                            ChunkLightStorage_V1 cls = reader.readChunk();
+                try {
+                    while (true) {
+                        ChunkLightStorage_V1 cls = reader.readChunk();
 
-                            int index = cls.encodePosition();
+                        int index = cls.encodePosition();
 
-                            if (chunks[index] != null) {
-                                throw new IllegalStateException(String.format("Duplicate Chunk Information for Chunk %s found in File %s", cls.getChunkPosition().toShortString(), file.getAbsolutePath()));
-                            }
-
-                            if (cls.isEmpty()) {
-                                LOGGER.warning(String.format("Not loading Chunk %s because it is empty", cls.getChunkPosition().toShortString()));
-                            } else {
-                                chunks[index] = cls;
-                                ++nonEmptyChunks;
-                            }
+                        if (chunks[index] != null) {
+                            throw new IllegalStateException(String.format("Duplicate Chunk Information for Chunk %s found in File %s", cls.getChunkPosition().toShortString(), file.getAbsolutePath()));
                         }
-                    } catch (EOFException ignored) {
 
+                        if (cls.isEmpty()) {
+                            LOGGER.warning(String.format("Not loading Chunk %s because it is empty", cls.getChunkPosition().toShortString()));
+                        } else {
+                            chunks[index] = cls;
+                            ++nonEmptyChunks;
+                        }
                     }
+                } catch (EOFException ignored) {
+
                 }
             }
         }
