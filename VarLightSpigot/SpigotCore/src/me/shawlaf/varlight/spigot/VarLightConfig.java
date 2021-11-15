@@ -25,6 +25,7 @@ public class VarLightConfig {
     public static final String CONFIG_KEY_LOG_VERBOSE = "logger.verbose";
     public static final String CONFIG_KEY_LOG_DEBUG = "logger.debug";
     public static final String CONFIG_KEY_CHECK_UPDATE = "check-update";
+    public static final String CONFIG_KEY_BULK_MAX_CHUNKS = "bulk.max-chunks";
     public static final String CONFIG_KEY_ENABLE_EXPERIMENTAL_BLOCKS = "experimental-blocks";
 
     private final VarLightPlugin plugin;
@@ -49,6 +50,7 @@ public class VarLightConfig {
         plugin.getConfig().addDefault(CONFIG_KEY_LOG_VERBOSE, false);
         plugin.getConfig().addDefault(CONFIG_KEY_LOG_DEBUG, false);
         plugin.getConfig().addDefault(CONFIG_KEY_CHECK_UPDATE, true);
+        plugin.getConfig().addDefault(CONFIG_KEY_BULK_MAX_CHUNKS, 25);
         plugin.getConfig().addDefault(CONFIG_KEY_ENABLE_EXPERIMENTAL_BLOCKS, false);
 
         plugin.getConfig().options().copyDefaults(true);
@@ -281,6 +283,16 @@ public class VarLightConfig {
         plugin.getConfig().set(CONFIG_KEY_CHECK_UPDATE, value);
 
         save();
+    }
+
+    public int getBulkChunkUpdateLimit() {
+        int limit = plugin.getConfig().getInt(CONFIG_KEY_BULK_MAX_CHUNKS);
+
+        if (limit <= 0) {
+            return 1;
+        }
+
+        return limit;
     }
 
     public boolean isAllowExperimentalBlocks() {

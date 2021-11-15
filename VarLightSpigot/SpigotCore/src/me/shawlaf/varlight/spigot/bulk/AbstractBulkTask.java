@@ -52,9 +52,9 @@ public abstract class AbstractBulkTask {
     protected abstract CompletableFuture<BulkTaskResult> doRun();
 
     protected void checkSizeRestrictions(Set<ChunkCoords> affectedChunks) throws BulkTaskTooLargeException {
-        final int limit = 25; // TODO Make configurable
+        final int limit = plugin.getVarLightConfig().getBulkChunkUpdateLimit();
 
-        if (affectedChunks.size() > 25) {
+        if (affectedChunks.size() > limit) {
             throw new BulkTaskTooLargeException(limit, affectedChunks.size());
         }
     }
