@@ -12,7 +12,7 @@ import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
-import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
+import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
@@ -55,7 +55,7 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
 
     @Override
     public @Nullable PermissionNode getRequiredPermissionNode() {
-        return VarLightPermissionTree.instance().admin.modify.modifyBase;
+        return VarLightPermissionTree.MODIFY;
     }
 
     @Override

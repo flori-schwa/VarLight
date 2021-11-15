@@ -8,7 +8,7 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.api.LightUpdateResult;
 import me.shawlaf.varlight.spigot.bulk.exception.BulkTaskTooLargeException;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
-import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
+import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
@@ -149,7 +149,7 @@ public class BulkFillTask extends AbstractBulkTask {
                                         illegalBlocks.size(),
                                         skippedBlocks.size(),
                                         failedBlocks.size()
-                                ), VarLightPermissionTree.instance().admin.modify.modifyBase));
+                                ), VarLightPermissionTree.MODIFY));
             } catch (Exception e) {
                 e.printStackTrace();
                 return new BulkTaskResult(this, BulkTaskResult.Type.ERROR, new CommandResultFailure(plugin.getCommand(), String.format("Failed to run fill command: %s", e.getMessage())));

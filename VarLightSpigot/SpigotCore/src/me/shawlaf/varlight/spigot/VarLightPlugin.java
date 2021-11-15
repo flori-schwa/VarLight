@@ -7,7 +7,7 @@ import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.exceptions.VarLightInitializationException;
 import me.shawlaf.varlight.spigot.nms.IMinecraftLightUpdater;
 import me.shawlaf.varlight.spigot.nms.INmsMethods;
-import me.shawlaf.varlight.spigot.permissions.VarLightPermissionTree;
+import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.util.MessageUtil;
 import me.shawlaf.varlight.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -80,7 +80,7 @@ public class VarLightPlugin extends JavaPlugin {
             throw new VarLightInitializationException(e);
         }
 
-        VarLightPermissionTree.instance().base.register();
+        VarLightPermissionTree.init();
     }
 
     @Override
