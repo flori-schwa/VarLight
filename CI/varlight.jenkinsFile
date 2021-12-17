@@ -5,7 +5,6 @@ pipeline {
     }
 
     tools {
-        ant "ant-1.10.10"
         maven "maven-3.6.3"
     }
 
@@ -49,7 +48,7 @@ pipeline {
         stage("Build Core") {
             steps {
                 dir("VarLightCore") {
-                    sh "mvn -B clean package -Dlombok-version=${params.LOMBOK_VERSION} -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djunit-version=${params.JUNIT_VERSION}"
+                    sh "mvn -B clean package install -Dlombok-version=${params.LOMBOK_VERSION} -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djunit-version=${params.JUNIT_VERSION}"
                 }
             }
         }
@@ -58,11 +57,12 @@ pipeline {
             steps {
                 dir("VarLightSpigot/libraries") {
                     copyArtifacts(projectName: 'Spigot 1.16.5')
+
+                    sh "chmod +x install.sh"
+                    sh "./install.sh"
                 }
                 
                 dir ("VarLightSpigot") {
-                    sh "ant -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djoor-java-8-version=${params.JOOR_JAVA_8_VERSION} -Dlombok-version=${params.LOMBOK_VERSION} -Dworldedit-version=${params.WORLD_EDIT_VERSION} -Dworldguard-version=${params.WORLD_GUARD_VERSION} download-libs"
-
                     script {
                         def version;
 
@@ -72,7 +72,7 @@ pipeline {
                             version = params.VERSION
                         }
 
-                        sh "ant -Dplugin.version=$version -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djoor-java-8-version=${params.JOOR_JAVA_8_VERSION} -Dlombok-version=${params.LOMBOK_VERSION} -Dworldedit-version=${params.WORLD_EDIT_VERSION} -Dworldguard-version=${params.WORLD_GUARD_VERSION}"
+                        sh "mvn -B clean package install -Dvarlight.version=$version -Dannotations.version=${params.ANNOTATIONS_VERSION} -Djoor.version=${params.JOOR_JAVA_8_VERSION} -Dlombok.version=${params.LOMBOK_VERSION} -Dworldedit.version=${params.WORLD_EDIT_VERSION} -Dworldguard.version=${params.WORLD_GUARD_VERSION}"
                     }
                 }
             }
@@ -81,11 +81,11 @@ pipeline {
 
     post {
         success {
-            archiveArtifacts artifacts: 'VarLightSpigot/dist/*.jar', fingerprint: true, followSymlinks: false
+            archiveArtifacts artifacts: 'VarLightSpigot/target/VarLight-*.jar', fingerprint: true, followSymlinks: false
         }
 
         always {
-            recordIssues(tools: [java(), mavenConsole(), junitParser(pattern: 'VarLightCore/target/**/*.xml')])
+            recordIssues(tools: [java(), mavenConsole(), junitParser(pattern: 'VarLightCore/target/**/*.xml'), junitParser(pattern: 'VarLightSpigot/target/**/*.xml')])
             junit allowEmptyResults: true, testResults: 'VarLightCore/target/**/*.xml'
         }
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/VarLightCore/VarLightCore.iml" filepath="$PROJECT_DIR$/VarLightCore/VarLightCore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/VarLightSpigot/VarLightSpigot.iml" filepath="$PROJECT_DIR$/VarLightSpigot/VarLightSpigot.iml" />
+    </modules>
+  </component>
+</project>
