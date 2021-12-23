@@ -1,4 +1,7 @@
 # VarLight #
+
+[![Build Status](https://flori-schwa.me/jenkins/job/VarLight/job/1.16.5/badge/icon)](https://flori-schwa.me/jenkins/job/VarLight/job/1.16.5/)
+
 Turn any block into a light source
 
 | Minecraft Version | Compatibility Status                                                                                                          |
