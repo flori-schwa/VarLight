@@ -6,6 +6,7 @@ import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
@@ -18,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,6 +121,35 @@ public interface IVarLightAPI {
      * @return The custom Light Level at the specified Location, or {@code 0} if there is no custom Light Source
      */
     int getCustomLuminance(World world, IntPosition position);
+
+    /**
+     * <p>
+     *     Check whether VarLight is enabled in the specified {@link World}
+     * </p>
+     *
+     * @param world The world
+     * @return {@code true} if VarLight is enabled in the specified {@link World}, {@code false} otherwise
+     */
+    boolean isVarLightEnabled(World world);
+
+    /**
+     * <p>
+     *     Creates a new Glowing ItemStack using the specified base ItemStack and Light level
+     * </p>
+     * @param base The Base ItemStack, DisplayName and Lore will be completely over-written in the result
+     * @param lightLevel The Lightlevel the block should be emitting when placed by a player
+     * @return The newly created {@link GlowItemStack} containing the resulting {@link ItemStack} and Light level
+     */
+    @NotNull GlowItemStack createGlowItemStack(ItemStack base, int lightLevel);
+
+    /**
+     *<p>
+     *     Parses the given {@link ItemStack} as a {@link GlowItemStack}. If the specified {@link ItemStack} is not a glowing stack, {@code null} will be returned
+     *</p>
+     * @param glowingStack The {@link ItemStack} to parse from
+     * @return The parsed {@link GlowItemStack} or {@code null} if the item is not a glowing stack
+     */
+    @Nullable GlowItemStack importGlowItemStack(ItemStack glowingStack);
 
     /**
      * <p>

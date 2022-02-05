@@ -15,14 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VarLightPlugin extends JavaPlugin {
 
-    public static VarLightPlugin getVarLight() {
-        return ((VarLightPlugin) Bukkit.getPluginManager().getPlugin("VarLight"));
-    }
-
-    public static IVarLightAPI getVarLightAPI() {
-        return getVarLight().getApi();
-    }
-
     private VarLightAPIImpl api;
     @Getter
     private IMinecraftLightUpdater lightUpdater;

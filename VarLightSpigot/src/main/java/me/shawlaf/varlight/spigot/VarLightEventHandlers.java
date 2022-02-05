@@ -3,24 +3,36 @@ package me.shawlaf.varlight.spigot;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResult;
+import me.shawlaf.varlight.spigot.api.LightUpdateResult;
+import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
+import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
 
 @ExtensionMethod({
         IntPositionExtension.class,
@@ -137,6 +149,124 @@ public class VarLightEventHandlers implements Listener {
 
             result.displayMessage(player);
         });
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void playerBreakLightSource(BlockBreakEvent e) {
+        if (!plugin.getVarLightConfig().isReclaimEnabled()) {
+            return;
+        }
+
+        if (plugin.getVarLightConfig().isCheckingPermission() && !VarLightPermissionTree.USE_RECLAIM.hasPermission(e.getPlayer())) {
+            return;
+        }
+
+        Block theBlock = e.getBlock();
+        IntPosition position = theBlock.toIntPosition();
+        World world = theBlock.getWorld();
+
+        ICustomLightStorage cls;
+
+        try {
+            cls = plugin.getApi().unsafe().requireVarLightEnabled(world);
+        } catch (VarLightNotActiveException ignored) {
+            return;
+        }
+
+        int customLuminance = cls.getCustomLuminance(position);
+
+        if (customLuminance <= 0) {
+            return;
+        }
+
+        // Can't break blocks using off-hand
+        ItemStack heldItem = e.getPlayer().getInventory().getItemInMainHand();
+
+        int fortuneLevel = heldItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+        boolean silkTouch = heldItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) != 0;
+
+        Collection<ItemStack> vanillaDrops = theBlock.getDrops(heldItem);
+
+        if (silkTouch) {
+            if (vanillaDrops.size() != 1 || vanillaDrops.stream().findFirst().get().getAmount() != 1) {
+                return;
+            }
+
+            ItemStack vanillaDrop = vanillaDrops.stream().findFirst().get();
+
+            e.setDropItems(false);
+            world.dropItemNaturally(theBlock.getLocation(), plugin.getApi().createGlowItemStack(vanillaDrop, customLuminance).getItemStack());
+        } else {
+            if (!plugin.getVarLightConfig().isConsumeLui()) {
+                return; // Prevent infinite duping of LUI
+            }
+
+            if (vanillaDrops.size() == 0) {
+                return;
+            }
+
+            ItemStack luiStack = new ItemStack(plugin.getApi().getLightUpdateItem(), 1);
+
+            if (fortuneLevel == 0) {
+                world.dropItemNaturally(theBlock.getLocation(), luiStack);
+            } else {
+                // f(x) = 1 - (1 - -0.5) * e^(-0.6 * x)
+                double chance = 1d - (1.5) * Math.exp(-0.6 * fortuneLevel);
+
+                for (int i = 0; i < customLuminance; i++) {
+                    if (Math.random() <= chance) {
+                        world.dropItemNaturally(theBlock.getLocation(), luiStack);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void playerPlaceLightSource(BlockPlaceEvent e) {
+        if ((plugin.getVarLightConfig().isCheckingPermission() && !VarLightPermissionTree.USE_RECLAIM.hasPermission(e.getPlayer())) || !e.canBuild()) {
+            return;
+        }
+
+        // noinspection ConstantConditions: https://github.com/flori-schwa/VarLightOld/issues/24
+        if (e.getItemInHand() == null) {
+            return;
+        }
+
+        ICustomLightStorage cls;
+
+        try {
+            cls = plugin.getApi().unsafe().requireVarLightEnabled(e.getBlock().getWorld());
+        } catch (VarLightNotActiveException ex) {
+            CommandResult.info(plugin.getCommand(), e.getPlayer(), "VarLight is not active in your current world!");
+            e.setCancelled(true);
+            return;
+        }
+
+        ItemStack handCopy = e.getItemInHand().clone();
+        final GlowItemStack placedItemStack = plugin.getApi().importGlowItemStack(handCopy);
+
+        if (placedItemStack == null) {
+            return;
+        }
+
+        final Material before = e.getBlock().getType();
+
+        if (placedItemStack.getCustomLuminance() > 0) {
+            plugin.getApi().getAsyncExecutor().submitDelayed(() -> {
+                LightUpdateResult result = plugin.getApi().setCustomLuminance(e.getBlock().getLocation(), placedItemStack.getCustomLuminance(), true, LightUpdateCause.player(e.getPlayer())).join();
+
+                if (!result.isSuccess()) {
+                    plugin.getApi().getSyncExecutor().submit(() -> {
+                       e.getBlock().setType(before);
+
+                       handCopy.setAmount(1);
+                       e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), handCopy);
+                    });
+                }
+            }, Ticks.of(1));
+        }
+
     }
 
     @EventHandler

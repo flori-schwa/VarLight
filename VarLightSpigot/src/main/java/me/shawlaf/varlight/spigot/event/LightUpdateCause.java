@@ -10,6 +10,7 @@ public class LightUpdateCause {
         COMMAND,
         API
     }
+
     @Getter
     private final CommandSender playerCause, commandCause;
     @Getter

@@ -13,6 +13,7 @@ import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
 import me.shawlaf.varlight.spigot.module.APIModule;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
@@ -28,6 +29,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -172,6 +174,25 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
             return requireVarLightEnabled(world).getCustomLuminance(position);
         } catch (VarLightNotActiveException exception) {
             return 0;
+        }
+    }
+
+    @Override
+    public boolean isVarLightEnabled(World world) {
+        return plugin.getVarLightConfig().getVarLightEnabledWorldNames().contains(world.getName());
+    }
+
+    @Override
+    public @NotNull GlowItemStack createGlowItemStack(ItemStack base, int lightLevel) {
+        return new GlowItemStack(plugin, base, lightLevel);
+    }
+
+    @Override
+    public @Nullable GlowItemStack importGlowItemStack(ItemStack glowingStack) {
+        try {
+            return new GlowItemStack(plugin, glowingStack);
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 

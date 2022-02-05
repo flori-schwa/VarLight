@@ -4,6 +4,7 @@ import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.nms.INmsMethods;
 import me.shawlaf.varlight.spigot.util.NamespacedID;
+import me.shawlaf.varlight.util.Preconditions;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -22,6 +23,7 @@ import org.joor.Reflect;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -105,6 +107,8 @@ public class NmsAdapter implements INmsMethods {
 
     @Override
     public @NotNull ItemStack makeGlowingStack(@NotNull ItemStack base, int lightLevel) {
+        Preconditions.assertInRange("lightLevel", lightLevel, 0, 15);
+
         net.minecraft.server.v1_16_R3.ItemStack nmsStack = new net.minecraft.server.v1_16_R3.ItemStack(
                 CraftMagicNumbers.getItem(base.getType()),
                 base.getAmount()
@@ -119,11 +123,24 @@ public class NmsAdapter implements INmsMethods {
         ItemMeta meta = stack.getItemMeta();
 
         meta.setDisplayName(ChatColor.RESET + "" + ChatColor.GOLD + "Glowing " + getLocalizedBlockName(stack.getType()));
-        meta.setLore(Collections.singletonList(ChatColor.RESET + "Emitting Light: " + lightLevel));
+        meta.setLore(Collections.singletonList(ChatColor.RESET  + "" + ChatColor.WHITE + "Emitting Light: " + lightLevel));
 
         stack.setItemMeta(meta);
 
         return stack;
+    }
+
+    @Override
+    public int getGlowingValue(@NotNull ItemStack glowingStack) {
+        net.minecraft.server.v1_16_R3.ItemStack nmsStack = CraftItemStack.asNMSCopy(glowingStack);
+
+        NBTTagCompound tag = nmsStack.getTag();
+
+        if (tag == null || !tag.hasKey("varlight:glowing")) {
+            return -1;
+        }
+
+        return tag.getInt("varlight:glowing");
     }
 
     @Override

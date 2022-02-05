@@ -79,7 +79,21 @@ public class VarLightPermissionTree {
     public final PermissionNode USE = new PermissionNode(
             PLAYER_ROOT,
             "use",
-            "Allows usage of the Light Update Item to modify Light Sources",
+            "Allows usage of VarLight Gameplay features (LUI / Reclaim)",
+            PermissionDefault.TRUE
+    );
+
+    public final PermissionNode USE_ITEM = new PermissionNode(
+            USE,
+            "item",
+            "Allows usage of the VarLight Light Update Item (LUI)",
+            PermissionDefault.TRUE
+    );
+
+    public final PermissionNode USE_RECLAIM = new PermissionNode(
+            USE,
+            "reclaim",
+            "Allows players to retrieve Glowstone Dust / Glowing Variants of Blocks when breaking Custom Light sources",
             PermissionDefault.TRUE
     );
 
