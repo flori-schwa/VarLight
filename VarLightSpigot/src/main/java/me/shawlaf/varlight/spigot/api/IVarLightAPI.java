@@ -199,7 +199,7 @@ public interface IVarLightAPI {
 
     /**
      * <p>
-     * Same as {@link IVarLightAPI#setCustomLuminance(CommandSender, World, IntPosition, int)} bur taking a {@link Location} as an Argument rather than a
+     * Same as {@link IVarLightAPI#setCustomLuminance(CommandSender, LightUpdateCause.Type, World, IntPosition, int)} but taking a {@link Location} as an Argument rather than a
      * separate {@link World} and {@link IntPosition}
      * </p>
      *

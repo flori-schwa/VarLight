@@ -145,10 +145,6 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
                         if (!nlsFile.file.delete()) {
                             throw new LightPersistFailedException("Could not delete file " + nlsFile.file.getAbsolutePath());
                         } else {
-//                            if (log) { TODO implement and localize
-//                                CommandResult.info(plugin.getCommand(), commandSender, String.format("Deleted File %s", nlsFile.file.getName()));
-//                            }
-
                             ++deleted;
                         }
                     }

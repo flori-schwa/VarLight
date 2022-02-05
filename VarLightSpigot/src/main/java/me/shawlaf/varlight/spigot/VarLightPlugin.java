@@ -15,10 +15,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class VarLightPlugin extends JavaPlugin {
 
-    private static final String SERVER_VERSION;
+    public static VarLightPlugin getVarLight() {
+        return ((VarLightPlugin) Bukkit.getPluginManager().getPlugin("VarLight"));
+    }
 
-    @Getter
-    private IVarLightAPI api;
+    public static IVarLightAPI getVarLightAPI() {
+        return getVarLight().getApi();
+    }
+
+    private VarLightAPIImpl api;
     @Getter
     private IMinecraftLightUpdater lightUpdater;
     @Getter
@@ -30,26 +35,15 @@ public class VarLightPlugin extends JavaPlugin {
 
     private boolean doLoad = true;
 
-    static {
-        String version = Bukkit.getServer().getClass().getPackage().getName();
-
-        SERVER_VERSION = version.substring(version.lastIndexOf('.') + 1);
-    }
-
     {
         try {
-            Class<?> nmsLightUpdaterClass = Class.forName(String.format("me.shawlaf.varlight.spigot.nms.%s.LightUpdater", SERVER_VERSION));
-            Class<?> nmsAdapterClass = Class.forName(String.format("me.shawlaf.varlight.spigot.nms.%s.NmsAdapter", SERVER_VERSION));
-
-            this.lightUpdater = (IMinecraftLightUpdater) nmsLightUpdaterClass.getConstructor(VarLightPlugin.class).newInstance(this);
-            this.nmsAdapter = (INmsMethods) nmsAdapterClass.getConstructor(VarLightPlugin.class).newInstance(this);
-        } catch (ClassNotFoundException e) {
-            String errMsg = String.format("No VarLight implementation present for Minecraft Version %s (%s): Could not find Class %s", Bukkit.getVersion(), SERVER_VERSION, e.getMessage());
-            startUpError(errMsg);
-
-            throw new VarLightInitializationException(errMsg, e);
+            this.lightUpdater = new me.shawlaf.varlight.spigot.nms.v1_16_R3.LightUpdater(this);
+            this.nmsAdapter = new me.shawlaf.varlight.spigot.nms.v1_16_R3.NmsAdapter(this);
         } catch (Throwable e) {
-            String errMsg = String.format("Failed to initialize VarLight for Minecraft Version %s (%s): %s", Bukkit.getVersion(), SERVER_VERSION, e.getMessage());
+            String packageVersion = Bukkit.getServer().getClass().getPackage().getName();
+            packageVersion = packageVersion.substring(packageVersion.lastIndexOf('.') + 1);
+
+            String errMsg = String.format("Failed to initialize VarLight for Minecraft Version %s (%s): %s", Bukkit.getVersion(), packageVersion, e.getMessage());
             startUpError(errMsg);
 
             throw new VarLightInitializationException(errMsg, e);
@@ -65,16 +59,18 @@ public class VarLightPlugin extends JavaPlugin {
         this.varLightConfig = new VarLightConfig(this);
         this.api = new VarLightAPIImpl(this);
 
+        this.api.addModule(this.nmsAdapter);
+        this.api.addModule(this.lightUpdater);
+
+        VarLightPermissionTree.init();
+
         try {
-            this.nmsAdapter.onLoad();
-            this.lightUpdater.onLoad();
+            this.api.onLoad();
         } catch (Exception e) {
             startUpError(e.getMessage());
 
             throw new VarLightInitializationException(e);
         }
-
-        VarLightPermissionTree.init();
     }
 
     @Override
@@ -84,31 +80,26 @@ public class VarLightPlugin extends JavaPlugin {
             return;
         }
 
-        ((VarLightAPIImpl) this.api).onEnable();
-        this.command = new VarLightCommand(this);
-
-        Bukkit.getPluginManager().registerEvents(new VarLightEventHandlers(this), this);
-
         try {
-            this.nmsAdapter.onEnable();
-            this.lightUpdater.onEnable();
+            this.api.onEnable();
         } catch (Exception e) {
             Bukkit.getPluginManager().disablePlugin(this);
 
             throw new VarLightInitializationException(e);
         }
+
+        this.command = new VarLightCommand(this);
+
+        Bukkit.getPluginManager().registerEvents(new VarLightEventHandlers(this), this);
     }
 
     @Override
     public void onDisable() {
-        try {
-            this.nmsAdapter.onDisable();
-            this.lightUpdater.onDisable();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.api.onDisable();
+    }
 
-        ((VarLightAPIImpl) this.api).onDisable();
+    public IVarLightAPI getApi() {
+        return this.api;
     }
 
     // region Util

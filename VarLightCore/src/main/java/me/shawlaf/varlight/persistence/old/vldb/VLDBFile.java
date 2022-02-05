@@ -196,7 +196,7 @@ public abstract class VLDBFile<L extends ICustomLightSource> {
         }
 
         synchronized (lock) {
-            final ChunkCoords chunkCoords = new ChunkCoords(cx, cz); // TODO Write into the chunks[]
+            final ChunkCoords chunkCoords = new ChunkCoords(cx, cz);
 
             final int index = chunkIndex(chunkCoords);
 

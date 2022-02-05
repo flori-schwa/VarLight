@@ -148,11 +148,6 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
 
     @SuppressWarnings("unchecked")
     protected CompletableFuture<Void> createTickets(World world, Set<ChunkCoords> chunkCoords) {
-
-        if (!plugin.getNmsAdapter().supportsPluginChunkTickets()) {
-            return CompletableFuture.completedFuture(null); // TODO maybe another way to forceload in pre-1.13
-        }
-
         Runnable r = () -> {
             for (ChunkCoords chunkCoord : chunkCoords) {
                 world.addPluginChunkTicket(chunkCoord.x, chunkCoord.z, plugin);
@@ -168,11 +163,6 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
     }
 
     protected CompletableFuture<Void> releaseTickets(World world, Set<ChunkCoords> chunkCoords) {
-
-        if (!plugin.getNmsAdapter().supportsPluginChunkTickets()) {
-            return CompletableFuture.completedFuture(null); // TODO maybe another way to forceload in pre-1.13
-        }
-
         Runnable r = () -> {
             for (ChunkCoords chunkCoord : chunkCoords) {
                 world.removePluginChunkTicket(chunkCoord.x, chunkCoord.z, plugin);

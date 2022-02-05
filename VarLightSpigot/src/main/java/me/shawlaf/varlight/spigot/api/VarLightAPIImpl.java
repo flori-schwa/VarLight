@@ -86,7 +86,9 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
         }
 
         loadLightUpdateItem();
+    }
 
+    public void onLoad() {
         modules.values().forEach(IPluginLifeCycleOperations::onLoad);
     }
 
@@ -297,7 +299,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     // region Internals
 
-    private <M extends IPluginLifeCycleOperations> void addModule(M module) {
+    public <M extends IPluginLifeCycleOperations> void addModule(M module) {
         this.modules.put(module.getClass(), module);
     }
 

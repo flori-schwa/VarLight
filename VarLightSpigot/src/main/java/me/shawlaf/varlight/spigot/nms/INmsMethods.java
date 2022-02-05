@@ -37,8 +37,6 @@ public interface INmsMethods extends IPluginLifeCycleOperations {
      */
     boolean isIllegalLightUpdateItem(@NotNull Material material);
 
-    boolean supportsPluginChunkTickets();
-
     /**
      * Returns the parent directory of the {@code region} folder stored inside minecraft worlds for the specified {@link World}
      *
