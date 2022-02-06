@@ -337,23 +337,6 @@ public class NLSFile implements IRegionCustomLightAccess {
         };
     }
 
-    @NotNull
-    @Override
-    @SuppressWarnings("deprecation")
-    public List<IntPosition> getAllLightSources() {
-        List<IntPosition> all = new ArrayList<>();
-
-        synchronized (this) {
-            List<ChunkCoords> affected = getAffectedChunks();
-
-            for (ChunkCoords chunkCoords : affected) {
-                all.addAll(getAllLightSources(chunkCoords));
-            }
-        }
-
-        return all;
-    }
-
     public void unload() {
         if (dirty) {
             LOGGER.warning("Unloading dirty NLS File " + file.getName());

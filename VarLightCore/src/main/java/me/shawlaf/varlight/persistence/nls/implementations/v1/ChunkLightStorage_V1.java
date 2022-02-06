@@ -140,27 +140,6 @@ public class ChunkLightStorage_V1 implements IChunkCustomLightAccess {
         };
     }
 
-    @Override
-    public @NotNull List<IntPosition> getAllLightSources() {
-        List<IntPosition> lightSources = new ArrayList<>();
-
-        for (int y = 0; y < 16; ++y) {
-            NibbleArray arr = getSection(y);
-
-            if (arr == null) {
-                continue;
-            }
-
-            for (int i = 0; i < SECTION_SIZE; ++i) {
-                if (arr.get(i) > 0) {
-                    lightSources.add(fromIndex(y, i));
-                }
-            }
-        }
-
-        return lightSources;
-    }
-
     public boolean isEmpty() {
         return !hasData();
     }

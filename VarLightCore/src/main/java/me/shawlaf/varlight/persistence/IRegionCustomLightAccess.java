@@ -36,12 +36,6 @@ public interface IRegionCustomLightAccess {
         return Optional.ofNullable(getChunk(chunkCoords)).map(IChunkCustomLightAccess::iterateLightSources).orElse(Collections.emptyIterator());
     }
 
-    default  @Deprecated @NotNull List<IntPosition> getAllLightSources(ChunkCoords chunkCoords) {
-        return Optional.ofNullable(getChunk(chunkCoords)).map(IChunkCustomLightAccess::getAllLightSources).orElse(Collections.emptyList());
-    }
-
     @NotNull Iterator<IntPosition> iterateAllLightSources();
-
-    @Deprecated @NotNull List<IntPosition> getAllLightSources();
 
 }

@@ -23,6 +23,4 @@ public interface IChunkCustomLightAccess {
 
     @NotNull Iterator<IntPosition> iterateLightSources();
 
-    @Deprecated @NotNull List<IntPosition> getAllLightSources();
-
 }
