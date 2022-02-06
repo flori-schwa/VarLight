@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.spigot.api;
 
 import me.shawlaf.varlight.exception.VarLightIOException;
+import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
@@ -47,6 +48,8 @@ public interface IVarLightAPI {
 
         return ((VarLightPlugin) varLightPlugin).getApi();
     }
+
+    VarLightConfig getConfiguration();
 
     /**
      * @return An {@link ExecutorService} used to schedule tasks on the Server's Main Thread

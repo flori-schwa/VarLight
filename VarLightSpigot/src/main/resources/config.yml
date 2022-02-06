@@ -2,6 +2,7 @@
 # Please refer to the wiki for more information: https://github.com/flori-schwa/VarLight/wiki
 
 lui: "glowstone_dust"
+consume-lui: true
 autosave: -1
 check-permission: false
 whitelist: []

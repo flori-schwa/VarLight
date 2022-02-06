@@ -106,6 +106,12 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     // region Getter
 
+
+    @Override
+    public VarLightConfig getConfiguration() {
+        return plugin.getVarLightConfig();
+    }
+
     @Override
     public AbstractBukkitExecutor getSyncExecutor() {
         return syncExecutor;

@@ -101,7 +101,7 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        if (plugin.getVarLightConfig().isCheckingPermission() && !e.getPlayer().hasVarLightUsePermission()) {
+        if (!e.getPlayer().mayUseLui()) {
             return;
         }
 
@@ -157,7 +157,7 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        if (plugin.getVarLightConfig().isCheckingPermission() && !VarLightPermissionTree.USE_RECLAIM.hasPermission(e.getPlayer())) {
+        if (!e.getPlayer().mayReclaimLui()) {
             return;
         }
 
@@ -224,7 +224,7 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void playerPlaceLightSource(BlockPlaceEvent e) {
-        if ((plugin.getVarLightConfig().isCheckingPermission() && !VarLightPermissionTree.USE_RECLAIM.hasPermission(e.getPlayer())) || !e.canBuild()) {
+        if (!e.getPlayer().mayReclaimLui() || !e.canBuild()) {
             return;
         }
 
