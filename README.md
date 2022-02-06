@@ -6,7 +6,8 @@ Turn any block into a light source
 
 | Minecraft Version | Compatibility Status                                                                                                          |
 |-------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| 1.17.1            | :x: Support planned                                                                                                           |
+| 1.18.x            | :x: Support planned                                                                                                           |
+| 1.17.x            | :x: Skipped                                                                                                                   |
 | 1.16.5            | :heavy_check_mark:                                                                                                            |
 | 1.16.0 - 1.16.3   | :x: Last Supported Version: [1.12.8](https://github.com/flori-schwa/VarLightOld/releases/tag/1.12.8)                          |
 | 1.15.x            | :x: Last Supported Version: [1.12.8](https://github.com/flori-schwa/VarLightOld/releases/tag/1.12.8)                          |
