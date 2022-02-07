@@ -224,7 +224,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
         ICustomLightStorage cls;
 
         if ((cls = getLightStorage(world)) == null) {
-            return completedFuture(LightUpdateResult.notActive(fromLight, customLuminance, e));
+            return completedFuture(LightUpdateResult.notActive(fromLight, customLuminance, world));
         }
 
         int finalFromLight = cls.getCustomLuminance(position);
