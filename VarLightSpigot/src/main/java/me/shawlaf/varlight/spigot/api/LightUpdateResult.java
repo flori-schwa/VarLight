@@ -2,9 +2,10 @@ package me.shawlaf.varlight.spigot.api;
 
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ public class LightUpdateResult {
     @Getter
     private final int fromLight, toLight;
     @Nullable
-    private final VarLightNotActiveException exception;
+    private final World world;
 
     public static LightUpdateResult invalidBlock(int fromLight, int toLight) {
         return new LightUpdateResult(LightUpdateResultType.INVALID_BLOCK, fromLight, toLight, null);
@@ -45,15 +46,15 @@ public class LightUpdateResult {
         return new LightUpdateResult(LightUpdateResultType.UPDATED, fromLight, toLight, null);
     }
 
-    public static LightUpdateResult notActive(int fromLight, int toLight, @NotNull VarLightNotActiveException exception) {
-        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, exception.requireNonNull("Must provide a VarLightNotActiveException for NOT_ACTIVE Result"));
+    public static LightUpdateResult notActive(int fromLight, int toLight, @NotNull World world) {
+        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, world.requireNonNull("Must provide a World for NOT_ACTIVE Result"));
     }
 
-    private LightUpdateResult(@NotNull LightUpdateResultType resultType, int fromLight, int toLight, @Nullable VarLightNotActiveException exception) {
+    private LightUpdateResult(@NotNull LightUpdateResultType resultType, int fromLight, int toLight, @Nullable World world) {
         this.resultType = resultType.requireNonNull("resultType may not be null");
         this.fromLight = fromLight;
         this.toLight = toLight;
-        this.exception = exception;
+        this.world = world;
     }
 
     public boolean isSuccess() {
@@ -73,9 +74,9 @@ public class LightUpdateResult {
             case UPDATED:
                 return String.format("Updated Light level to %d", toLight);
             case NOT_ACTIVE:
-                return exception.requireNonNull().getMessage();
+                return VarLightMessages.varLightNotActiveInWorld(Objects.requireNonNull(world));
             default:
-                throw new IllegalStateException(String.format("Reached default block (%s)", resultType.toString()));
+                throw new IllegalStateException(String.format("Reached default block (%s)", resultType));
         }
     }
 

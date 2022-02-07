@@ -1,7 +1,6 @@
 package me.shawlaf.varlight.spigot.nms.v1_16_R3;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import net.minecraft.server.v1_16_R3.*;
@@ -37,13 +36,13 @@ public class WrappedIChunkAccess implements IChunkAccess {
     public int g(BlockPosition blockposition) {
         int vanilla = wrapped.getType(blockposition).f();
 
-        try {
-            ICustomLightStorage cls = plugin.getApi().unsafe().requireVarLightEnabled(world);
+        ICustomLightStorage cls;
 
-            return cls.getCustomLuminance(new IntPosition(blockposition.getX(), blockposition.getY(), blockposition.getZ()), vanilla);
-        } catch (VarLightNotActiveException e) {
+        if ((cls = plugin.getApi().unsafe().getLightStorage(this.world)) == null) {
             return vanilla;
         }
+
+        return cls.getCustomLuminance(new IntPosition(blockposition.getX(), blockposition.getY(), blockposition.getZ()), vanilla);
     }
 
     @Override

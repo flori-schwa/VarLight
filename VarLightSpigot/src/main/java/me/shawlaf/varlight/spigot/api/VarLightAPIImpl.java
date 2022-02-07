@@ -12,7 +12,6 @@ import me.shawlaf.varlight.spigot.bulk.BulkFillTask;
 import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
 import me.shawlaf.varlight.spigot.module.APIModule;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
@@ -28,7 +27,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -176,16 +174,12 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
         world.requireNonNull("World may not be null");
         position.requireNonNull("Position may not be null");
 
-        try {
-            return requireVarLightEnabled(world).getCustomLuminance(position);
-        } catch (VarLightNotActiveException exception) {
-            return 0;
-        }
+        return Optional.ofNullable(getLightStorage(world)).map(cls -> cls.getCustomLuminance(position)).orElse(0);
     }
 
     @Override
     public boolean isVarLightEnabled(World world) {
-        return plugin.getVarLightConfig().getVarLightEnabledWorldNames().contains(world.getName());
+        return getLightStorage(world) != null;
     }
 
     @Override
@@ -227,16 +221,13 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
             return completedFuture(LightUpdateResult.invalidBlock(fromLight, customLuminance));
         }
 
-        ICustomLightStorage wlp;
+        ICustomLightStorage cls;
 
-        try {
-            // noinspection ConstantConditions NotNull for world Already checked at the beginning of the Method
-            wlp = requireVarLightEnabled(world);
-        } catch (VarLightNotActiveException e) {
+        if ((cls = getLightStorage(world)) == null) {
             return completedFuture(LightUpdateResult.notActive(fromLight, customLuminance, e));
         }
 
-        int finalFromLight = wlp.getCustomLuminance(position);
+        int finalFromLight = cls.getCustomLuminance(position);
 
         final CustomLuminanceUpdateEvent updateEvent = new CustomLuminanceUpdateEvent(block, finalFromLight, customLuminance, cause);
 
@@ -246,13 +237,13 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
             return completedFuture(LightUpdateResult.cancelled(updateEvent.getFromLight(), updateEvent.getToLight()));
         }
 
-        wlp.setCustomLuminance(position, updateEvent.getToLight());
+        cls.setCustomLuminance(position, updateEvent.getToLight());
 
         LightUpdateResult result = LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());
 
         if (update) {
             return asyncExecutor.submit(() -> {
-                plugin.getLightUpdater().updateLightSingleBlock(wlp, position).join();
+                plugin.getLightUpdater().updateLightSingleBlock(cls, position).join();
 
                 return result;
             });

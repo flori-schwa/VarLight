@@ -1,11 +1,9 @@
 package me.shawlaf.varlight.spigot.util;
 
 import lombok.experimental.UtilityClass;
-import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.api.IVarLightAPI;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import org.bukkit.permissions.Permissible;
-import org.bukkit.plugin.java.JavaPlugin;
 
 @UtilityClass
 public class VarLightPermissions {

@@ -1,7 +1,7 @@
 package me.shawlaf.command.exception;
 
-import me.shawlaf.command.ArgumentIterator;
 import me.shawlaf.command.AbstractCommand;
+import me.shawlaf.command.ArgumentIterator;
 import org.bukkit.command.CommandSender;
 
 /**

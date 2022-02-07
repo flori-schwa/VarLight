@@ -6,7 +6,6 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.bulk.BulkTaskResult;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
 import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
@@ -353,16 +352,6 @@ public interface IVarLightAPI {
      */
     interface Internal {
         @Nullable ICustomLightStorage getLightStorage(World world);
-
-        default ICustomLightStorage requireVarLightEnabled(World world) throws VarLightNotActiveException {
-            ICustomLightStorage cls = getLightStorage(world);
-
-            if (cls == null) {
-                throw new VarLightNotActiveException(world);
-            }
-
-            return cls;
-        }
 
         @NotNull Collection<ICustomLightStorage> getAllActiveVarLightWorlds();
     }

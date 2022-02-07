@@ -8,7 +8,7 @@ import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
@@ -91,17 +91,15 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
     private int update(CommandSender source, Location location, int toLight) {
         World world = location.getWorld();
 
-        @NotNull ICustomLightStorage manager;
+        ICustomLightStorage cls;
 
-        try {
-            manager = plugin.getApi().unsafe().requireVarLightEnabled(world);
-        } catch (VarLightNotActiveException e) {
-            failure(this, source, String.format("VarLight is not active in world \"%s\"", world.getName()));
+        if ((cls = plugin.getApi().unsafe().getLightStorage(world)) == null) {
+            failure(this, source, VarLightMessages.varLightNotActiveInWorld(world));
 
             return FAILURE;
         }
 
-        int fromLight = manager.getCustomLuminance(location.toIntPosition());
+        int fromLight = cls.getCustomLuminance(location.toIntPosition());
 
         if (!world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) {
             failure(this, source, "The target chunk is not loaded!");

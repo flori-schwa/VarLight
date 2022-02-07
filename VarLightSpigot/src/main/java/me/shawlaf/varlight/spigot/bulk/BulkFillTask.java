@@ -7,7 +7,7 @@ import me.shawlaf.command.result.CommandResultSuccessBroadcast;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.api.LightUpdateResult;
 import me.shawlaf.varlight.spigot.bulk.exception.BulkTaskTooLargeException;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
@@ -72,12 +72,10 @@ public class BulkFillTask extends AbstractBulkTask {
 
     @Override
     public CompletableFuture<BulkTaskResult> doRun() {
-        @NotNull ICustomLightStorage manager;
+        ICustomLightStorage cls;
 
-        try {
-            manager = plugin.getApi().unsafe().requireVarLightEnabled(this.world);
-        } catch (VarLightNotActiveException e) {
-            return CompletableFuture.completedFuture(new BulkTaskResult(this, BulkTaskResult.Type.NOT_ACTIVE, new CommandResultFailure(plugin.getCommand(), e.getMessage())));
+        if ((cls = plugin.getApi().unsafe().getLightStorage(this.world)) == null) {
+            return CompletableFuture.completedFuture(new BulkTaskResult(this, BulkTaskResult.Type.NOT_ACTIVE, new CommandResultFailure(plugin.getCommand(), VarLightMessages.varLightNotActiveInWorld(this.world))));
         }
 
         RegionIterator regionIterator = new RegionIterator(this.start, this.end);
@@ -137,7 +135,7 @@ public class BulkFillTask extends AbstractBulkTask {
                     }
                 }).join();
 
-                plugin.getLightUpdater().updateLightMultiBlock(manager, updatedBlocks, useProgressBar ? this.progressSubscribers : null).join();
+                plugin.getLightUpdater().updateLightMultiBlock(cls, updatedBlocks, useProgressBar ? this.progressSubscribers : null).join();
 
                 return new BulkTaskResult(this, BulkTaskResult.Type.SUCCESS,
                         new CommandResultSuccessBroadcast(plugin.getCommand(),

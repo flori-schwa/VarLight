@@ -3,7 +3,6 @@ package me.shawlaf.varlight.spigot.persistence;
 import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -12,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class Autosave implements Listener, IPluginLifeCycleOperations {
@@ -28,11 +28,7 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
     @Override
     public void onDisable() {
         for (World world : plugin.getVarLightConfig().getVarLightEnabledWorlds()) {
-            try {
-                plugin.getApi().unsafe().requireVarLightEnabled(world).runAutosave();
-            } catch (VarLightNotActiveException ignored) {
-
-            }
+            Optional.ofNullable(plugin.getApi().unsafe().getLightStorage(world)).ifPresent(ICustomLightStorage::runAutosave);
         }
     }
 
@@ -87,11 +83,7 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
             return;
         }
 
-        try {
-            plugin.getApi().unsafe().requireVarLightEnabled(e.getWorld()).runAutosave();
-        } catch (VarLightNotActiveException ignored) {
-            // Ignore any worlds, that are not VarLight enabled
-        }
+        Optional.ofNullable(plugin.getApi().unsafe().getLightStorage(e.getWorld())).ifPresent(ICustomLightStorage::runAutosave);
     }
 
     private void update(int interval) {
@@ -121,11 +113,7 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
 
         autosaveTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (World world : plugin.getVarLightConfig().getVarLightEnabledWorlds()) {
-                try {
-                    plugin.getApi().unsafe().requireVarLightEnabled(world).runAutosave();
-                } catch (VarLightNotActiveException notPossible) {
-                    notPossible.printStackTrace();
-                }
+                Optional.ofNullable(plugin.getApi().unsafe().getLightStorage(world)).ifPresent(ICustomLightStorage::runAutosave);
             }
         }, ticks, ticks);
     }

@@ -6,9 +6,8 @@ import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.api.LightUpdateResult;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
-import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
+import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.util.IntPositionExtension;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
@@ -19,7 +18,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -70,10 +68,8 @@ public class VarLightEventHandlers implements Listener {
 
         ICustomLightStorage cls;
 
-        try {
-            cls = plugin.getApi().unsafe().requireVarLightEnabled(e.getClickedBlock().getWorld());
-        } catch (VarLightNotActiveException ex) {
-            CommandResult.failure(plugin.getCommand(), e.getPlayer(), ex.getMessage());
+        if ((cls = plugin.getApi().unsafe().getLightStorage(e.getClickedBlock().getWorld())) == null) {
+            CommandResult.failure(plugin.getCommand(), e.getPlayer(), VarLightMessages.varLightNotActiveInWorld(e.getClickedBlock().getWorld()));
             return;
         }
 
@@ -167,9 +163,7 @@ public class VarLightEventHandlers implements Listener {
 
         ICustomLightStorage cls;
 
-        try {
-            cls = plugin.getApi().unsafe().requireVarLightEnabled(world);
-        } catch (VarLightNotActiveException ignored) {
+        if ((cls = plugin.getApi().unsafe().getLightStorage(world)) == null) {
             return;
         }
 
@@ -233,11 +227,7 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        ICustomLightStorage cls;
-
-        try {
-            cls = plugin.getApi().unsafe().requireVarLightEnabled(e.getBlock().getWorld());
-        } catch (VarLightNotActiveException ex) {
+        if (!plugin.getApi().isVarLightEnabled(e.getBlock().getWorld())) {
             CommandResult.info(plugin.getCommand(), e.getPlayer(), "VarLight is not active in your current world!");
             e.setCancelled(true);
             return;
@@ -258,10 +248,10 @@ public class VarLightEventHandlers implements Listener {
 
                 if (!result.isSuccess()) {
                     plugin.getApi().getSyncExecutor().submit(() -> {
-                       e.getBlock().setType(before);
+                        e.getBlock().setType(before);
 
-                       handCopy.setAmount(1);
-                       e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), handCopy);
+                        handCopy.setAmount(1);
+                        e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), handCopy);
                     });
                 }
             }, Ticks.of(1));
@@ -271,30 +261,30 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler
     public void lightSourceReceiveUpdate(BlockPhysicsEvent e) {
-        try {
-            ICustomLightStorage cls = plugin.getApi().unsafe().requireVarLightEnabled(e.getBlock().getWorld());
+        ICustomLightStorage cls;
 
-            IntPosition position = e.getBlock().toIntPosition();
-            int luminance = cls.getCustomLuminance(position);
+        if ((cls = plugin.getApi().unsafe().getLightStorage(e.getBlock().getWorld())) == null) {
+            return;
+        }
 
-            if (luminance > 0) {
-                if (e.getBlock() == e.getSourceBlock()) {
-                    // The Light Source Block was changed
+        IntPosition position = e.getBlock().toIntPosition();
+        int luminance = cls.getCustomLuminance(position);
 
-                    // See World.notifyAndUpdatePhysics(BlockPosition, Chunk, IBlockData, IBlockData, IBlockData, int)
-                    if (plugin.getNmsAdapter().isIllegalBlockType(e.getChangedType())) {
-                        cls.setCustomLuminance(position, 0);
-                    } else {
-                        // Probably not possible, but /shrug
-                        plugin.getLightUpdater().updateLightSingleBlock(cls, position);
-                    }
+        if (luminance > 0) {
+            if (e.getBlock() == e.getSourceBlock()) {
+                // The Light Source Block was changed
+
+                // See World.notifyAndUpdatePhysics(BlockPosition, Chunk, IBlockData, IBlockData, IBlockData, int)
+                if (plugin.getNmsAdapter().isIllegalBlockType(e.getChangedType())) {
+                    cls.setCustomLuminance(position, 0);
                 } else {
-                    // The Light source Block received an update from another Block
+                    // Probably not possible, but /shrug
                     plugin.getLightUpdater().updateLightSingleBlock(cls, position);
                 }
+            } else {
+                // The Light source Block received an update from another Block
+                plugin.getLightUpdater().updateLightSingleBlock(cls, position);
             }
-        } catch (VarLightNotActiveException ex) {
-            return;
         }
     }
 

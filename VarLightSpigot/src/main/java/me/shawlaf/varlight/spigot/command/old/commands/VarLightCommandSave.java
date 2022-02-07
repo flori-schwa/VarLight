@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
@@ -58,17 +58,16 @@ public class VarLightCommandSave extends VarLightSubCommand {
 
         Player player = (Player) context.getSource();
 
-        try {
-            plugin.getApi().unsafe().requireVarLightEnabled(player.getWorld()).save(player, true);
+        ICustomLightStorage cls;
 
-            return SUCCESS;
-        } catch (VarLightNotActiveException e) {
-            failure(this, player, e.getMessage());
+        if ((cls = plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
+            failure(this, player, VarLightMessages.varLightNotActiveInWorld(player.getWorld()));
 
             return FAILURE;
         }
 
-
+        cls.save(player, true);
+        return SUCCESS;
     }
 
     private int saveAll(CommandContext<CommandSender> context) {
@@ -82,15 +81,17 @@ public class VarLightCommandSave extends VarLightSubCommand {
     private int saveExplicit(CommandContext<CommandSender> context) {
         World world = context.getArgument(ARG_WORLD.getName(), World.class);
 
-        try {
-            plugin.getApi().unsafe().requireVarLightEnabled(world).save(context.getSource(), true);
+        ICustomLightStorage cls;
 
-            return SUCCESS;
-        } catch (VarLightNotActiveException e) {
-            failure(this, context.getSource(), String.format("Varlight is not active in world \"%s\"", world.getName()));
+        if ((cls = plugin.getApi().unsafe().getLightStorage(world)) == null) {
+            failure(this, context.getSource(), VarLightMessages.varLightNotActiveInWorld(world));
 
             return FAILURE;
         }
+
+        cls.save(context.getSource(), true);
+
+        return SUCCESS;
     }
 
 }

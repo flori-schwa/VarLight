@@ -1,7 +1,6 @@
 package me.shawlaf.varlight.spigot.nms.v1_16_R3;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
@@ -35,13 +34,13 @@ public class WrappedLightAccess implements ILightAccess, Listener {
     private int getCustomLuminance(IChunkAccess blockAccess, BlockPosition bPos) {
         int vanilla = blockAccess.getType(bPos).f();
 
-        try {
-            ICustomLightStorage wlp = plugin.getApi().unsafe().requireVarLightEnabled(world.getWorld());
+        ICustomLightStorage cls;
 
-            return wlp.getCustomLuminance(new IntPosition(bPos.getX(), bPos.getY(), bPos.getZ()), vanilla);
-        } catch (VarLightNotActiveException e) {
+        if ((cls = plugin.getApi().unsafe().getLightStorage(this.world.getWorld())) == null) {
             return vanilla;
         }
+
+        return cls.getCustomLuminance(new IntPosition(bPos.getX(), bPos.getY(), bPos.getZ()), vanilla);
     }
 
     private WrappedIChunkAccess createProxy(ChunkCoords chunkCoords) {

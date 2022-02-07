@@ -7,7 +7,7 @@ import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
-import me.shawlaf.varlight.spigot.exceptions.VarLightNotActiveException;
+import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
@@ -187,18 +187,16 @@ public class VarLightCommandDebug extends VarLightSubCommand {
 
     private void listLightSourcesInRegion(Player player, int regionX, int regionZ, int page) {
 
-        @NotNull ICustomLightStorage manager;
+        ICustomLightStorage cls;
 
-        try {
-            manager = plugin.getApi().unsafe().requireVarLightEnabled(player.getWorld());
-        } catch (VarLightNotActiveException e) {
-            success(this, player, e.getMessage());
+        if ((cls = plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
+            success(this, player, VarLightMessages.varLightNotActiveInWorld(player.getWorld()));
             return;
         }
 
         RegionCoords regionCoords = new RegionCoords(regionX, regionZ);
 
-        CountingIterator<IntPosition> all = manager.iterateAllLightSources(regionCoords.getRegionStart(), regionCoords.getRegionEnd()).count();
+        CountingIterator<IntPosition> all = cls.iterateAllLightSources(regionCoords.getRegionStart(), regionCoords.getRegionEnd()).count();
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
@@ -209,25 +207,23 @@ public class VarLightCommandDebug extends VarLightSubCommand {
             page = Math.min(page, pages);
 
             player.sendMessage(String.format("Light sources in region (%d | %d): %d (Showing Page %d / %d)", regionX, regionZ, totalCount, page, pages));
-            listInternal(player, manager, pageList);
+            listInternal(player, cls, pageList);
         } catch (IndexOutOfBoundsException e) {
             CommandResult.failure(this, player, String.format("The specified page %d (out of %d) is out of bounds!", page, Paginator.getAmountPages(all.countToEnd(), PAGE_SIZE)));
         }
     }
 
     private void listLightSourcesInChunk(Player player, int chunkX, int chunkZ, int page) {
-        @NotNull ICustomLightStorage manager;
+        ICustomLightStorage cls;
 
-        try {
-            manager = plugin.getApi().unsafe().requireVarLightEnabled(player.getWorld());
-        } catch (VarLightNotActiveException e) {
-            success(this, player, e.getMessage());
+        if ((cls = plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
+            success(this, player, VarLightMessages.varLightNotActiveInWorld(player.getWorld()));
             return;
         }
 
         ChunkCoords chunkCoords = new ChunkCoords(chunkX, chunkZ);
 
-        CountingIterator<IntPosition> all = manager.iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd()).count();
+        CountingIterator<IntPosition> all = cls.iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd()).count();
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
@@ -238,7 +234,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
             page = Math.min(page, pages);
 
             player.sendMessage(String.format("Light sources in chunk (%d | %d): %d (Showing Page %d / %d)", chunkX, chunkZ, totalCount, page, pages));
-            listInternal(player, manager, pageList);
+            listInternal(player, cls, pageList);
         } catch (IndexOutOfBoundsException e) {
             CommandResult.failure(this, player, String.format("The specified page %d (out of %d) is out of bounds!", page, Paginator.getAmountPages(all.countToEnd(), PAGE_SIZE)));
         }
