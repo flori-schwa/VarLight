@@ -3,8 +3,6 @@ package me.shawlaf.varlight.spigot;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResult;
-import me.shawlaf.varlight.spigot.api.LightUpdateResult;
-import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
 import me.shawlaf.varlight.spigot.messages.VarLightMessages;
@@ -14,9 +12,9 @@ import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -135,9 +133,13 @@ public class VarLightEventHandlers implements Listener {
 
         e.setCancelled(creative && e.getAction() == Action.LEFT_CLICK_BLOCK); // Prevent Block break in creative
 
-        plugin.getApi().setCustomLuminance(clicked.getLocation(), cls.getCustomLuminance(clicked.toIntPosition()) + mod, true, LightUpdateCause.player(player)).thenAccept(result -> {
+        plugin.getApi().setCustomLuminance(
+                clicked.getLocation(),
+                cls.getCustomLuminance(clicked.toIntPosition()) + mod,
+                true,
+                LightUpdateCause.player(player, LightUpdateCause.PlayerAction.LUI)
+        ).thenAccept(result -> {
             if (result.isSuccess()) {
-
                 if (plugin.getVarLightConfig().isConsumeLui() && !creative && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     item.setAmount(item.getAmount() - Math.abs(finalMod));
                 }
@@ -240,21 +242,27 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        final Material before = e.getBlock().getType();
+        final World world = e.getBlock().getWorld();
+        final BlockState before = e.getBlockReplacedState();
 
         if (placedItemStack.getCustomLuminance() > 0) {
-            plugin.getApi().getAsyncExecutor().submitDelayed(() -> {
-                LightUpdateResult result = plugin.getApi().setCustomLuminance(e.getBlock().getLocation(), placedItemStack.getCustomLuminance(), true, LightUpdateCause.player(e.getPlayer())).join();
 
+            plugin.getApi().setCustomLuminance(
+                    e.getBlock().getLocation(),
+                    placedItemStack.getCustomLuminance(),
+                    true,
+                    LightUpdateCause.player(e.getPlayer(), LightUpdateCause.PlayerAction.PLACE_LIGHT_SOURCE)
+            ).thenAccept(result -> {
                 if (!result.isSuccess()) {
+                    // Because of update: true this block will be run in parallel thread
                     plugin.getApi().getSyncExecutor().submit(() -> {
-                        e.getBlock().setType(before);
+                        before.update(true, false);
 
                         handCopy.setAmount(1);
-                        e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), handCopy);
+                        world.dropItemNaturally(e.getBlock().getLocation(), handCopy);
                     });
                 }
-            }, Ticks.of(1));
+            });
         }
 
     }

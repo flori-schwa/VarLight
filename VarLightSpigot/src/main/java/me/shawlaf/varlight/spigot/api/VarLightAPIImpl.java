@@ -199,7 +199,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
         if (!Bukkit.isPrimaryThread()) {
-            return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update)).join();
+            return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update, cause)).join();
         }
 
         world.requireNonNull("World may not be null");
@@ -262,17 +262,16 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     @Override
     public void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull World world, @NotNull IntPosition position, int customLuminance) {
-
         LightUpdateCause cause;
 
         switch (causeType) {
             case PLAYER: {
-                cause = LightUpdateCause.player(source);
+                cause = LightUpdateCause.player(source, LightUpdateCause.PlayerAction.UNSPECIFIED); // TODO expand this API
                 break;
             }
 
             case COMMAND: {
-                cause = LightUpdateCause.player(source);
+                cause = LightUpdateCause.command(source);
             }
 
             case API: {

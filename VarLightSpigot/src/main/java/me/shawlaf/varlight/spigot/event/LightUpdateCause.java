@@ -11,26 +11,35 @@ public class LightUpdateCause {
         API
     }
 
+    public enum PlayerAction {
+        LUI,
+        PLACE_LIGHT_SOURCE,
+        UNSPECIFIED
+    }
+
     @Getter
     private final CommandSender playerCause, commandCause;
     @Getter
     private final Type cause;
+    @Getter
+    private final PlayerAction playerAction;
 
-    public static LightUpdateCause player(CommandSender player) {
-        return new LightUpdateCause(player, null, Type.PLAYER);
+    public static LightUpdateCause player(CommandSender player, PlayerAction playerAction) {
+        return new LightUpdateCause(player, null, Type.PLAYER, playerAction);
     }
 
     public static LightUpdateCause command(CommandSender source) {
-        return new LightUpdateCause(null, source, Type.COMMAND);
+        return new LightUpdateCause(null, source, Type.COMMAND, null);
     }
 
     public static LightUpdateCause api() {
-        return new LightUpdateCause(null, null, Type.API);
+        return new LightUpdateCause(null, null, Type.API, null);
     }
 
-    private LightUpdateCause(CommandSender playerCause, CommandSender commandCause, Type cause) {
+    private LightUpdateCause(CommandSender playerCause, CommandSender commandCause, Type cause, PlayerAction playerAction) {
         this.playerCause = playerCause;
         this.commandCause = commandCause;
         this.cause = cause;
+        this.playerAction = playerAction;
     }
 }
