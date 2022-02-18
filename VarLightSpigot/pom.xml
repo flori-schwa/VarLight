@@ -7,12 +7,12 @@
     <properties>
         <varlight.version>dev</varlight.version>
         <varlight.base.version>0.0.1</varlight.base.version>
-        <annotations.version>20.1.0</annotations.version>
-        <joor.version>0.9.13</joor.version>
-        <lombok.version>1.18.20</lombok.version>
-        <worldedit.version>7.2.5</worldedit.version>
-        <worldguard.version>7.0.4</worldguard.version>
-        <junit.version>5.7.1</junit.version>
+        <annotations.version>22.0.0</annotations.version>
+        <joor.version>0.9.14</joor.version>
+        <lombok.version>1.18.22</lombok.version>
+        <worldedit.version>7.2.9</worldedit.version>
+        <worldguard.version>7.0.6</worldguard.version>
+        <junit.version>5.8.2</junit.version>
     </properties>
 
     <groupId>me.shawlaf</groupId>
@@ -24,11 +24,6 @@
         <repository>
             <id>sk89q-repo</id>
             <url>https://maven.enginehub.org/repo/</url>
-        </repository>
-        
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
 
@@ -77,6 +72,8 @@
         </dependency>
 
         <dependency>
+            <!-- THIS ONLY WORKS WHEN THE BUILT SPIGOT JAR IS LOCALLY INSTALLED, THIS IS NOT ACTUALLY IN THE SPIGOT MAVEN REPOSITORY -->
+            <!-- REQUIRED FOR NMS -->
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>1.16.5-SERVER</version>

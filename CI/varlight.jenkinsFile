@@ -12,12 +12,12 @@ pipeline {
         booleanParam(name: 'DRY_RUN', defaultValue: false)
         string(name: 'VERSION', defaultValue: '')
 
-        string(name: 'WORLD_EDIT_VERSION', defaultValue: '7.2.5')
-        string(name: 'WORLD_GUARD_VERSION', defaultValue: '7.0.4')
-        string(name: 'ANNOTATIONS_VERSION', defaultValue: '20.1.0')
-        string(name: 'JOOR_JAVA_8_VERSION', defaultValue: '0.9.13')
-        string(name: 'LOMBOK_VERSION', defaultValue: '1.18.20')
-        string(name: 'JUNIT_VERSION', defaultValue: '5.7.1')
+        string(name: 'WORLD_EDIT_VERSION', defaultValue: '7.2.9')
+        string(name: 'WORLD_GUARD_VERSION', defaultValue: '7.0.6')
+        string(name: 'ANNOTATIONS_VERSION', defaultValue: '22.0.0')
+        string(name: 'JOOR_JAVA_8_VERSION', defaultValue: '0.9.14')
+        string(name: 'LOMBOK_VERSION', defaultValue: '1.18.22')
+        string(name: 'JUNIT_VERSION', defaultValue: '5.8.2')
     }
 
     triggers {
