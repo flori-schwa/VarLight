@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.spigot;
 
 import lombok.Getter;
+import me.shawlaf.varlight.persistence.migrate.LightDatabaseMigrator;
 import me.shawlaf.varlight.spigot.api.IVarLightAPI;
 import me.shawlaf.varlight.spigot.api.VarLightAPIImpl;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
@@ -8,12 +9,18 @@ import me.shawlaf.varlight.spigot.exceptions.VarLightInitializationException;
 import me.shawlaf.varlight.spigot.nms.IMinecraftLightUpdater;
 import me.shawlaf.varlight.spigot.nms.INmsMethods;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
+import me.shawlaf.varlight.spigot.persistence.migrations.JsonToNLSMigration;
+import me.shawlaf.varlight.spigot.persistence.migrations.MoveVarLightRootFolder;
+import me.shawlaf.varlight.spigot.persistence.migrations.VLDBToNLSMigration;
 import me.shawlaf.varlight.spigot.updatecheck.VarLightUpdateCheck;
 import me.shawlaf.varlight.util.MessageUtil;
 import me.shawlaf.varlight.util.NumericMajorMinorVersion;
 import me.shawlaf.varlight.util.StringUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 public class VarLightPlugin extends JavaPlugin {
 
@@ -26,6 +33,8 @@ public class VarLightPlugin extends JavaPlugin {
     private VarLightConfig varLightConfig;
     @Getter
     private VarLightCommand command;
+    @Getter
+    private LightDatabaseMigrator<World> lightDatabaseMigrator;
 
     private boolean doLoad = true;
 
@@ -49,6 +58,21 @@ public class VarLightPlugin extends JavaPlugin {
         if (!doLoad) {
             return;
         }
+
+        this.lightDatabaseMigrator = new LightDatabaseMigrator<World>(getLogger()) {
+            @Override
+            protected File getVarLightSaveDirectory(World world) {
+                return nmsAdapter.getVarLightSaveDirectory(world);
+            }
+
+            @Override
+            protected String getName(World world) {
+                return world.getName();
+            }
+        };
+
+        this.lightDatabaseMigrator.addDataMigrations(new JsonToNLSMigration(this), new VLDBToNLSMigration(this));
+        this.lightDatabaseMigrator.addStructureMigrations(new MoveVarLightRootFolder(this));
 
         this.varLightConfig = new VarLightConfig(this);
         this.api = new VarLightAPIImpl(this);

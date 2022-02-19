@@ -39,6 +39,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
         this.plugin = plugin;
 
         plugin.getNmsAdapter().getVarLightSaveDirectory(forBukkitWorld);
+        plugin.getLightDatabaseMigrator().runMigrations(forBukkitWorld);
     }
 
     @Override
