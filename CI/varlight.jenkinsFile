@@ -53,18 +53,16 @@ pipeline {
                     sh "./install.sh"
                 }
                 
-                dir ("VarLight") {
-                    script {
-                        def version;
+                script {
+                    def version;
 
-                        if (params.VERSION.isEmpty()) {
-                            version = "${BUILD_NUMBER}"
-                        } else {
-                            version = params.VERSION
-                        }
-
-                        sh "mvn -B clean package -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true -Dvarlight.version=$version -Dannotations.version=${params.ANNOTATIONS_VERSION} -Djoor.version=${params.JOOR_JAVA_8_VERSION} -Dlombok.version=${params.LOMBOK_VERSION} -Dworldedit.version=${params.WORLD_EDIT_VERSION} -Dworldguard.version=${params.WORLD_GUARD_VERSION}"
+                    if (params.VERSION.isEmpty()) {
+                        version = "${BUILD_NUMBER}"
+                    } else {
+                        version = params.VERSION
                     }
+
+                    sh "mvn -B clean package -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true -Dvarlight.version=$version -Dannotations.version=${params.ANNOTATIONS_VERSION} -Djoor.version=${params.JOOR_JAVA_8_VERSION} -Dlombok.version=${params.LOMBOK_VERSION} -Dworldedit.version=${params.WORLD_EDIT_VERSION} -Dworldguard.version=${params.WORLD_GUARD_VERSION}"
                 }
             }
         }
