@@ -44,16 +44,7 @@ pipeline {
                 }
             }
         }
-
-        stage("Build Core") {
-            steps {
-                dir("VarLightCore") {
-                    sh "mvn -B clean package install -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true -Dlombok-version=${params.LOMBOK_VERSION} -Dannotations-version=${params.ANNOTATIONS_VERSION} -Djunit-version=${params.JUNIT_VERSION}"
-                }
-            }
-        }
-
-        stage("Build Plugin") {
+        stage("Build") {
             steps {
                 dir("VarLightSpigot/libraries") {
                     copyArtifacts(projectName: 'Spigot 1.16.5')
@@ -62,7 +53,7 @@ pipeline {
                     sh "./install.sh"
                 }
                 
-                dir ("VarLightSpigot") {
+                dir ("VarLight") {
                     script {
                         def version;
 
@@ -72,7 +63,7 @@ pipeline {
                             version = params.VERSION
                         }
 
-                        sh "mvn -B clean package install -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true -Dvarlight.version=$version -Dannotations.version=${params.ANNOTATIONS_VERSION} -Djoor.version=${params.JOOR_JAVA_8_VERSION} -Dlombok.version=${params.LOMBOK_VERSION} -Dworldedit.version=${params.WORLD_EDIT_VERSION} -Dworldguard.version=${params.WORLD_GUARD_VERSION}"
+                        sh "mvn -B clean package -Dmaven.compiler.showDeprecation=true -Dmaven.compiler.showWarnings=true -Dvarlight.version=$version -Dannotations.version=${params.ANNOTATIONS_VERSION} -Djoor.version=${params.JOOR_JAVA_8_VERSION} -Dlombok.version=${params.LOMBOK_VERSION} -Dworldedit.version=${params.WORLD_EDIT_VERSION} -Dworldguard.version=${params.WORLD_GUARD_VERSION}"
                     }
                 }
             }
