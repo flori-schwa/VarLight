@@ -1,5 +1,6 @@
 package me.shawlaf.varlight.spigot.api;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.VarLightConfig;
@@ -77,7 +78,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
             if (!IPluginLifeCycleOperations.class.isAssignableFrom(field.getType())) {
                 throw new IllegalStateException("Fields annotated with @" + APIModule.class.getName() + " must implement " + IPluginLifeCycleOperations.class.getName());
             }
-            
+
             Constructor<?> constructor = field.getType().getConstructor(VarLightPlugin.class);
             Object module = constructor.newInstance(plugin);
 
@@ -170,25 +171,22 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public int getCustomLuminance(World world, IntPosition position) {
-        world.requireNonNull("World may not be null");
-        position.requireNonNull("Position may not be null");
-
+    public int getCustomLuminance(@NonNull World world, @NonNull IntPosition position) {
         return Optional.ofNullable(getLightStorage(world)).map(cls -> cls.getCustomLuminance(position)).orElse(0);
     }
 
     @Override
-    public boolean isVarLightEnabled(World world) {
+    public boolean isVarLightEnabled(@NonNull World world) {
         return getLightStorage(world) != null;
     }
 
     @Override
-    public @NotNull GlowItemStack createGlowItemStack(ItemStack base, int lightLevel) {
+    public @NotNull GlowItemStack createGlowItemStack(@NonNull ItemStack base, int lightLevel) {
         return new GlowItemStack(plugin, base, lightLevel);
     }
 
     @Override
-    public @Nullable GlowItemStack importGlowItemStack(ItemStack glowingStack) {
+    public @Nullable GlowItemStack importGlowItemStack(@NonNull ItemStack glowingStack) {
         try {
             return new GlowItemStack(plugin, glowingStack);
         } catch (IllegalArgumentException e) {
@@ -197,7 +195,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @NotNull
-    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
+    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull World world, @NonNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
         if (!Bukkit.isPrimaryThread()) {
             return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update, cause)).join();
         }
@@ -261,7 +259,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull World world, @NotNull IntPosition position, int customLuminance) {
+    public void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NonNull World world, @NonNull IntPosition position, int customLuminance) {
         LightUpdateCause cause;
 
         switch (causeType) {
@@ -291,7 +289,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public CompletableFuture<BulkTaskResult> runBulkClear(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end) {
+    public CompletableFuture<BulkTaskResult> runBulkClear(@NonNull World world, @NonNull CommandSender source, @NonNull IntPosition start, @NonNull IntPosition end) {
         return new BulkClearTask(plugin, world, source, start, end).run();
     }
 

@@ -1,6 +1,7 @@
 package me.shawlaf.varlight.spigot.glowingitems;
 
 import lombok.Getter;
+import lombok.NonNull;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,12 +14,12 @@ public class GlowItemStack {
     @Getter
     private final int customLuminance;
 
-    public GlowItemStack(VarLightPlugin plugin, ItemStack baseStack, int lightLevel) {
+    public GlowItemStack(@NonNull VarLightPlugin plugin, @NonNull ItemStack baseStack, int lightLevel) {
         this.customLuminance = lightLevel;
         this.itemStack = plugin.getNmsAdapter().makeGlowingStack(baseStack, lightLevel);
     }
 
-    public GlowItemStack(VarLightPlugin plugin, ItemStack importStack) {
+    public GlowItemStack(@NonNull VarLightPlugin plugin, @NonNull ItemStack importStack) {
         this.itemStack = importStack;
         this.customLuminance = plugin.getNmsAdapter().getGlowingValue(this.itemStack);
 

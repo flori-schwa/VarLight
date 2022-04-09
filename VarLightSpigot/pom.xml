@@ -5,7 +5,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <varlight.version>dev</varlight.version>
         <varlight.base.version>0.0.1</varlight.base.version>
         <annotations.version>20.1.0</annotations.version>
         <joor.version>0.9.13</joor.version>
@@ -15,7 +14,12 @@
         <junit.version>5.7.1</junit.version>
     </properties>
 
-    <groupId>me.shawlaf</groupId>
+    <parent>
+        <artifactId>varlight</artifactId>
+        <groupId>me.shawlaf</groupId>
+        <version>0.0.1</version>
+    </parent>
+
     <artifactId>VarLightSpigot</artifactId>
     <version>${varlight.version}</version>
     <packaging>jar</packaging>
@@ -85,7 +89,7 @@
         
         <dependency>
             <groupId>me.shawlaf</groupId>
-            <artifactId>VarLightCommons</artifactId>
+            <artifactId>commons-varlight</artifactId>
             <version>${varlight.base.version}</version>
         </dependency>
 
@@ -135,9 +139,9 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>org.jetbrains:*</include>
-                                    <include>org.jooq:*</include>
-                                    <include>me.shawlaf:*</include>
+                                    <include>org.jetbrains:annotations</include>
+                                    <include>org.jooq:joor-java-8</include>
+                                    <include>me.shawlaf:commons-varlight</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

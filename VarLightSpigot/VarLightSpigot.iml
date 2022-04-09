@@ -56,7 +56,7 @@
     <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.0.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
     <orderEntry type="library" name="Maven: org.spigotmc:spigot:1.16.5-SERVER" level="project" />
-    <orderEntry type="library" name="Maven: me.shawlaf:VarLightCommons:0.0.1" level="project" />
+    <orderEntry type="module" module-name="commons-varlight" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter:5.7.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.7.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />

@@ -1,0 +1,3 @@
+[submodule "commons-varlight"]
+	path = commons-varlight
+	url = git@github.com:flori-schwa/commons-varlight.git
