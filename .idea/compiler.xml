@@ -15,14 +15,14 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.20/lombok-1.18.20.jar" />
         </processorPath>
-        <module name="commons-varlight" />
         <module name="VarLightSpigot" />
+        <module name="VarLightCommons" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="commons-varlight" target="8" />
+      <module name="commons-varlight" target="1.5" />
       <module name="varlight" target="1.5" />
-      <module name="VarLightCommons" target="1.5" />
+      <module name="VarLightCommons" target="8" />
       <module name="VarLightCommons (1)" target="8" />
       <module name="VarLightCommons (2)" target="1.5" />
       <module name="VarLightSpigot" target="8" />
