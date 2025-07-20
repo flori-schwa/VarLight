@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.api;
 
-import lombok.NonNull;
 import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
@@ -12,7 +11,7 @@ import me.shawlaf.varlight.spigot.persistence.Autosave;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -123,7 +122,7 @@ public interface IVarLightAPI {
      * @param position The {@link IntPosition} to query for custom Light Data
      * @return The custom Light Level at the specified Location, or {@code 0} if there is no custom Light Source
      */
-    int getCustomLuminance(@NonNull World world, @NonNull IntPosition position);
+    int getCustomLuminance(@NotNull World world, @NotNull IntPosition position);
 
     /**
      * <p>
@@ -133,7 +132,7 @@ public interface IVarLightAPI {
      * @param world The world
      * @return {@code true} if VarLight is enabled in the specified {@link World}, {@code false} otherwise
      */
-    boolean isVarLightEnabled(@NonNull World world);
+    boolean isVarLightEnabled(@NotNull World world);
 
     /**
      * <p>
@@ -144,7 +143,7 @@ public interface IVarLightAPI {
      * @param lightLevel The Lightlevel the block should be emitting when placed by a player
      * @return The newly created {@link GlowItemStack} containing the resulting {@link ItemStack} and Light level
      */
-    @NotNull GlowItemStack createGlowItemStack(@NonNull ItemStack base, int lightLevel);
+    @NotNull GlowItemStack createGlowItemStack(@NotNull ItemStack base, int lightLevel);
 
     /**
      * <p>
@@ -154,7 +153,7 @@ public interface IVarLightAPI {
      * @param glowingStack The {@link ItemStack} to parse from
      * @return The parsed {@link GlowItemStack} or {@code null} if the item is not a glowing stack
      */
-    @Nullable GlowItemStack importGlowItemStack(@NonNull ItemStack glowingStack);
+    @Nullable GlowItemStack importGlowItemStack(@NotNull ItemStack glowingStack);
 
     /**
      * <p>
@@ -163,8 +162,8 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#getCustomLuminance(World, IntPosition)
      */
-    default int getCustomLuminance(@NonNull Location location) {
-        return getCustomLuminance(location.getWorld(), IntPositionExtension.toIntPosition(location));
+    default int getCustomLuminance(@NotNull Location location) {
+        return getCustomLuminance(location.getWorld(), IntPositionUtil.toIntPosition(location));
     }
 
     /**
@@ -179,9 +178,9 @@ public interface IVarLightAPI {
      * @param cause           The {@link LightUpdateCause} of this Light update
      * @return A {@link CompletableFuture} returning a {@link LightUpdateResult} upon completion
      */
-    CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull World world, @NonNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause);
+    CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause);
 
-    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull World world, @NonNull IntPosition position, int customLuminance, boolean update) {
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update) {
         return setCustomLuminance(world, position, customLuminance, update, LightUpdateCause.api());
     }
 
@@ -193,12 +192,12 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#setCustomLuminance(World, IntPosition, int, boolean)
      */
-    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull World world, @NonNull IntPosition position, int customLuminance) {
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance) {
         return setCustomLuminance(world, position, customLuminance, true);
     }
 
-    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull Location location, int customLuminance, boolean update, LightUpdateCause cause) {
-        return setCustomLuminance(location.getWorld(), IntPositionExtension.toIntPosition(location), customLuminance, update, cause);
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance, boolean update, LightUpdateCause cause) {
+        return setCustomLuminance(location.getWorld(), IntPositionUtil.toIntPosition(location), customLuminance, update, cause);
     }
 
     /**
@@ -209,7 +208,7 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#setCustomLuminance(World, IntPosition, int, boolean)
      */
-    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull Location location, int customLuminance, boolean update) {
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance, boolean update) {
         return setCustomLuminance(location, customLuminance, update, LightUpdateCause.api());
     }
 
@@ -219,7 +218,7 @@ public interface IVarLightAPI {
      * Calling this method will always immediately update Light on the Server and the Client on success (i.e. {@code true} is passed to {@link IVarLightAPI#setCustomLuminance(Location, int, boolean)})
      * </p>
      */
-    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull Location location, int customLuminance) {
+    default CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull Location location, int customLuminance) {
         return setCustomLuminance(location, customLuminance, true);
     }
 
@@ -231,7 +230,7 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#setCustomLuminance(World, IntPosition, int)
      */
-    void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NonNull World world, @NonNull IntPosition position, int customLuminance);
+    void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull World world, @NotNull IntPosition position, int customLuminance);
 
     /**
      * <p>
@@ -241,8 +240,8 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#setCustomLuminance(CommandSender, LightUpdateCause.Type, World, IntPosition, int)
      */
-    default void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NonNull Location location, int customLuminance) {
-        setCustomLuminance(source, causeType, location.getWorld(), IntPositionExtension.toIntPosition(location), customLuminance);
+    default void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull Location location, int customLuminance) {
+        setCustomLuminance(source, causeType, location.getWorld(), IntPositionUtil.toIntPosition(location), customLuminance);
     }
 
     /**
@@ -253,7 +252,7 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#setCustomLuminance(World, IntPosition, int, boolean)
      */
-    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NonNull World world, @NonNull IntPosition position, boolean update) {
+    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NotNull World world, @NotNull IntPosition position, boolean update) {
         return setCustomLuminance(world, position, 0, update);
     }
 
@@ -265,7 +264,7 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#clearCustomLuminance(World, IntPosition, boolean)
      */
-    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NonNull World world, @NonNull IntPosition position) {
+    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NotNull World world, @NotNull IntPosition position) {
         return clearCustomLuminance(world, position, true);
     }
 
@@ -277,8 +276,8 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#clearCustomLuminance(World, IntPosition, boolean)
      */
-    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NonNull Location location, boolean update) {
-        return clearCustomLuminance(location.getWorld(), IntPositionExtension.toIntPosition(location), update);
+    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NotNull Location location, boolean update) {
+        return clearCustomLuminance(location.getWorld(), IntPositionUtil.toIntPosition(location), update);
     }
 
     /**
@@ -289,7 +288,7 @@ public interface IVarLightAPI {
      *
      * @see IVarLightAPI#clearCustomLuminance(Location, boolean)
      */
-    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NonNull Location location) {
+    default CompletableFuture<LightUpdateResult> clearCustomLuminance(@NotNull Location location) {
         return clearCustomLuminance(location, true);
     }
 
@@ -304,7 +303,7 @@ public interface IVarLightAPI {
      * @param end    The end position
      * @return A {@link CompletableFuture} returning a {@link BulkTaskResult} upon completion
      */
-    CompletableFuture<BulkTaskResult> runBulkClear(@NonNull World world, @NonNull CommandSender source, @NonNull IntPosition start, @NonNull IntPosition end);
+    CompletableFuture<BulkTaskResult> runBulkClear(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end);
 
     /**
      * <p>

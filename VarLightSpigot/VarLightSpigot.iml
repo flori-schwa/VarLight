@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+<module version="4">
   <component name="FacetManager">
     <facet type="minecraft" name="Minecraft">
       <configuration>
@@ -9,61 +9,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
-    <output url="file://$MODULE_DIR$/target/classes" />
-    <output-test url="file://$MODULE_DIR$/target/test-classes" />
-    <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" generated="true" />
-      <excludeFolder url="file://$MODULE_DIR$/test-servers" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
-    </content>
-    <orderEntry type="jdk" jdkName="16" jdkType="JavaSDK" />
-    <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="VarLightCore" />
-    <orderEntry type="library" name="Maven: org.jetbrains:annotations:20.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.jooq:joor-java-8:0.9.13" level="project" />
-    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.20" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-core:7.2.5" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:antlr4:4.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:ST4:4.3" level="project" />
-    <orderEntry type="library" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
-    <orderEntry type="library" name="Maven: com.ibm.icu:icu4j:61.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.2.5" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: de.schlichtherle:truezip:6.8.4" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mozilla:rhino-runtime:1.7.13" level="project" />
-    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.26" level="project" />
-    <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.logging.log4j:log4j-api:2.8.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: it.unimi.dsi:fastutil:8.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:antlr4-runtime:4.9.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.2.5" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldedit.worldedit-libs:bukkit:7.2.5" level="project" />
-    <orderEntry type="library" name="Maven: org.spigotmc:spigot-api:1.16.1-R0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: net.md-5:bungeecord-chat:1.16-R0.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: io.papermc:paperlib:1.0.6" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.bstats:bstats-bukkit:2.1.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.bstats:bstats-base:2.1.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-core:7.0.4" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard.worldguard-libs:core:7.0.4" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.flywaydb:flyway-core:3.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sk89q.worldguard:worldguard-bukkit:7.0.4" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sk89q:commandbook:2.3" level="project" />
-    <orderEntry type="library" name="Maven: org.spigotmc:spigot:1.16.5-SERVER" level="project" />
-    <orderEntry type="module" module-name="VarLightCommons" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-params:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.7.1" level="project" />
+  <component name="McpModuleSettings">
+    <option name="srgType" value="SRG" />
   </component>
 </module>

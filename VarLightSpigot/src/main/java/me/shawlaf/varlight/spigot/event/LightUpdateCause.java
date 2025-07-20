@@ -1,8 +1,8 @@
 package me.shawlaf.varlight.spigot.event;
 
-import lombok.Getter;
 import org.bukkit.command.CommandSender;
 
+@Deprecated // Replace with sealed interface
 public class LightUpdateCause {
 
     public enum Type {
@@ -17,11 +17,8 @@ public class LightUpdateCause {
         UNSPECIFIED
     }
 
-    @Getter
     private final CommandSender playerCause, commandCause;
-    @Getter
     private final Type cause;
-    @Getter
     private final PlayerAction playerAction;
 
     public static LightUpdateCause player(CommandSender player, PlayerAction playerAction) {
@@ -41,5 +38,21 @@ public class LightUpdateCause {
         this.commandCause = commandCause;
         this.cause = cause;
         this.playerAction = playerAction;
+    }
+
+    public CommandSender getPlayerCause() {
+        return playerCause;
+    }
+
+    public CommandSender getCommandCause() {
+        return commandCause;
+    }
+
+    public Type getCause() {
+        return cause;
+    }
+
+    public PlayerAction getPlayerAction() {
+        return playerAction;
     }
 }

@@ -1,31 +1,36 @@
 package me.shawlaf.varlight.spigot.glowingitems;
 
-import lombok.Getter;
-import lombok.NonNull;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class GlowItemStack {
 
-    @Getter
     private final ItemStack itemStack;
-    @Getter
     private final int customLuminance;
 
-    public GlowItemStack(@NonNull VarLightPlugin plugin, @NonNull ItemStack baseStack, int lightLevel) {
+    public GlowItemStack(@NotNull VarLightPlugin plugin, @NotNull ItemStack baseStack, int lightLevel) {
         this.customLuminance = lightLevel;
-        this.itemStack = plugin.getNmsAdapter().makeGlowingStack(baseStack, lightLevel);
+        this.itemStack = plugin.getNmsAdapter().makeGlowingStack(Objects.requireNonNull(baseStack), lightLevel);
     }
 
-    public GlowItemStack(@NonNull VarLightPlugin plugin, @NonNull ItemStack importStack) {
-        this.itemStack = importStack;
+    public GlowItemStack(@NotNull VarLightPlugin plugin, @NotNull ItemStack importStack) {
+        this.itemStack = Objects.requireNonNull(importStack);
         this.customLuminance = plugin.getNmsAdapter().getGlowingValue(this.itemStack);
 
         if (this.customLuminance < 0) {
             throw new IllegalArgumentException("Supplied Itemstack is not a glowing item!");
         }
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public int getCustomLuminance() {
+        return customLuminance;
     }
 
     @Override

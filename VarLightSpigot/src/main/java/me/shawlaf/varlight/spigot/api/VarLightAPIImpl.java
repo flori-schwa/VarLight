@@ -1,8 +1,6 @@
 package me.shawlaf.varlight.spigot.api;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.experimental.ExtensionMethod;
+
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
@@ -21,7 +19,7 @@ import me.shawlaf.varlight.spigot.persistence.CustomLightStorageNLS;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.prompt.ChatPrompts;
 import me.shawlaf.varlight.spigot.stepsize.StepsizeHandler;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,16 +32,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-@ExtensionMethod({
-        Objects.class,
-        IntPositionExtension.class
-})
 public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     private final VarLightPlugin plugin;
@@ -63,27 +58,31 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     private Material lightUpdateItem;
 
-    @SneakyThrows
     public VarLightAPIImpl(VarLightPlugin plugin) {
         this.plugin = plugin;
 
         this.syncExecutor = new BukkitSyncExecutorService(plugin);
         this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
 
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (!field.isAnnotationPresent(APIModule.class)) {
-                continue;
+        try {
+            for (Field field : this.getClass().getDeclaredFields()) {
+                if (!field.isAnnotationPresent(APIModule.class)) {
+                    continue;
+                }
+
+                if (!IPluginLifeCycleOperations.class.isAssignableFrom(field.getType())) {
+                    throw new IllegalStateException("Fields annotated with @" + APIModule.class.getName() + " must implement " + IPluginLifeCycleOperations.class.getName());
+                }
+
+                Constructor<?> constructor = field.getType().getConstructor(VarLightPlugin.class);
+                Object module = constructor.newInstance(plugin);
+
+                field.set(this, module);
+                addModule(((IPluginLifeCycleOperations) module));
             }
-
-            if (!IPluginLifeCycleOperations.class.isAssignableFrom(field.getType())) {
-                throw new IllegalStateException("Fields annotated with @" + APIModule.class.getName() + " must implement " + IPluginLifeCycleOperations.class.getName());
-            }
-
-            Constructor<?> constructor = field.getType().getConstructor(VarLightPlugin.class);
-            Object module = constructor.newInstance(plugin);
-
-            field.set(this, module);
-            addModule(((IPluginLifeCycleOperations) module));
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
+                 IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
 
         loadLightUpdateItem();
@@ -150,7 +149,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     @Override
     public @Nullable ICustomLightStorage getLightStorage(World world) {
-        world.requireNonNull("World may not be null");
+        Objects.requireNonNull(world, "World may not be null");
 
         ICustomLightStorage cls = persistenceManagers.get(world.getUID());
 
@@ -171,39 +170,42 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public int getCustomLuminance(@NonNull World world, @NonNull IntPosition position) {
+    public int getCustomLuminance(@NotNull World world, @NotNull IntPosition position) {
+        Objects.requireNonNull(world);
+        Objects.requireNonNull(position);
+
         return Optional.ofNullable(getLightStorage(world)).map(cls -> cls.getCustomLuminance(position)).orElse(0);
     }
 
     @Override
-    public boolean isVarLightEnabled(@NonNull World world) {
-        return getLightStorage(world) != null;
+    public boolean isVarLightEnabled(@NotNull World world) {
+        return getLightStorage(Objects.requireNonNull(world)) != null;
     }
 
     @Override
-    public @NotNull GlowItemStack createGlowItemStack(@NonNull ItemStack base, int lightLevel) {
-        return new GlowItemStack(plugin, base, lightLevel);
+    public @NotNull GlowItemStack createGlowItemStack(@NotNull ItemStack base, int lightLevel) {
+        return new GlowItemStack(plugin, Objects.requireNonNull(base), lightLevel);
     }
 
     @Override
-    public @Nullable GlowItemStack importGlowItemStack(@NonNull ItemStack glowingStack) {
+    public @Nullable GlowItemStack importGlowItemStack(@NotNull ItemStack glowingStack) {
         try {
-            return new GlowItemStack(plugin, glowingStack);
+            return new GlowItemStack(plugin, Objects.requireNonNull(glowingStack));
         } catch (IllegalArgumentException e) {
             return null;
         }
     }
 
     @NotNull
-    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NonNull World world, @NonNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
+    public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
         if (!Bukkit.isPrimaryThread()) {
             return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update, cause)).join();
         }
 
-        world.requireNonNull("World may not be null");
-        position.requireNonNull("Position may not be null");
+        Objects.requireNonNull(world, "World may not be null");
+        Objects.requireNonNull(position, "Position may not be null");
 
-        Block block = position.toBlock(world);
+        Block block = IntPositionUtil.toBlock(position, world);
 
         int fromLight = block.getLightFromBlocks();
 
@@ -259,43 +261,29 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     }
 
     @Override
-    public void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NonNull World world, @NonNull IntPosition position, int customLuminance) {
-        LightUpdateCause cause;
+    public void setCustomLuminance(@Nullable CommandSender source, LightUpdateCause.Type causeType, @NotNull World world, @NotNull IntPosition position, int customLuminance) {
+        Objects.requireNonNull(world);
+        Objects.requireNonNull(source);
 
-        switch (causeType) {
-            case PLAYER: {
-                cause = LightUpdateCause.player(source, LightUpdateCause.PlayerAction.UNSPECIFIED); // TODO expand this API
-                break;
-            }
+        final LightUpdateCause cause = switch (causeType) {
+            case PLAYER ->
+                    LightUpdateCause.player(source, LightUpdateCause.PlayerAction.UNSPECIFIED); // TODO expand this API
+            case COMMAND -> LightUpdateCause.command(source);
+            case API -> LightUpdateCause.api();
+        };
 
-            case COMMAND: {
-                cause = LightUpdateCause.command(source);
-            }
-
-            case API: {
-                cause = LightUpdateCause.api();
-            }
-
-            default: {
-                throw new IllegalStateException("Default block reached");
-            }
-        }
-
-        setCustomLuminance(world, position, customLuminance, true, cause).thenAccept(result -> {
-            if (source != null) {
-                result.displayMessage(source);
-            }
-        });
+        setCustomLuminance(world, position, customLuminance, true, cause) //
+                .thenAccept(result -> result.displayMessage(source));
     }
 
     @Override
-    public CompletableFuture<BulkTaskResult> runBulkClear(@NonNull World world, @NonNull CommandSender source, @NonNull IntPosition start, @NonNull IntPosition end) {
-        return new BulkClearTask(plugin, world, source, start, end).run();
+    public CompletableFuture<BulkTaskResult> runBulkClear(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end) {
+        return new BulkClearTask(plugin, Objects.requireNonNull(world), Objects.requireNonNull(source), Objects.requireNonNull(start), Objects.requireNonNull(end)).run();
     }
 
     @Override
     public CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Block> filter) {
-        return new BulkFillTask(plugin, world, source, start, end, lightLevel, filter).run();
+        return new BulkFillTask(plugin, Objects.requireNonNull(world), Objects.requireNonNull(source), Objects.requireNonNull(start), Objects.requireNonNull(end), lightLevel, filter).run();
     }
 
     @Override

@@ -1,13 +1,11 @@
 package me.shawlaf.varlight.spigot;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.glowingitems.GlowItemStack;
 import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import me.shawlaf.varlight.spigot.util.VarLightPermissions;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.ChatColor;
@@ -30,17 +28,16 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 
-@ExtensionMethod({
-        IntPositionExtension.class,
-        VarLightPermissions.class
-})
 public class VarLightEventHandlers implements Listener {
 
-    @Getter
     private final VarLightPlugin plugin;
 
     public VarLightEventHandlers(VarLightPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    public VarLightPlugin getPlugin() {
+        return plugin;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -59,7 +56,7 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        if (!e.getPlayer().hasVarLightDebugPermission()) {
+        if (!VarLightPermissions.hasVarLightDebugPermission(e.getPlayer())) {
             CommandResult.failure(plugin.getCommand(), e.getPlayer(), "You do not have permission to use the debug stick!");
             return;
         }
@@ -71,7 +68,7 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        IntPosition clickedBlock = e.getClickedBlock().toIntPosition();
+        IntPosition clickedBlock = IntPositionUtil.toIntPosition(e.getClickedBlock());
 
         int customLuminance = cls.getCustomLuminance(clickedBlock);
 
@@ -90,16 +87,17 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        if (e.useInteractedBlock() == Event.Result.DENY // Check for Spawn Protection
-                || (e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.LEFT_CLICK_BLOCK)) {
-            return;
-        }
-
-        if (!e.getPlayer().mayUseLui()) {
-            return;
-        }
-
         Block clicked = e.getClickedBlock();
+
+        if (e.useInteractedBlock() == Event.Result.DENY // Check for Spawn Protection
+                || clicked == null || (e.getAction() != Action.RIGHT_CLICK_BLOCK && e.getAction() != Action.LEFT_CLICK_BLOCK)) {
+            return;
+        }
+
+        if (!VarLightPermissions.mayUseLui(e.getPlayer())) {
+            return;
+        }
+
         Player player = e.getPlayer();
         ItemStack item = e.getItem();
         final boolean creative = player.getGameMode() == GameMode.CREATIVE;
@@ -109,16 +107,11 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        int mod = 0;
-
-        switch (e.getAction()) {
-            case RIGHT_CLICK_BLOCK:
-                mod = 1;
-                break;
-            case LEFT_CLICK_BLOCK:
-                mod = -1;
-                break;
-        }
+        int mod = switch (e.getAction()) {
+            case RIGHT_CLICK_BLOCK -> 1;
+            case LEFT_CLICK_BLOCK -> -1;
+            default -> 0;
+        };
 
         // Check if sufficient amount when not in creative
         if (!creative && mod > 0 && item.getAmount() < mod) {
@@ -135,7 +128,7 @@ public class VarLightEventHandlers implements Listener {
 
         plugin.getApi().setCustomLuminance(
                 clicked.getLocation(),
-                cls.getCustomLuminance(clicked.toIntPosition()) + mod,
+                cls.getCustomLuminance(IntPositionUtil.toIntPosition(clicked)) + mod,
                 true,
                 LightUpdateCause.player(player, LightUpdateCause.PlayerAction.LUI)
         ).thenAccept(result -> {
@@ -155,12 +148,12 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        if (!e.getPlayer().mayReclaimLui()) {
+        if (!VarLightPermissions.mayReclaimLui(e.getPlayer())) {
             return;
         }
 
         Block theBlock = e.getBlock();
-        IntPosition position = theBlock.toIntPosition();
+        IntPosition position = IntPositionUtil.toIntPosition(theBlock);
         World world = theBlock.getWorld();
 
         ICustomLightStorage cls;
@@ -178,7 +171,7 @@ public class VarLightEventHandlers implements Listener {
         // Can't break blocks using off-hand
         ItemStack heldItem = e.getPlayer().getInventory().getItemInMainHand();
 
-        int fortuneLevel = heldItem.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+        int fortuneLevel = heldItem.getEnchantmentLevel(Enchantment.FORTUNE);
         boolean silkTouch = heldItem.getEnchantmentLevel(Enchantment.SILK_TOUCH) != 0;
 
         Collection<ItemStack> vanillaDrops = theBlock.getDrops(heldItem);
@@ -220,7 +213,7 @@ public class VarLightEventHandlers implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void playerPlaceLightSource(BlockPlaceEvent e) {
-        if (!e.getPlayer().mayReclaimLui() || !e.canBuild()) {
+        if (!VarLightPermissions.mayReclaimLui(e.getPlayer()) || !e.canBuild()) {
             return;
         }
 
@@ -275,7 +268,7 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        IntPosition position = e.getBlock().toIntPosition();
+        IntPosition position = IntPositionUtil.toIntPosition(e.getBlock());
         int luminance = cls.getCustomLuminance(position);
 
         if (luminance > 0) {

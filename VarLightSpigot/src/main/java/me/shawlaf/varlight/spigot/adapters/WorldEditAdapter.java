@@ -39,8 +39,8 @@ public class WorldEditAdapter {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
-        Location a = new Location(player.getWorld(), min.getX(), min.getY(), min.getZ());
-        Location b = new Location(player.getWorld(), max.getX(), max.getY(), max.getZ());
+        Location a = new Location(player.getWorld(), min.x(), min.y(), min.z());
+        Location b = new Location(player.getWorld(), max.x(), max.y(), max.z());
 
         return new Location[]{a, b};
     }

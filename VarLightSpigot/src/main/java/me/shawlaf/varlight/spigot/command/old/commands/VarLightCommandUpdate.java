@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
@@ -12,7 +11,7 @@ import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -25,9 +24,6 @@ import static me.shawlaf.command.result.CommandResult.successBroadcast;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
-@ExtensionMethod({
-        IntPositionExtension.class
-})
 public class VarLightCommandUpdate extends VarLightSubCommand {
 
     private static final RequiredArgumentBuilder<CommandSender, ICoordinates> ARG_POSITION = positionArgument("position");
@@ -54,9 +50,9 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
     public LiteralArgumentBuilder<CommandSender> build(LiteralArgumentBuilder<CommandSender> node) {
 
         node.then(ARG_POSITION.then(
-                ARG_LIGHT_LEVEL
-                        .executes(this::updateImplicit)
-                        .then(ARG_WORLD.executes(this::updateExplicit))
+                        ARG_LIGHT_LEVEL
+                                .executes(this::updateImplicit)
+                                .then(ARG_WORLD.executes(this::updateExplicit))
                 )
         );
 
@@ -99,7 +95,7 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
             return FAILURE;
         }
 
-        int fromLight = cls.getCustomLuminance(location.toIntPosition());
+        int fromLight = cls.getCustomLuminance(IntPositionUtil.toIntPosition(location));
 
         if (!world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) {
             failure(this, source, "The target chunk is not loaded!");

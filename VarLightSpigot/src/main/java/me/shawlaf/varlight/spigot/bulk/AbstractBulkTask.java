@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.bulk;
 
-import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.bulk.exception.BulkTaskTooLargeException;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
@@ -21,18 +20,24 @@ public abstract class AbstractBulkTask {
     protected final VarLightPlugin plugin;
 
     @NotNull
-    @Getter
     protected final World world;
     @NotNull
-    @Getter
     protected final CommandSender source;
 
     protected List<CommandSender> progressSubscribers;
 
     public AbstractBulkTask(@NotNull VarLightPlugin plugin, @NotNull World world, @NotNull CommandSender source) {
-        Objects.requireNonNull(this.plugin = plugin);
-        Objects.requireNonNull(this.world = world);
-        Objects.requireNonNull(this.source = source);
+        this.plugin = Objects.requireNonNull(plugin);
+        this.world = Objects.requireNonNull(world);
+        this.source = Objects.requireNonNull(source);
+    }
+
+    public @NotNull World getWorld() {
+        return world;
+    }
+
+    public @NotNull CommandSender getSource() {
+        return source;
     }
 
     public void subscribeProgress(CommandSender subscriber) {
@@ -51,11 +56,11 @@ public abstract class AbstractBulkTask {
 
     protected abstract CompletableFuture<BulkTaskResult> doRun();
 
-    protected void checkSizeRestrictions(Set<ChunkCoords> affectedChunks) throws BulkTaskTooLargeException {
+    protected void checkSizeRestrictions(long affectedChunksCount) throws BulkTaskTooLargeException {
         final int limit = plugin.getVarLightConfig().getBulkChunkUpdateLimit();
 
-        if (affectedChunks.size() > limit) {
-            throw new BulkTaskTooLargeException(limit, affectedChunks.size());
+        if (affectedChunksCount > limit) {
+            throw new BulkTaskTooLargeException(limit, affectedChunksCount);
         }
     }
 

@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.stepsize;
 
-import lombok.SneakyThrows;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
@@ -11,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class StepsizeHandler implements IPluginLifeCycleOperations {
@@ -36,7 +36,7 @@ public class StepsizeHandler implements IPluginLifeCycleOperations {
     public void onEnable() {
         this.saveTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (hasChanges) {
-                save();
+                saveConfiguration();
                 hasChanges = false;
             }
         }, Ticks.calculate(5, TimeUnit.MINUTES), Ticks.calculate(5, TimeUnit.MINUTES));
@@ -45,12 +45,15 @@ public class StepsizeHandler implements IPluginLifeCycleOperations {
     @Override
     public void onDisable() {
         saveTask.cancel();
-        save();
+        saveConfiguration();
     }
 
-    @SneakyThrows
-    public void save() {
-        stepSizeYamlConfiguration.save(this.stepSizeYamlConfigFile);
+    private void saveConfiguration() {
+        try {
+            stepSizeYamlConfiguration.save(this.stepSizeYamlConfigFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int getStepSize(Player player) {

@@ -1,7 +1,5 @@
 package me.shawlaf.varlight.spigot.event;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.block.Block;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -13,11 +11,8 @@ public class CustomLuminanceUpdateEvent extends BlockEvent implements Cancellabl
     public static final HandlerList handlers = new HandlerList();
 
     private boolean cancelled = false;
-    @Getter
     private final int fromLight;
-    @Getter @Setter
     private int toLight;
-    @Getter
     private LightUpdateCause cause;
 
     public CustomLuminanceUpdateEvent(@NotNull Block theBlock, int fromLight, int toLight, LightUpdateCause cause) {
@@ -25,6 +20,22 @@ public class CustomLuminanceUpdateEvent extends BlockEvent implements Cancellabl
         this.fromLight = fromLight;
         this.toLight = toLight;
         this.cause = cause;
+    }
+
+    public int getFromLight() {
+        return fromLight;
+    }
+
+    public int getToLight() {
+        return toLight;
+    }
+
+    public void setToLight(int toLight) {
+        this.toLight = toLight;
+    }
+
+    public LightUpdateCause getCause() {
+        return cause;
     }
 
     @Override

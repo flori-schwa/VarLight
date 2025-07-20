@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.prompt;
 
-import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -18,14 +17,12 @@ public class Prompt {
 
     private static final AtomicInteger ID = new AtomicInteger(0);
 
-    @Getter
     private final int id;
 
     private boolean timeout = false;
     private boolean completed = false;
     private boolean cancelled = false;
 
-    @Getter
     private final @NotNull VarLightPlugin plugin;
 
     private final @NotNull BaseComponent[] bungeeMessage;
@@ -47,17 +44,21 @@ public class Prompt {
         this.onConfirm = onConfirm;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void startWithTimeout(CommandSender source, Ticks timeoutTicks) {
         synchronized (this) {
             source.spigot().sendMessage(bungeeMessage);
 
             this.timeoutTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-               synchronized (Prompt.this) {
-                   if (!completed && !cancelled) {
-                       this.timeout = true;
-                       source.sendMessage(ChatColor.RED + "Your Chat prompt has timed out.");
-                   }
-               }
+                synchronized (Prompt.this) {
+                    if (!completed && !cancelled) {
+                        this.timeout = true;
+                        source.sendMessage(ChatColor.RED + "Your Chat prompt has timed out.");
+                    }
+                }
             }, timeoutTicks.ticks);
         }
     }

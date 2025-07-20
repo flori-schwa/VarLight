@@ -7,7 +7,6 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.Flags;
-import lombok.Getter;
 import me.shawlaf.varlight.spigot.event.CustomLuminanceUpdateEvent;
 import me.shawlaf.varlight.spigot.event.LightUpdateCause;
 import me.shawlaf.varlight.spigot.util.collections.EntityToObjectMap;
@@ -60,7 +59,7 @@ public class WorldGuardAdapter implements Listener {
                 message = worldGuard.getPlatform().getMatcher().replaceMacros(cachedPlayer.getWorldGuardPlayer(), message);
                 message = CommandUtils.replaceColorMacros(message);
 
-                cachedPlayer.getWorldGuardPlayer().printRaw(message);
+                playerCause.sendMessage(message);
             }
         }
     }
@@ -86,7 +85,6 @@ public class WorldGuardAdapter implements Listener {
         }
 
         private final Player player;
-        @Getter
         private final LocalPlayer worldGuardPlayer;
         private final boolean shallRemove;
 
@@ -102,6 +100,10 @@ public class WorldGuardAdapter implements Listener {
             }
 
             this.worldGuardPlayer = getWorldGuardPlayer(this.player);
+        }
+
+        public LocalPlayer getWorldGuardPlayer() {
+            return worldGuardPlayer;
         }
 
         @Override

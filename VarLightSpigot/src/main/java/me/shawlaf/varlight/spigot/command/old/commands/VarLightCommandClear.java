@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.adapters.WorldEditAdapter;
 import me.shawlaf.varlight.spigot.async.Ticks;
@@ -13,7 +12,7 @@ import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
 import net.md_5.bungee.api.ChatColor;
@@ -32,9 +31,6 @@ import java.util.function.Predicate;
 import static me.shawlaf.command.result.CommandResult.info;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
-@ExtensionMethod({
-        IntPositionExtension.class
-})
 public class VarLightCommandClear extends VarLightSubCommand implements IPlayerSelection {
 
     public static final String ARG_NAME_POS1 = "position 1";
@@ -97,7 +93,7 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
 
     private int startPrompt(LivingEntity source, Location[] selection) {
         World world = source.getWorld();
-        RegionIterator targetArea = new RegionIterator(selection[0].toIntPosition(), selection[1].toIntPosition());
+        RegionIterator targetArea = new RegionIterator(IntPositionUtil.toIntPosition(selection[0]), IntPositionUtil.toIntPosition(selection[1]));
 
         plugin.getApi().getChatPromptManager().runPrompt(
                 source,
@@ -118,8 +114,8 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
             return;
         }
 
-        IntPosition a = selection[0].toIntPosition();
-        IntPosition b = selection[1].toIntPosition();
+        IntPosition a = IntPositionUtil.toIntPosition(selection[0]);
+        IntPosition b = IntPositionUtil.toIntPosition(selection[1]);
 
         info(this, source, "Clearing Custom Light data in selection...");
 

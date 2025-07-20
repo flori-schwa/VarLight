@@ -1,13 +1,11 @@
 package me.shawlaf.varlight.spigot.persistence;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.persistence.LightPersistFailedException;
 import me.shawlaf.varlight.persistence.nls.NLSFile;
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import me.shawlaf.varlight.util.pos.ChunkCoords;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionCoords;
@@ -22,14 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-@ExtensionMethod({
-        IntPositionExtension.class
-})
 public class CustomLightStorageNLS implements ICustomLightStorage {
 
-    @Getter
     private final World forBukkitWorld;
-    @Getter
     private final VarLightPlugin plugin;
 
     private final Map<RegionCoords, NLSFile> worldMap = new HashMap<>();
@@ -40,6 +33,11 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
 
         plugin.getNmsAdapter().getVarLightSaveDirectory(forBukkitWorld);
         plugin.getLightDatabaseMigrator().runMigrations(forBukkitWorld);
+    }
+
+    @Override
+    public World getForBukkitWorld() {
+        return forBukkitWorld;
     }
 
     @Override
@@ -105,7 +103,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
 
     @Override
     public int setCustomLuminance(Location location, int luminance) throws PositionOutOfBoundsException {
-        return setCustomLuminance(location.toIntPosition(), luminance);
+        return setCustomLuminance(IntPositionUtil.toIntPosition(location), luminance);
     }
 
     @Override
@@ -141,7 +139,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
 
                 List<ChunkCoords> affected = nlsFile.getAffectedChunks();
 
-                if (affected.size() == 0) {
+                if (affected.isEmpty()) {
                     if (nlsFile.file.exists()) {
                         if (!nlsFile.file.delete()) {
                             throw new LightPersistFailedException("Could not delete file " + nlsFile.file.getAbsolutePath());

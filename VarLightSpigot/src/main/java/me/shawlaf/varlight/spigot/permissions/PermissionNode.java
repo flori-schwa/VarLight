@@ -1,7 +1,5 @@
 package me.shawlaf.varlight.spigot.permissions;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
@@ -15,18 +13,16 @@ import java.util.Objects;
 
 public class PermissionNode {
 
-    @Getter @Nullable
+    @Nullable
     private final PermissionNode parent;
-    @Getter @NotNull
+    @NotNull
     private final String name, fullName;
 
-    @Nullable @Getter @Setter
+    @Nullable
     private String description;
 
-    @NotNull @Getter @Setter
+    @NotNull
     private PermissionDefault permissionDefault = PermissionDefault.OP;
-
-    @Getter @Setter
     private boolean inherited = true;
 
     private final HashMap<String, PermissionNode> children = new HashMap<>();
@@ -57,6 +53,40 @@ public class PermissionNode {
 
     public PermissionNode(@Nullable PermissionNode parent, @NotNull String name, @Nullable String description) {
         this(parent, name, description, PermissionDefault.OP);
+    }
+
+    @Nullable
+    public PermissionNode getParent() {
+        return parent;
+    }
+
+    public @NotNull String getFullName() {
+        return fullName;
+    }
+
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(@Nullable String description) {
+        this.description = description;
+    }
+
+    public @NotNull PermissionDefault getPermissionDefault() {
+        return permissionDefault;
+    }
+
+    public void setPermissionDefault(@NotNull PermissionDefault permissionDefault) {
+        this.permissionDefault = permissionDefault;
+    }
+
+    public boolean isInherited() {
+        return inherited;
+    }
+
+    public void setInherited(boolean inherited) {
+        this.inherited = inherited;
     }
 
     public void register() {

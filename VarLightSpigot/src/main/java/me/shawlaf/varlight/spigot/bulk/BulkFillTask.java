@@ -1,7 +1,5 @@
 package me.shawlaf.varlight.spigot.bulk;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResultFailure;
 import me.shawlaf.command.result.CommandResultSuccessBroadcast;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
@@ -11,8 +9,7 @@ import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.spigot.progressbar.ProgressBar;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
 import org.bukkit.World;
@@ -27,33 +24,25 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-@ExtensionMethod({
-        IntPositionExtension.class
-})
 public class BulkFillTask extends AbstractBulkTask {
 
     private static final int PROGRESS_BAR_THRESHOLD = 100_000;
 
     @NotNull
-    @Getter
     private final IntPosition start;
     @NotNull
-    @Getter
     private final IntPosition end;
+    private final int lightLevel;
 
-    @Getter
     private int totalBlocks;
-
-    @Getter
-    private int lightLevel;
 
     @NotNull
     private final Predicate<Block> filter;
 
-    private Set<IntPosition> illegalBlocks = new HashSet<>();
-    private Set<IntPosition> skippedBlocks = new HashSet<>();
-    private Set<IntPosition> failedBlocks = new HashSet<>();
-    private Set<IntPosition> updatedBlocks = new HashSet<>();
+    private final Set<IntPosition> illegalBlocks = new HashSet<>();
+    private final Set<IntPosition> skippedBlocks = new HashSet<>();
+    private final Set<IntPosition> failedBlocks = new HashSet<>();
+    private final Set<IntPosition> updatedBlocks = new HashSet<>();
 
     public BulkFillTask(@NotNull VarLightPlugin plugin, @NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Block> filter) {
         super(plugin, world, source);
@@ -63,6 +52,22 @@ public class BulkFillTask extends AbstractBulkTask {
 
         this.lightLevel = lightLevel;
         this.filter = filter == null ? x -> true : filter;
+    }
+
+    public @NotNull IntPosition getStart() {
+        return start;
+    }
+
+    public @NotNull IntPosition getEnd() {
+        return end;
+    }
+
+    public int getTotalBlocks() {
+        return totalBlocks;
+    }
+
+    public int getLightLevel() {
+        return lightLevel;
     }
 
     @Override
@@ -80,17 +85,15 @@ public class BulkFillTask extends AbstractBulkTask {
 
         RegionIterator regionIterator = new RegionIterator(this.start, this.end);
 
-        Set<ChunkCoords> affectedChunks = regionIterator.getAllContainingChunks();
-
         try {
-            checkSizeRestrictions(affectedChunks);
+            checkSizeRestrictions(regionIterator.getAffectedChunksCount());
         } catch (BulkTaskTooLargeException e) {
             return CompletableFuture.completedFuture(
                     new BulkTaskResult(this,
                             BulkTaskResult.Type.TOO_LARGE,
                             new CommandResultFailure(
                                     plugin.getCommand(),
-                                    String.format("The fill command may only affect a maximum of %d chunks, you are trying to manipulate an area affecting %d chunks.", e.getChunkLimit(), e.getNChunksTryingToModify())
+                                    String.format("The fill command may only affect a maximum of %d chunks, you are trying to manipulate an area affecting %d chunks.", e.getChunkLimit(), e.getAmountOfChunksTryingToModify())
                             )
                     )
             );
@@ -103,14 +106,14 @@ public class BulkFillTask extends AbstractBulkTask {
         return plugin.getApi().getAsyncExecutor().submit(() -> {
             try {
                 plugin.getApi().getSyncExecutor().submit(() -> {
-                    try (ProgressBar progressBar = useProgressBar ? new ProgressBar(plugin, "VarLight fill | Iterating Blocks", regionIterator.getSize()) : ProgressBar.VOID) {
+                    try (ProgressBar progressBar = useProgressBar ? new ProgressBar(plugin, "VarLight fill | Iterating Blocks", regionIterator.getSize()) : ProgressBar.NULL_PROGRESS_BAR) {
                         progressBar.subscribeAll(this.progressSubscribers);
 
                         IntPosition next;
 
                         while (regionIterator.hasNext()) {
                             next = regionIterator.next();
-                            Block block = next.toBlock(this.world);
+                            Block block = IntPositionUtil.toBlock(next, this.world);
                             ++totalBlocks;
                             progressBar.step();
 

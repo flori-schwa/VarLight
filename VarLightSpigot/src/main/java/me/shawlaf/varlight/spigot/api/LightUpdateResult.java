@@ -1,7 +1,5 @@
 package me.shawlaf.varlight.spigot.api;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -13,15 +11,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-@ExtensionMethod({
-        Objects.class
-})
 public class LightUpdateResult {
 
     @NotNull
-    @Getter
     private final LightUpdateResultType resultType;
-    @Getter
     private final int fromLight, toLight;
     @Nullable
     private final World world;
@@ -47,14 +40,26 @@ public class LightUpdateResult {
     }
 
     public static LightUpdateResult notActive(int fromLight, int toLight, @NotNull World world) {
-        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, world.requireNonNull("Must provide a World for NOT_ACTIVE Result"));
+        return new LightUpdateResult(LightUpdateResultType.NOT_ACTIVE, fromLight, toLight, Objects.requireNonNull(world, "Must provide a World for NOT_ACTIVE Result"));
     }
 
     private LightUpdateResult(@NotNull LightUpdateResultType resultType, int fromLight, int toLight, @Nullable World world) {
-        this.resultType = resultType.requireNonNull("resultType may not be null");
+        this.resultType = Objects.requireNonNull(resultType, "resultType may not be null");
         this.fromLight = fromLight;
         this.toLight = toLight;
         this.world = world;
+    }
+
+    public @NotNull LightUpdateResultType getResultType() {
+        return resultType;
+    }
+
+    public int getFromLight() {
+        return fromLight;
+    }
+
+    public int getToLight() {
+        return toLight;
     }
 
     public boolean isSuccess() {
@@ -81,16 +86,14 @@ public class LightUpdateResult {
     }
 
     public void displayMessage(@NotNull CommandSender sender) {
-        sender.requireNonNull();
-
         String message = getMessage();
 
         if (message == null) {
             return;
         }
 
-        if (sender instanceof Player) {
-            ((Player) sender).spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+        if (sender instanceof Player player) {
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
         } else {
             sender.sendMessage(message);
         }

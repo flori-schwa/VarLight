@@ -1,22 +1,20 @@
 package me.shawlaf.varlight.spigot.permissions.tree;
 
-import lombok.experimental.UtilityClass;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import org.bukkit.permissions.PermissionDefault;
 
-@UtilityClass
-public class VarLightPermissionTree {
+public final class VarLightPermissionTree {
 
     // region Intermediary Permission Nodes
 
-    private final PermissionNode ROOT = new PermissionNode(
+    private static final PermissionNode ROOT = new PermissionNode(
             null,
             "varlight",
             "VarLight root Permission Node",
             PermissionDefault.FALSE
     );
 
-    private final PermissionNode ADMIN_ROOT = new PermissionNode(
+    private static final PermissionNode ADMIN_ROOT = new PermissionNode(
             ROOT,
             "admin",
             "Provides access to all VarLight Administrative Features",
@@ -24,7 +22,7 @@ public class VarLightPermissionTree {
             false
     );
 
-    private final PermissionNode PLAYER_ROOT = new PermissionNode(
+    private static final PermissionNode PLAYER_ROOT = new PermissionNode(
             ROOT,
             "player",
             "Provides access to all non-administrative Features of VarLight",
@@ -34,63 +32,63 @@ public class VarLightPermissionTree {
 
     // endregion
 
-    public final PermissionNode CONFIG = new PermissionNode(
+    public static final PermissionNode CONFIG = new PermissionNode(
             ADMIN_ROOT,
             "config",
             "Provides access to all VarLight Configuration Options"
     );
 
-    public final PermissionNode SAVE = new PermissionNode(
+    public static final PermissionNode SAVE = new PermissionNode(
             ADMIN_ROOT,
             "save",
             "Provides access to all VarLight Save Options"
     );
 
-    public final PermissionNode DEBUG = new PermissionNode(
+    public static final PermissionNode DEBUG = new PermissionNode(
             ADMIN_ROOT,
             "debug",
             "Provides access to all VarLight Debug Features"
     );
 
-    public final PermissionNode MODIFY = new PermissionNode(
+    public static final PermissionNode MODIFY = new PermissionNode(
             ADMIN_ROOT,
             "modify",
             "Provides access to all VarLight Commands to modify Light sources"
     );
 
-    public final PermissionNode MODIFY_SINGLE = new PermissionNode(
+    public static final PermissionNode MODIFY_SINGLE = new PermissionNode(
             MODIFY,
             "single",
             "Provides access to the /varlight update command"
     );
 
-    public final PermissionNode GIVE = new PermissionNode(
+    public static final PermissionNode GIVE = new PermissionNode(
             ADMIN_ROOT,
             "give",
             "Provides access to /varlight give"
     );
 
-    public final PermissionNode STEP_SIZE = new PermissionNode(
+    public static final PermissionNode STEP_SIZE = new PermissionNode(
             PLAYER_ROOT,
             "stepsize",
             "Provides access to /varlight stepsize"
     );
 
-    public final PermissionNode USE = new PermissionNode(
+    public static final PermissionNode USE = new PermissionNode(
             PLAYER_ROOT,
             "use",
             "Allows usage of VarLight Gameplay features (LUI / Reclaim)",
             PermissionDefault.TRUE
     );
 
-    public final PermissionNode USE_ITEM = new PermissionNode(
+    public static final PermissionNode USE_ITEM = new PermissionNode(
             USE,
             "item",
             "Allows usage of the VarLight Light Update Item (LUI)",
             PermissionDefault.TRUE
     );
 
-    public final PermissionNode USE_RECLAIM = new PermissionNode(
+    public static final PermissionNode USE_RECLAIM = new PermissionNode(
             USE,
             "reclaim",
             "Allows players to retrieve Glowstone Dust / Glowing Variants of Blocks when breaking Custom Light sources",
@@ -98,8 +96,12 @@ public class VarLightPermissionTree {
     );
 
 
-    public void init() {
+    public static void init() {
         ROOT.register();
+    }
+
+    private VarLightPermissionTree() {
+
     }
 
 }

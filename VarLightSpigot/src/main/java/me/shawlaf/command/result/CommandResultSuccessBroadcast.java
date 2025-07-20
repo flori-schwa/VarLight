@@ -1,9 +1,8 @@
 package me.shawlaf.command.result;
 
-import lombok.experimental.ExtensionMethod;
+
 import me.shawlaf.command.ICommandAccess;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
-import me.shawlaf.varlight.util.StreamUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -12,9 +11,6 @@ import org.bukkit.command.ConsoleCommandSender;
 /**
  * Will broadcast the result of the command execution to everyone who has the required permission node
  */
-@ExtensionMethod({
-        StreamUtil.class
-})
 public class CommandResultSuccessBroadcast extends CommandResult {
 
     private final String message;
@@ -40,7 +36,8 @@ public class CommandResultSuccessBroadcast extends CommandResult {
         Bukkit.getPluginManager()
                 .getPermissionSubscriptions(node == null ? "" : node.getFullName()).stream()
                 .filter(p -> p != sender && p instanceof CommandSender)
-                .ofType(CommandSender.class).forEach(recipient -> {
+                .map(CommandSender.class::cast)
+                .forEach(recipient -> {
                     if (recipient instanceof ConsoleCommandSender) {
                         recipient.sendMessage(msg);
                     } else {

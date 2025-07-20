@@ -1,7 +1,5 @@
 package me.shawlaf.varlight.spigot.bulk;
 
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResultFailure;
 import me.shawlaf.command.result.CommandResultSuccessBroadcast;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
@@ -20,21 +18,14 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@ExtensionMethod({
-        IteratorUtils.class
-})
 public class BulkClearTask extends AbstractBulkTask {
 
     private static final int PROGRESS_BAR_THRESHOLD = 100_000;
 
     @NotNull
-    @Getter
     private final IntPosition start;
     @NotNull
-    @Getter
     private final IntPosition end;
-
-    @Getter
     private Set<IntPosition> clearedLightSources;
 
     public BulkClearTask(@NotNull VarLightPlugin plugin, @NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end) {
@@ -42,6 +33,18 @@ public class BulkClearTask extends AbstractBulkTask {
 
         this.start = start;
         this.end = end;
+    }
+
+    public @NotNull IntPosition getStart() {
+        return start;
+    }
+
+    public @NotNull IntPosition getEnd() {
+        return end;
+    }
+
+    public Set<IntPosition> getClearedLightSources() {
+        return clearedLightSources;
     }
 
     @Override
@@ -52,17 +55,17 @@ public class BulkClearTask extends AbstractBulkTask {
     @Override
     public CompletableFuture<BulkTaskResult> doRun() {
         RegionIterator iterator = new RegionIterator(this.start, this.end);
-        Set<ChunkCoords> affectedChunks = iterator.iterateChunks().collectFromIterator(Collectors.toSet());
+        Set<ChunkCoords> affectedChunks = IteratorUtils.collectFromIterator(iterator.iterateChunks(), Collectors.toSet());
 
         try {
-            checkSizeRestrictions(affectedChunks);
+            checkSizeRestrictions(iterator.getAffectedChunksCount());
         } catch (BulkTaskTooLargeException e) {
             return CompletableFuture.completedFuture(
                     new BulkTaskResult(this,
                             BulkTaskResult.Type.TOO_LARGE,
                             new CommandResultFailure(
                                     plugin.getCommand(),
-                                    String.format("The clear command may only affect a maximum of %d chunks, you are trying to manipulate an area affecting %d chunks.", e.getChunkLimit(), e.getNChunksTryingToModify())
+                                    String.format("The clear command may only affect a maximum of %d chunks, you are trying to manipulate an area affecting %d chunks.", e.getChunkLimit(), e.getAmountOfChunksTryingToModify())
                             )
                     )
             );

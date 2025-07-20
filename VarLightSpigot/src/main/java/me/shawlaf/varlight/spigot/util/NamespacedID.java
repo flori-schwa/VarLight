@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.util;
 
-import lombok.Getter;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,12 +10,12 @@ import static java.util.Objects.requireNonNull;
 
 public class NamespacedID {
 
-    private static final Pattern NAMESPACE_PATTERN = Pattern.compile("[0-9a-z_\\-\\.]+");
-    private static final Pattern NAME_PATTERN = Pattern.compile("[0-9a-z_/\\-\\.]+");
+    private static final Pattern NAMESPACE_PATTERN = Pattern.compile("[0-9a-z_\\-.]+");
+    private static final Pattern NAME_PATTERN = Pattern.compile("[0-9a-z_/\\-.]+");
 
-    @NotNull @Getter
+    @NotNull
     private final String namespace;
-    @NotNull @Getter
+    @NotNull
     private final String name;
 
     private static boolean isLegalNamespace(String namespace) {
@@ -75,6 +74,14 @@ public class NamespacedID {
         if (!isLegalName(name)) {
             throw new IllegalArgumentException(String.format("%s is an illegal Name", name));
         }
+    }
+
+    public @NotNull String getNamespace() {
+        return namespace;
+    }
+
+    public @NotNull String getName() {
+        return name;
     }
 
     @SuppressWarnings("Deprecation")

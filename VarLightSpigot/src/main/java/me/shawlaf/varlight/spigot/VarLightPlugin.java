@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot;
 
-import lombok.Getter;
 import me.shawlaf.varlight.persistence.migrate.LightDatabaseMigrator;
 import me.shawlaf.varlight.spigot.api.IVarLightAPI;
 import me.shawlaf.varlight.spigot.api.VarLightAPIImpl;
@@ -25,23 +24,17 @@ import java.io.File;
 public class VarLightPlugin extends JavaPlugin {
 
     private VarLightAPIImpl api;
-    @Getter
     private IMinecraftLightUpdater lightUpdater;
-    @Getter
     private INmsMethods nmsAdapter;
-    @Getter
     private VarLightConfig varLightConfig;
-    @Getter
     private VarLightCommand command;
-    @Getter
     private LightDatabaseMigrator<World> lightDatabaseMigrator;
 
     private boolean doLoad = true;
 
     {
         try {
-            this.lightUpdater = new me.shawlaf.varlight.spigot.nms.v1_16_R3.LightUpdater(this);
-            this.nmsAdapter = new me.shawlaf.varlight.spigot.nms.v1_16_R3.NmsAdapter(this);
+            startUpError("NMS not yet supported for 1.21.8");
         } catch (Throwable e) {
             String packageVersion = Bukkit.getServer().getClass().getPackage().getName();
             packageVersion = packageVersion.substring(packageVersion.lastIndexOf('.') + 1);
@@ -122,6 +115,26 @@ public class VarLightPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         this.api.onDisable();
+    }
+
+    public IMinecraftLightUpdater getLightUpdater() {
+        return lightUpdater;
+    }
+
+    public INmsMethods getNmsAdapter() {
+        return nmsAdapter;
+    }
+
+    public VarLightConfig getVarLightConfig() {
+        return varLightConfig;
+    }
+
+    public VarLightCommand getCommand() {
+        return command;
+    }
+
+    public LightDatabaseMigrator<World> getLightDatabaseMigrator() {
+        return lightDatabaseMigrator;
     }
 
     public IVarLightAPI getApi() {

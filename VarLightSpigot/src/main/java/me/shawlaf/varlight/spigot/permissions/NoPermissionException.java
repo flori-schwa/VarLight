@@ -1,13 +1,10 @@
 package me.shawlaf.varlight.spigot.permissions;
 
-import lombok.Getter;
 import org.bukkit.permissions.Permissible;
 
 public class NoPermissionException extends Exception {
 
-    @Getter
     private final Permissible permissible;
-    @Getter
     private final PermissionNode node;
 
     public NoPermissionException(Permissible permissible, PermissionNode node) {
@@ -15,5 +12,13 @@ public class NoPermissionException extends Exception {
 
         this.permissible = permissible;
         this.node = node;
+    }
+
+    public Permissible getPermissible() {
+        return permissible;
+    }
+
+    public PermissionNode getNode() {
+        return node;
     }
 }

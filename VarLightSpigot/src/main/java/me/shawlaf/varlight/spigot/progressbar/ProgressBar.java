@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.progressbar;
 
-import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.util.StringUtil;
@@ -24,7 +23,7 @@ public class ProgressBar implements AutoCloseable {
 
     private static final AtomicInteger ID_TICKER = new AtomicInteger(0);
 
-    public static final ProgressBar VOID = new ProgressBar(null, "", 1) {
+    public static final ProgressBar NULL_PROGRESS_BAR = new ProgressBar(null, "", 1) {
 
         @Override
         public void subscribeAll(Collection<CommandSender> subscribers) {
@@ -59,13 +58,9 @@ public class ProgressBar implements AutoCloseable {
 
 
     private final VarLightPlugin plugin;
-    @Getter
     private final int id;
-    @Getter
     private final String name;
-    @Getter
     private final long totalUnits;
-    @Getter
     private long completedUnits = 0;
 
     private BukkitTask keepOnScreenTask = null;
@@ -186,7 +181,7 @@ public class ProgressBar implements AutoCloseable {
             keepOnScreenTask = null;
         }
 
-        if (subscribers.size() == 0) {
+        if (subscribers.isEmpty()) {
             return;
         }
 

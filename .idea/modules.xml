@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/commons-varlight/VarLightCommons.iml" filepath="$PROJECT_DIR$/commons-varlight/VarLightCommons.iml" />
       <module fileurl="file://$PROJECT_DIR$/VarLightCore/VarLightCore.iml" filepath="$PROJECT_DIR$/VarLightCore/VarLightCore.iml" />
       <module fileurl="file://$PROJECT_DIR$/VarLightSpigot/VarLightSpigot.iml" filepath="$PROJECT_DIR$/VarLightSpigot/VarLightSpigot.iml" />
-      <module fileurl="file://$PROJECT_DIR$/varlight.iml" filepath="$PROJECT_DIR$/varlight.iml" />
     </modules>
   </component>
 </project>

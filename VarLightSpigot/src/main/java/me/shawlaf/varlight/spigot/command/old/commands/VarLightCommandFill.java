@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.brigadier.datatypes.ICoordinates;
 import me.shawlaf.varlight.spigot.adapters.WorldEditAdapter;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
@@ -13,7 +12,7 @@ import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgume
 import me.shawlaf.varlight.spigot.command.old.util.IPlayerSelection;
 import me.shawlaf.varlight.spigot.permissions.PermissionNode;
 import me.shawlaf.varlight.spigot.permissions.tree.VarLightPermissionTree;
-import me.shawlaf.varlight.spigot.util.IntPositionExtension;
+import me.shawlaf.varlight.spigot.util.IntPositionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,10 +29,7 @@ import static me.shawlaf.command.result.CommandResult.failure;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
-@SuppressWarnings("DuplicatedCode")
-@ExtensionMethod({
-        IntPositionExtension.class
-})
+
 public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSelection {
 
     public static final String ARG_NAME_POS1 = "position 1";
@@ -187,7 +183,7 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
     private int fill(Player source, Location pos1, Location pos2, int lightLevel, Predicate<Block> filter) {
         plugin.getApi().getAsyncExecutor().submit(
                 () -> {
-                    plugin.getApi().runBulkFill(source.getWorld(), source, pos1.toIntPosition(), pos2.toIntPosition(), lightLevel, filter).join().finish(source);
+                    plugin.getApi().runBulkFill(source.getWorld(), source, IntPositionUtil.toIntPosition(pos1), IntPositionUtil.toIntPosition(pos2), lightLevel, filter).join().finish(source);
                 }
         );
 

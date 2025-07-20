@@ -3,7 +3,6 @@ package me.shawlaf.varlight.spigot.command.old.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import lombok.experimental.ExtensionMethod;
 import me.shawlaf.command.result.CommandResult;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
@@ -34,10 +33,7 @@ import static me.shawlaf.command.result.CommandResult.success;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.FAILURE;
 import static me.shawlaf.varlight.spigot.command.old.VarLightCommand.SUCCESS;
 
-@SuppressWarnings("DuplicatedCode")
-@ExtensionMethod({
-        CollectionUtil.class
-})
+
 public class VarLightCommandDebug extends VarLightSubCommand {
 
     private static final int PAGE_SIZE = 10;
@@ -196,7 +192,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
 
         RegionCoords regionCoords = new RegionCoords(regionX, regionZ);
 
-        CountingIterator<IntPosition> all = cls.iterateAllLightSources(regionCoords.getRegionStart(), regionCoords.getRegionEnd()).count();
+        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(regionCoords.getRegionStart(), regionCoords.getRegionEnd()));
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
@@ -223,7 +219,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
 
         ChunkCoords chunkCoords = new ChunkCoords(chunkX, chunkZ);
 
-        CountingIterator<IntPosition> all = cls.iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd()).count();
+        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd()));
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);

@@ -1,6 +1,5 @@
 package me.shawlaf.varlight.spigot.persistence;
 
-import lombok.Getter;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
@@ -41,8 +40,11 @@ public class Autosave implements Listener, IPluginLifeCycleOperations {
     private final VarLightPlugin plugin;
 
     private BukkitTask autosaveTask;
-    @Getter
     private Strategy strategy;
+
+    public Strategy getStrategy() {
+        return strategy;
+    }
 
     /**
      * <p>
