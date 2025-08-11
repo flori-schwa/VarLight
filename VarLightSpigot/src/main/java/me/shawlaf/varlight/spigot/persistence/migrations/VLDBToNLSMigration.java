@@ -10,7 +10,6 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.util.io.FileUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class VLDBToNLSMigration implements Migration<File> {

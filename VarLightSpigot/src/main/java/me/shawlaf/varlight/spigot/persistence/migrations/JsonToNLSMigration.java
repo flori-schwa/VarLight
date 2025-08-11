@@ -10,7 +10,6 @@ import me.shawlaf.varlight.util.io.FileUtil;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Objects;
 
 public class JsonToNLSMigration implements Migration<File> {
