@@ -13,7 +13,7 @@ import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.Paginator;
 import me.shawlaf.varlight.util.collections.CollectionUtil;
 import me.shawlaf.varlight.util.collections.CountingIterator;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionCoords;
 import net.md_5.bungee.api.ChatColor;
@@ -217,9 +217,9 @@ public class VarLightCommandDebug extends VarLightSubCommand {
             return;
         }
 
-        ChunkCoords chunkCoords = new ChunkCoords(chunkX, chunkZ);
+        ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
 
-        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd()));
+        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(chunkPosition.getChunkStart(), chunkPosition.getChunkEnd()));
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);

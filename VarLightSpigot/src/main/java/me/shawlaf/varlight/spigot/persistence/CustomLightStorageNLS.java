@@ -6,7 +6,7 @@ import me.shawlaf.varlight.persistence.nls.NLSFile;
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.util.IntPositionUtil;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionCoords;
 import me.shawlaf.varlight.util.pos.RegionIterator;
@@ -58,8 +58,8 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
     }
 
     @Override
-    public boolean hasChunkCustomLightData(ChunkCoords chunkCoords) {
-        return getNLSFile(chunkCoords.toRegionCoords()).hasChunkData(chunkCoords);
+    public boolean hasChunkCustomLightData(ChunkPosition chunkPosition) {
+        return getNLSFile(chunkPosition.toRegionCoords()).hasChunkData(chunkPosition);
     }
 
     @Override
@@ -112,8 +112,8 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
     }
 
     @Override
-    public void clearChunk(ChunkCoords chunkCoords) {
-        getNLSFile(chunkCoords.toRegionCoords()).clearChunk(chunkCoords);
+    public void clearChunk(ChunkPosition chunkPosition) {
+        getNLSFile(chunkPosition.toRegionCoords()).clearChunk(chunkPosition);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
                     throw new LightPersistFailedException(e);
                 }
 
-                List<ChunkCoords> affected = nlsFile.getAffectedChunks();
+                List<ChunkPosition> affected = nlsFile.getAffectedChunks();
 
                 if (affected.isEmpty()) {
                     if (nlsFile.file.exists()) {
@@ -154,8 +154,8 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
 
                 boolean anyLoaded = false;
 
-                for (ChunkCoords chunkCoords : affected) {
-                    if (forBukkitWorld.isChunkLoaded(chunkCoords.x(), chunkCoords.z())) {
+                for (ChunkPosition chunkPosition : affected) {
+                    if (forBukkitWorld.isChunkLoaded(chunkPosition.x(), chunkPosition.z())) {
                         anyLoaded = true;
                         break;
                     }

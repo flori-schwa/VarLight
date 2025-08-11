@@ -2,7 +2,7 @@ package me.shawlaf.varlight.spigot.bulk;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.bulk.exception.BulkTaskTooLargeException;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractBulkTask {
@@ -64,10 +63,10 @@ public abstract class AbstractBulkTask {
         }
     }
 
-    protected CompletableFuture<Void> ticketChunks(Iterator<ChunkCoords> chunkCoords) {
+    protected CompletableFuture<Void> ticketChunks(Iterator<ChunkPosition> chunkCoords) {
         Runnable r = () -> {
             while (chunkCoords.hasNext()) {
-                ChunkCoords next = chunkCoords.next();
+                ChunkPosition next = chunkCoords.next();
 
                 this.world.addPluginChunkTicket(next.x(), next.z(), plugin);
             }
@@ -81,10 +80,10 @@ public abstract class AbstractBulkTask {
         }
     }
 
-    protected CompletableFuture<Void> releaseTickets(Iterator<ChunkCoords> chunkCoords) {
+    protected CompletableFuture<Void> releaseTickets(Iterator<ChunkPosition> chunkCoords) {
         Runnable r = () -> {
             while (chunkCoords.hasNext()) {
-                ChunkCoords next = chunkCoords.next();
+                ChunkPosition next = chunkCoords.next();
 
                 this.world.removePluginChunkTicket(next.x(), next.z(), plugin);
             }

@@ -3,7 +3,7 @@ package me.shawlaf.varlight.spigot.nms;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.module.IPluginLifeCycleOperations;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.command.CommandSender;
 
@@ -20,22 +20,22 @@ public interface IMinecraftLightUpdater extends IPluginLifeCycleOperations {
 
     CompletableFuture<Void> updateLightMultiBlock(ICustomLightStorage lightStorage, Collection<IntPosition> positions, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkPosition chunk, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkPosition> chunkPositions, Collection<CommandSender> progressSubscribers);
 
     CompletableFuture<Set<IntPosition>> clearLightCubicArea(ICustomLightStorage lightStorage, IntPosition start, IntPosition end, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> clearLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> clearLightChunk(ICustomLightStorage lightStorage, ChunkPosition chunk, Collection<CommandSender> progressSubscribers);
 
-    CompletableFuture<Void> clearLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions, Collection<CommandSender> progressSubscribers);
+    CompletableFuture<Void> clearLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkPosition> chunkPositions, Collection<CommandSender> progressSubscribers);
 
 
-    default CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkCoords chunk) {
+    default CompletableFuture<Void> updateLightChunk(ICustomLightStorage lightStorage, ChunkPosition chunk) {
         return updateLightChunk(lightStorage, chunk, null);
     }
 
-    default CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkCoords> chunkPositions) {
+    default CompletableFuture<Void> updateLightMultiChunk(ICustomLightStorage lightStorage, Collection<ChunkPosition> chunkPositions) {
         return updateLightMultiChunk(lightStorage, chunkPositions, null);
     }
 

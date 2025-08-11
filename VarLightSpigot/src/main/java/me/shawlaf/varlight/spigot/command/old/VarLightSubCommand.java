@@ -16,7 +16,7 @@ import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.BlockTypeArgumentType;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.CollectionArgumentType;
 import me.shawlaf.varlight.spigot.command.old.commands.arguments.ItemTypeArgumentType;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -147,9 +147,9 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
     }
 
     @SuppressWarnings("unchecked")
-    protected CompletableFuture<Void> createTickets(World world, Set<ChunkCoords> chunkCoords) {
+    protected CompletableFuture<Void> createTickets(World world, Set<ChunkPosition> chunkCoords) {
         Runnable r = () -> {
-            for (ChunkCoords chunkCoord : chunkCoords) {
+            for (ChunkPosition chunkCoord : chunkCoords) {
                 world.addPluginChunkTicket(chunkCoord.x(), chunkCoord.z(), plugin);
             }
         };
@@ -162,9 +162,9 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
         }
     }
 
-    protected CompletableFuture<Void> releaseTickets(World world, Set<ChunkCoords> chunkCoords) {
+    protected CompletableFuture<Void> releaseTickets(World world, Set<ChunkPosition> chunkCoords) {
         Runnable r = () -> {
-            for (ChunkCoords chunkCoord : chunkCoords) {
+            for (ChunkPosition chunkCoord : chunkCoords) {
                 world.removePluginChunkTicket(chunkCoord.x(), chunkCoord.z(), plugin);
             }
         };

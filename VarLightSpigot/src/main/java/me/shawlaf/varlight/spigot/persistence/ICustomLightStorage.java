@@ -1,7 +1,7 @@
 package me.shawlaf.varlight.spigot.persistence;
 
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -39,10 +39,10 @@ public interface ICustomLightStorage {
 
     /**
      * Check if the given Chunk contains Custom Light Data
-     * @param chunkCoords The coordinates of the Chunk to query
+     * @param chunkPosition The coordinates of the Chunk to query
      * @return {@code true}, if the Chunk contains Custom Light data, {@code false} otherwise
      */
-    boolean hasChunkCustomLightData(ChunkCoords chunkCoords);
+    boolean hasChunkCustomLightData(ChunkPosition chunkPosition);
 
     /**
      * @param a The start Position
@@ -52,11 +52,11 @@ public interface ICustomLightStorage {
     Iterator<IntPosition> iterateAllLightSources(IntPosition a, IntPosition b);
 
     /**
-     * @param chunkCoords The Chunk Coordinates to query for all Custom Light Sources
+     * @param chunkPosition The Chunk Coordinates to query for all Custom Light Sources
      * @return an {@link Iterator} returning {@link IntPosition}s for all Custom Light Sources in the specified Chunk
      */
-    default Iterator<IntPosition> iterateLightSources(ChunkCoords chunkCoords) {
-        return iterateAllLightSources(chunkCoords.getChunkStart(), chunkCoords.getChunkEnd());
+    default Iterator<IntPosition> iterateLightSources(ChunkPosition chunkPosition) {
+        return iterateAllLightSources(chunkPosition.getChunkStart(), chunkPosition.getChunkEnd());
     }
 
     /**
@@ -79,9 +79,9 @@ public interface ICustomLightStorage {
 
     /**
      * Removes all Custom Light Data from the specified Chunk
-     * @param chunkCoords The Coordinates of the Chunk to clear
+     * @param chunkPosition The Coordinates of the Chunk to clear
      */
-    void clearChunk(ChunkCoords chunkCoords);
+    void clearChunk(ChunkPosition chunkPosition);
 
     /**
      * Used by the {@link Autosave} handler to automatically persist all Custom Light Sources in the underlying {@link World}

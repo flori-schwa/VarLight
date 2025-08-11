@@ -7,7 +7,7 @@ import me.shawlaf.varlight.spigot.bulk.exception.BulkTaskTooLargeException;
 import me.shawlaf.varlight.spigot.messages.VarLightMessages;
 import me.shawlaf.varlight.spigot.persistence.ICustomLightStorage;
 import me.shawlaf.varlight.util.collections.IteratorUtils;
-import me.shawlaf.varlight.util.pos.ChunkCoords;
+import me.shawlaf.varlight.util.pos.ChunkPosition;
 import me.shawlaf.varlight.util.pos.IntPosition;
 import me.shawlaf.varlight.util.pos.RegionIterator;
 import org.bukkit.World;
@@ -55,7 +55,7 @@ public class BulkClearTask extends AbstractBulkTask {
     @Override
     public CompletableFuture<BulkTaskResult> doRun() {
         RegionIterator iterator = new RegionIterator(this.start, this.end);
-        Set<ChunkCoords> affectedChunks = IteratorUtils.collectFromIterator(iterator.iterateChunks(), Collectors.toSet());
+        Set<ChunkPosition> affectedChunks = IteratorUtils.collectFromIterator(iterator.iterateChunks(), Collectors.toSet());
 
         try {
             checkSizeRestrictions(iterator.getAffectedChunksCount());
