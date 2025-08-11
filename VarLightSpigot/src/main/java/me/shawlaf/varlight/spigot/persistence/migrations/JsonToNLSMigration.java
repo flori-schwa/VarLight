@@ -56,7 +56,7 @@ public class JsonToNLSMigration implements Migration<File> {
             nlsFile.setCustomLuminance(bcls.getPosition(), bcls.getCustomLuminance());
         }
 
-        nlsFile.saveAndUnload();
+        nlsFile.save();
 
         if (!jsonFile.delete()) {
             throw new MigrationFailedException(this, jsonFile, "Could not delete the JSON File");

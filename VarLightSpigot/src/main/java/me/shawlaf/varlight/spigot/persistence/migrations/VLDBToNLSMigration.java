@@ -56,7 +56,7 @@ public class VLDBToNLSMigration implements Migration<File> {
                 }
             }
 
-            nlsFile.saveAndUnload();
+            nlsFile.save();
             in.close();
         }
 

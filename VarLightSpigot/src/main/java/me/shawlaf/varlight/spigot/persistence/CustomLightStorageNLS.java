@@ -140,9 +140,9 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
                 List<ChunkPosition> affected = nlsFile.getAffectedChunks();
 
                 if (affected.isEmpty()) {
-                    if (nlsFile.file.exists()) {
-                        if (!nlsFile.file.delete()) {
-                            throw new LightPersistFailedException("Could not delete file " + nlsFile.file.getAbsolutePath());
+                    if (nlsFile._file.exists()) {
+                        if (!nlsFile._file.delete()) {
+                            throw new LightPersistFailedException("Could not delete file " + nlsFile._file.getAbsolutePath());
                         } else {
                             ++deleted;
                         }
@@ -167,7 +167,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
             }
 
             for (RegionCoords regionCoords : regionsToUnload) {
-                worldMap.remove(regionCoords).unload();
+                worldMap.remove(regionCoords);
             }
         }
 
