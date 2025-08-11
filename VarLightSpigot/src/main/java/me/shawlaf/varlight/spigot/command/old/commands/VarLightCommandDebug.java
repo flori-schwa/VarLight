@@ -246,14 +246,14 @@ public class VarLightCommandDebug extends VarLightSubCommand {
                     "%s = %d (%s)",
                     lightSource.toShortString(),
                     manager.getCustomLuminance(lightSource),
-                    plugin.getNmsAdapter().getKey(player.getWorld().getBlockAt(lightSource.x, lightSource.y, lightSource.z).getType()))
+                    plugin.getNmsAdapter().getKey(player.getWorld().getBlockAt(lightSource.x(), lightSource.y(), lightSource.z()).getType()))
             );
 
             textComponent.setColor(ChatColor.GREEN);
 
             textComponent.setClickEvent(new ClickEvent(
                     ClickEvent.Action.RUN_COMMAND,
-                    String.format("/tp %d %d %d", lightSource.x, lightSource.y, lightSource.z)
+                    String.format("/tp %d %d %d", lightSource.x(), lightSource.y(), lightSource.z())
             ));
 
             textComponent.setHoverEvent(new HoverEvent(

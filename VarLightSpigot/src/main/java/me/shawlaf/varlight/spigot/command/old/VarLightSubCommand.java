@@ -150,7 +150,7 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
     protected CompletableFuture<Void> createTickets(World world, Set<ChunkCoords> chunkCoords) {
         Runnable r = () -> {
             for (ChunkCoords chunkCoord : chunkCoords) {
-                world.addPluginChunkTicket(chunkCoord.x, chunkCoord.z, plugin);
+                world.addPluginChunkTicket(chunkCoord.x(), chunkCoord.z(), plugin);
             }
         };
 
@@ -165,7 +165,7 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
     protected CompletableFuture<Void> releaseTickets(World world, Set<ChunkCoords> chunkCoords) {
         Runnable r = () -> {
             for (ChunkCoords chunkCoord : chunkCoords) {
-                world.removePluginChunkTicket(chunkCoord.x, chunkCoord.z, plugin);
+                world.removePluginChunkTicket(chunkCoord.x(), chunkCoord.z(), plugin);
             }
         };
 

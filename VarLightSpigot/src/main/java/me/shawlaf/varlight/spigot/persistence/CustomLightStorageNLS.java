@@ -155,7 +155,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
                 boolean anyLoaded = false;
 
                 for (ChunkCoords chunkCoords : affected) {
-                    if (forBukkitWorld.isChunkLoaded(chunkCoords.x, chunkCoords.z)) {
+                    if (forBukkitWorld.isChunkLoaded(chunkCoords.x(), chunkCoords.z())) {
                         anyLoaded = true;
                         break;
                     }
@@ -187,7 +187,7 @@ public class CustomLightStorageNLS implements ICustomLightStorage {
                     if (file.exists()) {
                         nlsFile = NLSFile.existingFile(file, plugin.getVarLightConfig().shouldDeflate());
                     } else {
-                        nlsFile = NLSFile.newFile(file, regionCoords.x, regionCoords.z, plugin.getVarLightConfig().shouldDeflate());
+                        nlsFile = NLSFile.newFile(file, regionCoords.x(), regionCoords.z(), plugin.getVarLightConfig().shouldDeflate());
                     }
                 } catch (IOException e) {
                     throw new VarLightIOException(e);

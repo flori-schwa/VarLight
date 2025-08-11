@@ -20,7 +20,7 @@ public final class IntPositionUtil {
     }
 
     public static Location toLocation(IntPosition self, World world) {
-        return new Location(world, self.x, self.y, self.z);
+        return new Location(world, self.x(), self.y(), self.z());
     }
 
     public static Block toBlock(IntPosition self, World world) {

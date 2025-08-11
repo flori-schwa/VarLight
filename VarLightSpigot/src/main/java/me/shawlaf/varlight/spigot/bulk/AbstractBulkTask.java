@@ -69,7 +69,7 @@ public abstract class AbstractBulkTask {
             while (chunkCoords.hasNext()) {
                 ChunkCoords next = chunkCoords.next();
 
-                this.world.addPluginChunkTicket(next.x, next.z, plugin);
+                this.world.addPluginChunkTicket(next.x(), next.z(), plugin);
             }
         };
 
@@ -86,7 +86,7 @@ public abstract class AbstractBulkTask {
             while (chunkCoords.hasNext()) {
                 ChunkCoords next = chunkCoords.next();
 
-                this.world.removePluginChunkTicket(next.x, next.z, plugin);
+                this.world.removePluginChunkTicket(next.x(), next.z(), plugin);
             }
         };
 
