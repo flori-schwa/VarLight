@@ -1,5 +1,6 @@
 package me.shawlaf.varlight.spigot.api;
 
+import me.shawlaf.varlight.adapter.IWorld;
 import me.shawlaf.varlight.exception.VarLightIOException;
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
@@ -331,6 +332,8 @@ public interface IVarLightAPI {
     default CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel) {
         return runBulkFill(world, source, start, end, lightLevel, x -> true);
     }
+
+    IWorld adapt(World bukkitWorld);
 
     /**
      * <p>

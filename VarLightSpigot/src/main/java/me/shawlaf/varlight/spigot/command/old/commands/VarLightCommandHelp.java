@@ -38,7 +38,7 @@ public class VarLightCommandHelp extends VarLightSubCommand {
     @NotNull
     @Override
     public LiteralArgumentBuilder<CommandSender> build(LiteralArgumentBuilder<CommandSender> literalArgumentBuilder) {
-        Stream.concat(Arrays.stream(rootCommand.getSubCommands()), Stream.of(this)).forEach(subCommand -> {
+        Stream.concat(Arrays.stream(_rootCommand.getSubCommands()), Stream.of(this)).forEach(subCommand -> {
             literalArgumentBuilder.then(
                     literalArgument(subCommand.getName())
                             .requires(subCommand::meetsRequirement)
@@ -77,7 +77,7 @@ public class VarLightCommandHelp extends VarLightSubCommand {
     private String getFullHelpRaw(CommandSender commandSender) {
         StringBuilder builder = new StringBuilder();
 
-        for (VarLightSubCommand subCommand : rootCommand.getSubCommands()) {
+        for (VarLightSubCommand subCommand : _rootCommand.getSubCommands()) {
             String help = subCommand.getUsageString(commandSender);
 
             if (!help.isEmpty() && subCommand.meetsRequirement(commandSender)) {

@@ -28,7 +28,7 @@ public class VarLightCommandStepSize extends VarLightSubCommand {
     @NotNull
     @Override
     public String getDescription() {
-        return "Edit the Step size when using " + plugin.getNmsAdapter().getKey(plugin.getApi().getLightUpdateItem()) + ".";
+        return "Edit the Step size when using " + _plugin.getNmsAdapter().getKey(_plugin.getApi().getLightUpdateItem()) + ".";
     }
 
     @Override
@@ -53,7 +53,7 @@ public class VarLightCommandStepSize extends VarLightSubCommand {
         }
 
         Player player = (Player) context.getSource();
-        success(this, player, String.format("You current stepsize is %d", plugin.getApi().getStepsizeManager().getStepSize(player)));
+        success(this, player, String.format("You current stepsize is %d", _plugin.getApi().getStepsizeManager().getStepSize(player)));
 
         return SUCCESS;
     }
@@ -69,7 +69,7 @@ public class VarLightCommandStepSize extends VarLightSubCommand {
 
         int newStepSize = context.getArgument(ARG_STEPSIZE.getName(), int.class);
 
-        plugin.getApi().getStepsizeManager().setStepSize(player, newStepSize);
+        _plugin.getApi().getStepsizeManager().setStepSize(player, newStepSize);
 
         success(this, player, String.format("Set your step size to %d", newStepSize));
 

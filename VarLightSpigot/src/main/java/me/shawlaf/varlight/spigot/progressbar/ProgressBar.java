@@ -2,7 +2,6 @@ package me.shawlaf.varlight.spigot.progressbar;
 
 import me.shawlaf.varlight.spigot.VarLightPlugin;
 import me.shawlaf.varlight.spigot.async.Ticks;
-import me.shawlaf.varlight.util.StringUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -80,9 +79,9 @@ public class ProgressBar implements AutoCloseable {
                 .color(ChatColor.GREEN)
                 .append(" [")
                     .color(ChatColor.DARK_GRAY)
-                .append(StringUtil.repeat("|", Math.max(0, fill)))
+                .append("|".repeat(Math.max(0, fill)))
                     .color(ChatColor.GREEN)
-                .append(StringUtil.repeat("|", Math.max(0, 50 - fill)))
+                .append("|".repeat(Math.max(0, 50 - fill)))
                     .color(ChatColor.GRAY)
                 .append("]")
                     .color(ChatColor.DARK_GRAY)
@@ -95,9 +94,9 @@ public class ProgressBar implements AutoCloseable {
         StringBuilder builder = new StringBuilder("[");
         int fill = percentage / 2;
 
-        builder.append(StringUtil.repeat("=", Math.max(0, fill - 1)));
+        builder.append("=".repeat(Math.max(0, fill - 1)));
         builder.append('>');
-        builder.append(StringUtil.repeat(" ", Math.max(0, 50 - fill - 1)));
+        builder.append(" ".repeat(Math.max(0, 50 - fill - 1)));
         builder.append(String.format("] (%d%%)", percentage));
 
         return builder.toString().trim();

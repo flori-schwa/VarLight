@@ -95,7 +95,7 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
         World world = source.getWorld();
         RegionIterator targetArea = new RegionIterator(IntPositionUtil.toIntPosition(selection[0]), IntPositionUtil.toIntPosition(selection[1]));
 
-        plugin.getApi().getChatPromptManager().runPrompt(
+        _plugin.getApi().getChatPromptManager().runPrompt(
                 source,
                 new ComponentBuilder("[VarLight] Are you sure, you want to ")
                         .append("delete all Light sources in your selected area? (" + targetArea.getSize() + " total blocks, " + targetArea.iterateChunks().getSize() + " chunks)").color(ChatColor.RED)
@@ -110,7 +110,7 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
     private void clear(LivingEntity source, World world, Location[] selection) {
         if (Bukkit.isPrimaryThread()) {
             // Ensure this is running on a different thread
-            plugin.getApi().getAsyncExecutor().submit(() -> clear(source, world, selection));
+            _plugin.getApi().getAsyncExecutor().submit(() -> clear(source, world, selection));
             return;
         }
 
@@ -119,7 +119,7 @@ public class VarLightCommandClear extends VarLightSubCommand implements IPlayerS
 
         info(this, source, "Clearing Custom Light data in selection...");
 
-        plugin.getApi().runBulkClear(source.getWorld(), source, a, b).join().finish(source);
+        _plugin.getApi().runBulkClear(source.getWorld(), source, a, b).join().finish(source);
     }
 
     @Override

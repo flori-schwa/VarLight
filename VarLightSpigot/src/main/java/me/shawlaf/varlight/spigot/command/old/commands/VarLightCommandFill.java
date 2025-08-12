@@ -71,14 +71,14 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
                                         .then(
                                                 literalArgument("include")
                                                         .then(
-                                                                collectionArgument(ARG_NAME_POSITIVE_FILTER, BlockTypeArgumentType.block(plugin))
+                                                                collectionArgument(ARG_NAME_POSITIVE_FILTER, BlockTypeArgumentType.block(_plugin))
                                                                         .executes(c -> fillPosFilter(c, false))
                                                         )
                                         )
                                         .then(
                                                 literalArgument("exclude")
                                                         .then(
-                                                                collectionArgument(ARG_NAME_NEGATIVE_FILTER, BlockTypeArgumentType.block(plugin))
+                                                                collectionArgument(ARG_NAME_NEGATIVE_FILTER, BlockTypeArgumentType.block(_plugin))
                                                                         .executes(c -> fillNegFilter(c, false))
                                                         )
                                         )
@@ -93,14 +93,14 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
                             .then(
                                     literalArgument("include")
                                             .then(
-                                                    collectionArgument(ARG_NAME_POSITIVE_FILTER, BlockTypeArgumentType.block(plugin))
+                                                    collectionArgument(ARG_NAME_POSITIVE_FILTER, BlockTypeArgumentType.block(_plugin))
                                                             .executes(c -> fillPosFilter(c, true))
                                             )
                             )
                             .then(
                                     literalArgument("exclude")
                                             .then(
-                                                    collectionArgument(ARG_NAME_NEGATIVE_FILTER, BlockTypeArgumentType.block(plugin))
+                                                    collectionArgument(ARG_NAME_NEGATIVE_FILTER, BlockTypeArgumentType.block(_plugin))
                                                             .executes(c -> fillNegFilter(c, true))
                                             )
                             )
@@ -181,9 +181,9 @@ public class VarLightCommandFill extends VarLightSubCommand implements IPlayerSe
     }
 
     private int fill(Player source, Location pos1, Location pos2, int lightLevel, Predicate<Block> filter) {
-        plugin.getApi().getAsyncExecutor().submit(
+        _plugin.getApi().getAsyncExecutor().submit(
                 () -> {
-                    plugin.getApi().runBulkFill(source.getWorld(), source, IntPositionUtil.toIntPosition(pos1), IntPositionUtil.toIntPosition(pos2), lightLevel, filter).join().finish(source);
+                    _plugin.getApi().runBulkFill(source.getWorld(), source, IntPositionUtil.toIntPosition(pos1), IntPositionUtil.toIntPosition(pos2), lightLevel, filter).join().finish(source);
                 }
         );
 

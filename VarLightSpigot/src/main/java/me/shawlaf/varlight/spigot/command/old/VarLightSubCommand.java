@@ -32,14 +32,14 @@ import java.util.function.ToIntFunction;
 
 public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugin> {
 
-    protected final VarLightPlugin plugin;
-    protected final VarLightCommand rootCommand;
-    private final String name;
+    protected final VarLightPlugin _plugin;
+    protected final VarLightCommand _rootCommand;
+    private final String _name;
 
     public VarLightSubCommand(VarLightCommand rootCommand, String name) {
-        this.rootCommand = rootCommand;
-        this.plugin = rootCommand.getPlugin();
-        this.name = name;
+        _rootCommand = rootCommand;
+        _plugin = rootCommand.getPlugin();
+        _name = name;
     }
 
     protected static LiteralArgumentBuilder<CommandSender> literalArgument(String literal) {
@@ -96,12 +96,12 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
 
     @Override
     public final @NotNull VarLightPlugin getPlugin() {
-        return plugin;
+        return _plugin;
     }
 
     @Override
     public final @NotNull String getName() {
-        return name;
+        return _name;
     }
 
     @Override
@@ -121,7 +121,7 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
     }
 
     public CommandNode<CommandSender> getNode() {
-        return rootCommand.getCommandDispatcher().getRoot().getChildren().iterator().next().getChild(getName());
+        return _rootCommand.getCommandDispatcher().getRoot().getChildren().iterator().next().getChild(getName());
     }
 
     @Override
@@ -131,15 +131,15 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
 
     @Override
     public @NotNull String getUsageString(CommandSender commandSender) {
-        return "/varlight " + rootCommand.getCommandDispatcher().getSmartUsage(rootCommand.getCommandDispatcher().getRoot().getChild(rootCommand.getName()), commandSender).get(getNode());
+        return "/varlight " + _rootCommand.getCommandDispatcher().getSmartUsage(_rootCommand.getCommandDispatcher().getRoot().getChild(_rootCommand.getName()), commandSender).get(getNode());
     }
 
     protected RequiredArgumentBuilder<CommandSender, Material> item(String name) {
-        return RequiredArgumentBuilder.argument(name, ItemTypeArgumentType.item(plugin));
+        return RequiredArgumentBuilder.argument(name, ItemTypeArgumentType.item(_plugin));
     }
 
     protected RequiredArgumentBuilder<CommandSender, Material> block(String name) {
-        return RequiredArgumentBuilder.argument(name, BlockTypeArgumentType.block(plugin));
+        return RequiredArgumentBuilder.argument(name, BlockTypeArgumentType.block(_plugin));
     }
 
     protected <E extends Enum<E>> RequiredArgumentBuilder<CommandSender, E> enumArgument(String name, Class<E> enumType) {
@@ -150,7 +150,7 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
     protected CompletableFuture<Void> createTickets(World world, Set<ChunkPosition> chunkCoords) {
         Runnable r = () -> {
             for (ChunkPosition chunkCoord : chunkCoords) {
-                world.addPluginChunkTicket(chunkCoord.x(), chunkCoord.z(), plugin);
+                world.addPluginChunkTicket(chunkCoord.x(), chunkCoord.z(), _plugin);
             }
         };
 
@@ -158,14 +158,14 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
             r.run();
             return CompletableFuture.completedFuture(null);
         } else {
-            return plugin.getApi().getSyncExecutor().submit(r, null);
+            return _plugin.getApi().getSyncExecutor().submit(r, null);
         }
     }
 
     protected CompletableFuture<Void> releaseTickets(World world, Set<ChunkPosition> chunkCoords) {
         Runnable r = () -> {
             for (ChunkPosition chunkCoord : chunkCoords) {
-                world.removePluginChunkTicket(chunkCoord.x(), chunkCoord.z(), plugin);
+                world.removePluginChunkTicket(chunkCoord.x(), chunkCoord.z(), _plugin);
             }
         };
 
@@ -173,7 +173,7 @@ public abstract class VarLightSubCommand implements ICommandAccess<VarLightPlugi
             r.run();
             return CompletableFuture.completedFuture(null);
         } else {
-            return plugin.getApi().getSyncExecutor().submit(r, null);
+            return _plugin.getApi().getSyncExecutor().submit(r, null);
         }
     }
 

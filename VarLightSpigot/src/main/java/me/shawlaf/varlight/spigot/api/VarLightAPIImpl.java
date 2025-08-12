@@ -1,8 +1,10 @@
 package me.shawlaf.varlight.spigot.api;
 
 
+import me.shawlaf.varlight.adapter.IWorld;
 import me.shawlaf.varlight.spigot.VarLightConfig;
 import me.shawlaf.varlight.spigot.VarLightPlugin;
+import me.shawlaf.varlight.spigot.adapters.VarLightWorldAdapterManager;
 import me.shawlaf.varlight.spigot.async.AbstractBukkitExecutor;
 import me.shawlaf.varlight.spigot.async.BukkitAsyncExecutorService;
 import me.shawlaf.varlight.spigot.async.BukkitSyncExecutorService;
@@ -41,31 +43,38 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
-    private final VarLightPlugin plugin;
-    private final Map<UUID, ICustomLightStorage> persistenceManagers = new HashMap<>();
+    private final VarLightPlugin _plugin;
+    private final Map<UUID, ICustomLightStorage> _persistenceManagers = new HashMap<>();
 
-    private final Map<Class<? extends IPluginLifeCycleOperations>, IPluginLifeCycleOperations> modules = new HashMap<>();
+    private final Map<Class<? extends IPluginLifeCycleOperations>, IPluginLifeCycleOperations> _modules = new HashMap<>();
 
-    private final AbstractBukkitExecutor syncExecutor;
-    private final AbstractBukkitExecutor asyncExecutor;
+    private final AbstractBukkitExecutor _syncExecutor;
+    private final AbstractBukkitExecutor _asyncExecutor;
 
     @APIModule
-    private Autosave autosaveHandler;
+    private Autosave _autosaveHandler;
     @APIModule
-    private ChatPrompts chatPromptManager;
+    private ChatPrompts _chatPromptManager;
     @APIModule
-    private StepsizeHandler stepsizeManager;
+    private StepsizeHandler _stepsizeManager;
+    @APIModule
+    private VarLightWorldAdapterManager _worldAdapterManager;
 
-    private Material lightUpdateItem;
+    private Material _lightUpdateItem;
 
     public VarLightAPIImpl(VarLightPlugin plugin) {
-        this.plugin = plugin;
+        _plugin = plugin;
 
-        this.syncExecutor = new BukkitSyncExecutorService(plugin);
-        this.asyncExecutor = new BukkitAsyncExecutorService(plugin);
+        _syncExecutor = new BukkitSyncExecutorService(plugin);
+        _asyncExecutor = new BukkitAsyncExecutorService(plugin);
 
+        initializeApiModules(plugin);
+        _lightUpdateItem = loadLightUpdateItem(plugin);
+    }
+
+    private void initializeApiModules(VarLightPlugin plugin) {
         try {
-            for (Field field : this.getClass().getDeclaredFields()) {
+            for (Field field : getClass().getDeclaredFields()) {
                 if (!field.isAnnotationPresent(APIModule.class)) {
                     continue;
                 }
@@ -84,20 +93,18 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
                  IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-
-        loadLightUpdateItem();
     }
 
     public void onLoad() {
-        modules.values().forEach(IPluginLifeCycleOperations::onLoad);
+        _modules.values().forEach(IPluginLifeCycleOperations::onLoad);
     }
 
     public void onEnable() {
-        modules.values().forEach(IPluginLifeCycleOperations::onEnable);
+        _modules.values().forEach(IPluginLifeCycleOperations::onEnable);
     }
 
     public void onDisable() {
-        modules.values().forEach(IPluginLifeCycleOperations::onDisable);
+        _modules.values().forEach(IPluginLifeCycleOperations::onDisable);
     }
 
     // region Impl
@@ -107,37 +114,37 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     @Override
     public VarLightConfig getConfiguration() {
-        return plugin.getVarLightConfig();
+        return _plugin.getVarLightConfig();
     }
 
     @Override
     public AbstractBukkitExecutor getSyncExecutor() {
-        return syncExecutor;
+        return _syncExecutor;
     }
 
     @Override
     public AbstractBukkitExecutor getAsyncExecutor() {
-        return asyncExecutor;
+        return _asyncExecutor;
     }
 
     @Override
     public Autosave getAutosaveHandler() {
-        return autosaveHandler;
+        return _autosaveHandler;
     }
 
     @Override
     public ChatPrompts getChatPromptManager() {
-        return chatPromptManager;
+        return _chatPromptManager;
     }
 
     @Override
     public StepsizeHandler getStepsizeManager() {
-        return stepsizeManager;
+        return _stepsizeManager;
     }
 
     @Override
     public Material getLightUpdateItem() {
-        return lightUpdateItem;
+        return _lightUpdateItem;
     }
 
     @Override
@@ -151,12 +158,12 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     public @Nullable ICustomLightStorage getLightStorage(World world) {
         Objects.requireNonNull(world, "World may not be null");
 
-        ICustomLightStorage cls = persistenceManagers.get(world.getUID());
+        ICustomLightStorage cls = _persistenceManagers.get(world.getUID());
 
         if (cls == null) {
-            if (plugin.getVarLightConfig().getVarLightEnabledWorldNames().contains(world.getName())) {
-                cls = new CustomLightStorageNLS(world, plugin);
-                persistenceManagers.put(world.getUID(), cls);
+            if (_plugin.getVarLightConfig().getVarLightEnabledWorldNames().contains(world.getName())) {
+                cls = new CustomLightStorageNLS(world, _plugin);
+                _persistenceManagers.put(world.getUID(), cls);
             }
         }
 
@@ -166,7 +173,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     @Override
     @NotNull
     public Collection<ICustomLightStorage> getAllActiveVarLightWorlds() {
-        return persistenceManagers.values();
+        return _persistenceManagers.values();
     }
 
     @Override
@@ -184,13 +191,13 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     @Override
     public @NotNull GlowItemStack createGlowItemStack(@NotNull ItemStack base, int lightLevel) {
-        return new GlowItemStack(plugin, Objects.requireNonNull(base), lightLevel);
+        return new GlowItemStack(_plugin, Objects.requireNonNull(base), lightLevel);
     }
 
     @Override
     public @Nullable GlowItemStack importGlowItemStack(@NotNull ItemStack glowingStack) {
         try {
-            return new GlowItemStack(plugin, Objects.requireNonNull(glowingStack));
+            return new GlowItemStack(_plugin, Objects.requireNonNull(glowingStack));
         } catch (IllegalArgumentException e) {
             return null;
         }
@@ -199,7 +206,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     @NotNull
     public CompletableFuture<LightUpdateResult> setCustomLuminance(@NotNull World world, @NotNull IntPosition position, int customLuminance, boolean update, LightUpdateCause cause) {
         if (!Bukkit.isPrimaryThread()) {
-            return syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update, cause)).join();
+            return _syncExecutor.submit(() -> setCustomLuminance(world, position, customLuminance, update, cause)).join();
         }
 
         Objects.requireNonNull(world, "World may not be null");
@@ -217,7 +224,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
             return completedFuture(LightUpdateResult.fifteenReached(fromLight, customLuminance));
         }
 
-        if (plugin.getNmsAdapter().isIllegalBlock(block)) {
+        if (_plugin.getNmsAdapter().isIllegalBlock(block)) {
             return completedFuture(LightUpdateResult.invalidBlock(fromLight, customLuminance));
         }
 
@@ -242,8 +249,8 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
         LightUpdateResult result = LightUpdateResult.updated(finalFromLight, updateEvent.getToLight());
 
         if (update) {
-            return asyncExecutor.submit(() -> {
-                plugin.getLightUpdater().updateLightSingleBlock(cls, position).join();
+            return _asyncExecutor.submit(() -> {
+                _plugin.getLightUpdater().updateLightSingleBlock(cls, position).join();
 
                 return result;
             });
@@ -256,7 +263,7 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
         if (Bukkit.isPrimaryThread()) {
             runnable.run();
         } else {
-            syncExecutor.submit(runnable);
+            _syncExecutor.submit(runnable);
         }
     }
 
@@ -278,12 +285,12 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
 
     @Override
     public CompletableFuture<BulkTaskResult> runBulkClear(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end) {
-        return new BulkClearTask(plugin, Objects.requireNonNull(world), Objects.requireNonNull(source), Objects.requireNonNull(start), Objects.requireNonNull(end)).run();
+        return new BulkClearTask(_plugin, Objects.requireNonNull(world), Objects.requireNonNull(source), Objects.requireNonNull(start), Objects.requireNonNull(end)).run();
     }
 
     @Override
     public CompletableFuture<BulkTaskResult> runBulkFill(@NotNull World world, @NotNull CommandSender source, @NotNull IntPosition start, @NotNull IntPosition end, int lightLevel, @Nullable Predicate<Block> filter) {
-        return new BulkFillTask(plugin, Objects.requireNonNull(world), Objects.requireNonNull(source), Objects.requireNonNull(start), Objects.requireNonNull(end), lightLevel, filter).run();
+        return new BulkFillTask(_plugin, Objects.requireNonNull(world), Objects.requireNonNull(source), Objects.requireNonNull(start), Objects.requireNonNull(end), lightLevel, filter).run();
     }
 
     @Override
@@ -292,10 +299,19 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
             item = Material.GLOWSTONE_DUST;
         }
 
-        plugin.getConfig().set(VarLightConfig.CONFIG_KEY_VARLIGHT_ITEM, item.getKey().toString());
-        plugin.saveConfig();
+        _plugin.getConfig().set(VarLightConfig.CONFIG_KEY_VARLIGHT_ITEM, item.getKeyOrThrow().toString());
+        _plugin.saveConfig();
 
-        loadLightUpdateItem();
+        _lightUpdateItem = loadLightUpdateItem(_plugin);
+    }
+
+    // endregion
+
+    // region Adapters
+
+    @Override
+    public IWorld adapt(World bukkitWorld) {
+        return _worldAdapterManager.adapt(bukkitWorld);
     }
 
     // endregion
@@ -303,12 +319,13 @@ public class VarLightAPIImpl implements IVarLightAPI, IVarLightAPI.Internal {
     // region Internals
 
     public <M extends IPluginLifeCycleOperations> void addModule(M module) {
-        this.modules.put(module.getClass(), module);
+        _modules.put(module.getClass(), module);
     }
 
-    private void loadLightUpdateItem() {
-        this.lightUpdateItem = plugin.getVarLightConfig().loadLightUpdateItem();
-        plugin.getLogger().info(String.format("Using \"%s\" as the Light Update Item", lightUpdateItem.getKey()));
+    private static Material loadLightUpdateItem(VarLightPlugin plugin) {
+        Material lui = plugin.getVarLightConfig().loadLightUpdateItem();
+        plugin.getLogger().info(String.format("Using \"%s\" as the Light Update Item", lui.getKeyOrThrow()));
+        return lui;
     }
 
     // endregion

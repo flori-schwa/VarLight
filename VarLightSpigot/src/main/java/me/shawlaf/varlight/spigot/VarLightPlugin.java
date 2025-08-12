@@ -14,7 +14,6 @@ import me.shawlaf.varlight.spigot.persistence.migrations.VLDBToNLSMigration;
 import me.shawlaf.varlight.spigot.updatecheck.VarLightUpdateCheck;
 import me.shawlaf.varlight.util.MessageUtil;
 import me.shawlaf.varlight.util.NumericMajorMinorVersion;
-import me.shawlaf.varlight.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -144,7 +143,7 @@ public class VarLightPlugin extends JavaPlugin {
     // region Util
 
     private void startUpError(String message) {
-        final String sep = StringUtil.repeat("-", 80);
+        final String sep = "-".repeat(80);
         final String[] msg = MessageUtil.splitLongMessage(message, sep.length());
 
         getLogger().severe(sep);

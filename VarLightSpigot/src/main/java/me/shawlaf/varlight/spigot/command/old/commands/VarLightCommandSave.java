@@ -60,7 +60,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
 
         ICustomLightStorage cls;
 
-        if ((cls = plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
+        if ((cls = _plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
             failure(this, player, VarLightMessages.varLightNotActiveInWorld(player.getWorld()));
 
             return FAILURE;
@@ -71,7 +71,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
     }
 
     private int saveAll(CommandContext<CommandSender> context) {
-        for (ICustomLightStorage wlp : plugin.getApi().unsafe().getAllActiveVarLightWorlds()) {
+        for (ICustomLightStorage wlp : _plugin.getApi().unsafe().getAllActiveVarLightWorlds()) {
             wlp.save(context.getSource(), true);
         }
 
@@ -83,7 +83,7 @@ public class VarLightCommandSave extends VarLightSubCommand {
 
         ICustomLightStorage cls;
 
-        if ((cls = plugin.getApi().unsafe().getLightStorage(world)) == null) {
+        if ((cls = _plugin.getApi().unsafe().getLightStorage(world)) == null) {
             failure(this, context.getSource(), VarLightMessages.varLightNotActiveInWorld(world));
 
             return FAILURE;

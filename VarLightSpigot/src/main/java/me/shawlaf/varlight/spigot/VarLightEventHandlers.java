@@ -61,16 +61,14 @@ public class VarLightEventHandlers implements Listener {
             return;
         }
 
-        ICustomLightStorage cls;
 
-        if ((cls = plugin.getApi().unsafe().getLightStorage(e.getClickedBlock().getWorld())) == null) {
+        if (!plugin.getApi().isVarLightEnabled(e.getClickedBlock().getWorld())) {
             CommandResult.failure(plugin.getCommand(), e.getPlayer(), VarLightMessages.varLightNotActiveInWorld(e.getClickedBlock().getWorld()));
             return;
         }
 
         IntPosition clickedBlock = IntPositionUtil.toIntPosition(e.getClickedBlock());
-
-        int customLuminance = cls.getCustomLuminance(clickedBlock);
+        int customLuminance = plugin.getApi().getCustomLuminance(e.getClickedBlock().getLocation());
 
         if (customLuminance == 0) {
             CommandResult.info(plugin.getCommand(), e.getPlayer(), String.format("No custom light source present at Position %s", clickedBlock.toShortString()), ChatColor.RED);

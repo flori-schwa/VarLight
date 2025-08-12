@@ -1,5 +1,6 @@
 package me.shawlaf.varlight.spigot.persistence;
 
+import me.shawlaf.varlight.adapter.IWorld;
 import me.shawlaf.varlight.persistence.nls.common.exception.PositionOutOfBoundsException;
 import me.shawlaf.varlight.util.pos.ChunkPosition;
 import me.shawlaf.varlight.util.pos.IntPosition;
@@ -55,8 +56,8 @@ public interface ICustomLightStorage {
      * @param chunkPosition The Chunk Coordinates to query for all Custom Light Sources
      * @return an {@link Iterator} returning {@link IntPosition}s for all Custom Light Sources in the specified Chunk
      */
-    default Iterator<IntPosition> iterateLightSources(ChunkPosition chunkPosition) {
-        return iterateAllLightSources(chunkPosition.getChunkStart(), chunkPosition.getChunkEnd());
+    default Iterator<IntPosition> iterateLightSources(ChunkPosition chunkPosition, IWorld world) {
+        return iterateAllLightSources(chunkPosition.getChunkStart(world), chunkPosition.getChunkEnd(world));
     }
 
     /**

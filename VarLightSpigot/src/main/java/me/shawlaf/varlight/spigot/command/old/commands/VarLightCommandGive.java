@@ -61,7 +61,7 @@ public class VarLightCommandGive extends VarLightSubCommand {
         ItemStack base = new ItemStack(type);
 
         while (given < amount) {
-            ItemStack toGive = plugin.getNmsAdapter().makeGlowingStack(base, lightLevel);
+            ItemStack toGive = _plugin.getNmsAdapter().makeGlowingStack(base, lightLevel);
             toGive.setAmount(Math.min(64, amount - given));
 
             if (toGive.getAmount() > 0) {
@@ -74,7 +74,7 @@ public class VarLightCommandGive extends VarLightSubCommand {
                 String.format("%s gave %d \"Glowing %s\" to %s",
                         context.getSource().getName(),
                         amount,
-                        plugin.getNmsAdapter().getLocalizedBlockName(type),
+                        _plugin.getNmsAdapter().getLocalizedBlockName(type),
                         target.getName())
         );
 

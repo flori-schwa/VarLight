@@ -89,7 +89,7 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
 
         ICustomLightStorage cls;
 
-        if ((cls = plugin.getApi().unsafe().getLightStorage(world)) == null) {
+        if ((cls = _plugin.getApi().unsafe().getLightStorage(world)) == null) {
             failure(this, source, VarLightMessages.varLightNotActiveInWorld(world));
 
             return FAILURE;
@@ -103,13 +103,13 @@ public class VarLightCommandUpdate extends VarLightSubCommand {
             return FAILURE;
         }
 
-        if (plugin.getNmsAdapter().isIllegalBlock(location.getBlock())) {
+        if (_plugin.getNmsAdapter().isIllegalBlock(location.getBlock())) {
             failure(this, source, String.format("%s cannot be used as a custom light source!", location.getBlock().getType().name()));
 
             return FAILURE;
         }
 
-        plugin.getApi().setCustomLuminance(location, toLight).thenAccept(result -> {
+        _plugin.getApi().setCustomLuminance(location, toLight).thenAccept(result -> {
             if (!result.isSuccess()) {
                 failure(this, source, result.getMessage());
             } else {

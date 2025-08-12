@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import me.shawlaf.command.result.CommandResult;
+import me.shawlaf.varlight.adapter.IWorld;
 import me.shawlaf.varlight.spigot.command.old.VarLightCommand;
 import me.shawlaf.varlight.spigot.command.old.VarLightSubCommand;
 import me.shawlaf.varlight.spigot.messages.VarLightMessages;
@@ -107,7 +108,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
                         return FAILURE;
                     }
 
-                    ((Player) context.getSource()).getInventory().addItem(plugin.getNmsAdapter().makeVarLightDebugStick());
+                    ((Player) context.getSource()).getInventory().addItem(_plugin.getNmsAdapter().makeVarLightDebugStick());
                     ;
 
                     return SUCCESS;
@@ -185,14 +186,14 @@ public class VarLightCommandDebug extends VarLightSubCommand {
 
         ICustomLightStorage cls;
 
-        if ((cls = plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
+        if ((cls = _plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
             success(this, player, VarLightMessages.varLightNotActiveInWorld(player.getWorld()));
             return;
         }
 
+        IWorld world = _plugin.getApi().adapt(player.getWorld());
         RegionCoords regionCoords = new RegionCoords(regionX, regionZ);
-
-        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(regionCoords.getRegionStart(), regionCoords.getRegionEnd()));
+        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(regionCoords.getRegionStart(world), regionCoords.getRegionEnd(world)));
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
@@ -212,14 +213,14 @@ public class VarLightCommandDebug extends VarLightSubCommand {
     private void listLightSourcesInChunk(Player player, int chunkX, int chunkZ, int page) {
         ICustomLightStorage cls;
 
-        if ((cls = plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
+        if ((cls = _plugin.getApi().unsafe().getLightStorage(player.getWorld())) == null) {
             success(this, player, VarLightMessages.varLightNotActiveInWorld(player.getWorld()));
             return;
         }
 
+        IWorld world = _plugin.getApi().adapt(player.getWorld());
         ChunkPosition chunkPosition = new ChunkPosition(chunkX, chunkZ);
-
-        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateAllLightSources(chunkPosition.getChunkStart(), chunkPosition.getChunkEnd()));
+        CountingIterator<IntPosition> all = CollectionUtil.createCountingIterator(cls.iterateLightSources(chunkPosition, world));
 
         try {
             Iterator<IntPosition> pageList = Paginator.paginateEntriesIterator(all, PAGE_SIZE, page);
@@ -246,7 +247,7 @@ public class VarLightCommandDebug extends VarLightSubCommand {
                     "%s = %d (%s)",
                     lightSource.toShortString(),
                     manager.getCustomLuminance(lightSource),
-                    plugin.getNmsAdapter().getKey(player.getWorld().getBlockAt(lightSource.x(), lightSource.y(), lightSource.z()).getType()))
+                    _plugin.getNmsAdapter().getKey(player.getWorld().getBlockAt(lightSource.x(), lightSource.y(), lightSource.z()).getType()))
             );
 
             textComponent.setColor(ChatColor.GREEN);
